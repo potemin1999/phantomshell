@@ -1,0 +1,61 @@
+--SYNTAX--
+1. Очень явное объявление переменных:
+var minValue : int;
+var _bootObject; // Переменная без типа (любого типпа?) ???
+_bootObject = bootObject; // Похоже, что bootObject - какой-то особенный глобальный объект, который умеет вызывать системные функции.
+
+Поиски показали, что bootObject имеет тип .internal.object
+
+2. Массивы типа void. Похоже, что это массив ссылок на любой тип данных:
+_matrix = new void[ ]( );
+...
+var row : string;
+row = "000000000000000000000000000000";
+_matrix[ y ] = row;
+
+
+3. Мы можем сравнивать объекты по значению:
+var inkey : .internal.string
+var key : string;
+if( key == inkey ) return val;
+
+и по ссылке с помощью двоеточия перед оператором сравнения:
+if( impl :!= null )
+if( env :== null )
+
+4. ?Что-то неизвестное?:
+attribute const * ->!;
+void run(var parent_object @const ) [8]
+	{ 
+		throw "Abstract runnable started";
+	}
+
+5. Все внутренние (internal) методы имеют нумерацию и даже могут вызываться по номеру. Что-то типа define получается. Наверное, так можно переназывать и другие методы (но это не точно):
+void construct_me () [0] { }
+void destruct_me () [1] {  }
+.internal."class" getClass () [2] {  }
+void clone() [3] {  }
+...
+
+void print( var input : string ) {
+    _bootObject.16(input); // Вызов по "алиасу". Интересно, можно ли заменять не на номер, а на строку?
+}
+
+Исследование показало, что Завалишин называет их syscall'ами. Всё ещё не известно, можно ли давать номера другим методам.
+
+
+--CODESTYLE--
+1. Всюду пробельные отступы в скобках:
+while ( y < _height )                                                 // Местами смотрится нормально,
+while ( ( !( isExitCommandReceived( ) ) ) && ( !( isGameOver( ) ) ) ) // но чаще довольно забавно.
+
+
+2. Часть return'ов в скобках, часть - нет. Странно:
+return ( 0 );                      // from Tetris
+return (virtualX + _maskSize / 2);
+
+return 0;                          // from phantom.util.map
+
+
+--OFFTOP--
+1.?В упор не вижу реализации internal объектов. Она спрятана или её нет???
