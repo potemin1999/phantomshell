@@ -1,0 +1,30 @@
+Типы данных.
+
+ Пользователю предлагается использовать три основных типа данных:
+  
+  Integer - целочисленное значение со знаком размером 32 бита, примитив
+  Float   - число с плавающей запятой одинарной точности размером 32 бита, примитив
+  Char    - символ, примитив
+  String  - последовательность символов
+
+ Кроме этого, чуть позже будет добавлена возможность работы с объектами
+
+
+Операции над типами данных.
+ 
+ Предусмотрено использование оператора "+" для любого сочетания описанных выше типов данных:
+
+  Integer + Integer = Integer
+  Float + Float = Float
+  Char + Char = String
+  String + String = String    // "hello " + "shell" = "hello shell"
+
+  Integer + Float = Float
+  Integer + String = String
+  Float + String = String
+  Integer + Char = String     
+  Float + Char = String
+  Char + String = String
+    
+  
+ 
