@@ -17,7 +17,7 @@ array[1]=World
   
 
 Примеры использования:
-def array = <one, two, three, four>;
+def array = <one, two, three, [34] = four>;
 for [item in array[*]]{
     print("   %s\n" item);
 }
@@ -28,7 +28,6 @@ one
 two
 three
 four
-five
 
 for [item in !array[*]]{
     print("   %s\n" item);
@@ -39,5 +38,5 @@ for [item in !array[*]]{
 0
 1
 2
-3
+34
 
