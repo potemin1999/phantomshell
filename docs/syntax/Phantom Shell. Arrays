@@ -1,5 +1,5 @@
 Массивы имеют только численные индексы. Массив целиком может быть определен путем заключения записей в угловые скобки:
-    def array=<Hello, World>
+    def array=[Hello, World]
     
 Отдельные записи могут быть определены с помощью знакомого всем синтаксиса:
 array[0]=Hello
@@ -10,10 +10,12 @@ array[1]=World
   array[*] // Все записи в массиве
   !array[*] // Все индексы в массиве
   #array[*] // Количество записей в массиве
+  array[a:b] // другой массив, от а до b включительно
   
+
 Примеры использования:
 def array = <one, two, three, four>;
-for item in array[*]{
+for [item in array[*]]{
     print("   %s\n" item);
 }
 
@@ -25,7 +27,7 @@ three
 four
 five
 
-for item in !array[*]{
+for [item in !array[*]]{
     print("   %s\n" item);
 }
 
