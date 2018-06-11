@@ -10,25 +10,25 @@ class Shell{
 
 После названия класса идут фигурные скобки, в которых мы определяем конструкторы, методы и поля класса:
 class Cat{
-	Cat()//конструктор
+	Cat[]//конструктор
 	{
 		
 	}
-	String name; //
-	int age; // поля
-	void printAge() //метод
+	def name; //
+	def age; // поля
+	void printAge[] //метод
 	{
-		print(age);
+		print[age];
 	}
 }
 
 Мы можем наследовать классы с помощью ключевого слова extends
 class BengalCat extends Cat{
-	BengalCat()
+	BengalCat[]
 	{
 		this.pattern = 'Spotted';
 	}
-	String pattern;
+	def pattern;
 }
 
 
