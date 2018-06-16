@@ -1,19 +1,30 @@
 package ExpressionParser;
 
+import ExpressionEvaluator.ExpressionEvaluator;
+
+import javafx.util.Pair;
 import java.util.ArrayList;
 
 public class Test {
-    public static void print(ArrayList<String> tokens, int counter) {
+    public static void print(ArrayList<Pair<Object, Integer>> tokens, int counter) {
         System.out.printf("ExpressionParser.Test #%d\n", counter);
         for (var i = 0; i < tokens.size(); ++i) {
-            System.out.println(tokens.get(i));
+            System.out.printf("%8s %d\n", tokens.get(i).getKey(), tokens.get(i).getValue());
         }
-        System.out.print('\n');
+        System.out.println();
+    }
+
+    public static void print2(Object result, int counter) {
+        System.out.printf("ExpressionEvaluator.Test #%d\n", counter);
+        System.out.println(result);
+        System.out.println();
     }
 
     public static void main(String[] args) {
         ExpressionParser parser = new ExpressionParser();
-        ArrayList<String> tokens;
+        ExpressionEvaluator evaluator = new ExpressionEvaluator();
+
+        ArrayList<Pair<Object, Integer>> tokens;
         var counter = 0;
 
         //ExpressionParser.Test #1
@@ -59,5 +70,33 @@ public class Test {
         //ExpressionParser.Test #11
         tokens = parser.parseInTokens("++x+++++x++");
         print(tokens, ++counter);
+
+
+        Object result;
+        counter = 0;
+
+        //ExpressionEvaluator.Test #1
+        result = evaluator.evaluateExpression(parser.parseInTokens("100 + 250 / 10"));
+        print2(result, ++counter);
+
+        //ExpressionEvaluator.Test #2
+        result = evaluator.evaluateExpression(parser.parseInTokens("(245 - 250)"));
+        print2(result, ++counter);
+
+        //ExpressionEvaluator.Test #3
+        result = evaluator.evaluateExpression(parser.parseInTokens("10/\\2"));
+        print2(result, ++counter);
+
+        //ExpressionEvaluator.Test #4
+        result = evaluator.evaluateExpression(parser.parseInTokens("100.0 / 3 << 1"));
+        print2(result, ++counter);
+
+        //ExpressionEvaluator.Test #5
+        result = evaluator.evaluateExpression(parser.parseInTokens("100.0 + 3 / 2"));
+        print2(result, ++counter);
+
+        //ExpressionEvaluator.Test #5
+        result = evaluator.evaluateExpression(parser.parseInTokens("(100.0 + 3) / 2"));
+        print2(result, ++counter);
     }
 }

@@ -3,8 +3,11 @@ package ExpressionParser;
 import java.util.HashSet;
 
 public class Operator {
-    static HashSet<String> list = new HashSet<>();
-    static {
+    HashSet<String> list;
+
+    public Operator() {
+        list = new HashSet<>();
+
         list.add("+");      //addition
         list.add("-");      //subtraction
         list.add("*");      //multiplication
@@ -35,7 +38,7 @@ public class Operator {
         list.add(")");      //closing parenthesis
     }
 
-    static boolean isOperator(String str) {
+    boolean isOperator(String str) {
         return list.contains(str);
     }
 }
