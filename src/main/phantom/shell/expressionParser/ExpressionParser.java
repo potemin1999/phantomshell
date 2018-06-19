@@ -1,6 +1,6 @@
-package expressionParser;
+package phantom.shell.expressionParser;
 
-import environment.Environment;
+import phantom.shell.environment.Environment;
 import structures.Character;
 import structures.Operator;
 
