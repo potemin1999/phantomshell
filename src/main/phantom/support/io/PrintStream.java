@@ -49,7 +49,7 @@ public class PrintStream extends OutputStream {
         newLine();
     }
 
-    public void println(){
+    public void println() {
         newLine();
     }
 
@@ -58,7 +58,7 @@ public class PrintStream extends OutputStream {
         print(exception.getClass().getName());
         if (exception.getMessage() != null) {
             println(" : " + exception.getMessage());
-        }else{
+        } else {
             println();
         }
         if (exception.getCause() != null)

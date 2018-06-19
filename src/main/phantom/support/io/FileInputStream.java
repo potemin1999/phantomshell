@@ -1,9 +1,9 @@
 package phantom.support.io;
 
 
-public class FileInputStream extends InputStream{
+public class FileInputStream extends InputStream {
 
-    public FileInputStream(File file){
+    public FileInputStream(File file) {
         super();
         try {
             var stream = new java.io.FileInputStream(file.getFile());

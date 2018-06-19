@@ -5,23 +5,23 @@ public class Token {
     private int tokenType;
     private char[] tokenValue;
 
-    public Token(){
+    public Token() {
         tokenType = TokenType.IDENTIFIER;
     }
 
-    public void setType(int tokenType){
+    public void setType(int tokenType) {
         this.tokenType = tokenType;
     }
 
-    public int getType(){
+    public int getType() {
         return this.tokenType;
     }
 
-    public void setValue(char[] tokenValue){
+    public void setValue(char[] tokenValue) {
         this.tokenValue = tokenValue;
     }
 
-    public char[] getValue(){
+    public char[] getValue() {
         return this.tokenValue;
     }
 

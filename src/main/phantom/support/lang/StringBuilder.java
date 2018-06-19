@@ -37,9 +37,9 @@ public class StringBuilder {
         currentSize += -1;
     }
 
-    public char[] build(){
+    public char[] build() {
         char[] res = new char[currentSize];
-        copy(res,buffer,0,0,currentSize);
+        copy(res, buffer, 0, 0, currentSize);
         return res;
     }
 

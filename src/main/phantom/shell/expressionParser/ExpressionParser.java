@@ -5,9 +5,11 @@ import structures.Character;
 import structures.Operator;
 
 import javafx.util.Pair;
+
 import java.util.ArrayList;
 
 public class ExpressionParser {
+
     Character character;
     Operator operator;
 

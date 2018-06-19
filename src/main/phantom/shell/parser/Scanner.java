@@ -47,7 +47,7 @@ public class Scanner {
         int b3 = stdIn.read() & 0b00111111;
         int b4 = stdIn.read() & 0b00111111;
         res = res & 0b00000111;
-        return (char) ((res << 18 ) + (b2 << 12) + (b3 << 6) + b4);
+        return (char) ((res << 18) + (b2 << 12) + (b3 << 6) + b4);
 
     }
 

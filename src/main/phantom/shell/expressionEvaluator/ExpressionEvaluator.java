@@ -3,9 +3,11 @@ package expressionEvaluator;
 import structures.Operator;
 
 import javafx.util.Pair;
+
 import java.util.ArrayList;
 
 public class ExpressionEvaluator {
+
     Operator operator;
 
     public ExpressionEvaluator() {
@@ -44,7 +46,7 @@ public class ExpressionEvaluator {
                         prevOp = null;
                     }
 
-                    while (prevOp != null && !prevOp.equals("(") && operator.getPriority(prevOp) <= operator.getPriority(op)){
+                    while (prevOp != null && !prevOp.equals("(") && operator.getPriority(prevOp) <= operator.getPriority(op)) {
                         var a = objectStack.get(objectStack.size() - 2);
                         var b = objectStack.get(objectStack.size() - 1);
 
@@ -158,7 +160,7 @@ public class ExpressionEvaluator {
                         prevOp = null;
                     }
 
-                    while (prevOp != null && !prevOp.equals("(") && operator.getPriority(prevOp) <= operator.getPriority(op)){
+                    while (prevOp != null && !prevOp.equals("(") && operator.getPriority(prevOp) <= operator.getPriority(op)) {
                         var a = objectStack.get(objectStack.size() - 2);
                         var b = objectStack.get(objectStack.size() - 1);
 
@@ -175,7 +177,6 @@ public class ExpressionEvaluator {
                             prevOp = null;
                         }
                     }
-
 
 
                     nextToken = tokens.get(i + 1);
@@ -409,35 +410,35 @@ public class ExpressionEvaluator {
 
                     //TODO: compare by EPS
                     case "==":
-                        result = (a == b) ? 1:0;
+                        result = (a == b) ? 1 : 0;
                         break;
                     case "!=":
-                        result = (a != b) ? 1:0;
+                        result = (a != b) ? 1 : 0;
                         break;
                     case ">":
-                        result = (a > b) ? 1:0;
+                        result = (a > b) ? 1 : 0;
                         break;
                     case ">=":
-                        result = (a >= b) ? 1:0;
+                        result = (a >= b) ? 1 : 0;
                         break;
                     case "<":
-                        result = (a < b) ? 1:0;
+                        result = (a < b) ? 1 : 0;
                         break;
                     case "<=":
-                        result = (a <= b) ? 1:0;
+                        result = (a <= b) ? 1 : 0;
                         break;
 
                     case "and":
-                        result = (a != 0 && b != 0) ? 1:0;
+                        result = (a != 0 && b != 0) ? 1 : 0;
                         break;
                     case "or":
-                        result = (a != 0 || b != 0) ? 1:0;
+                        result = (a != 0 || b != 0) ? 1 : 0;
                         break;
                     case "xor":
-                        result = (a == 0 && b != 0 || a != 0 && b == 0) ? 1:0;
+                        result = (a == 0 && b != 0 || a != 0 && b == 0) ? 1 : 0;
                         break;
                     case "->":
-                        result = (a != 0 && b == 0) ? 0:1;
+                        result = (a != 0 && b == 0) ? 0 : 1;
                         break;
 
                     default:
@@ -482,35 +483,35 @@ public class ExpressionEvaluator {
                         break;
 
                     case "==":
-                        result = (a == b) ? 1:0;
+                        result = (a == b) ? 1 : 0;
                         break;
                     case "!=":
-                        result = (a != b) ? 1:0;
+                        result = (a != b) ? 1 : 0;
                         break;
                     case ">":
-                        result = (a > b) ? 1:0;
+                        result = (a > b) ? 1 : 0;
                         break;
                     case ">=":
-                        result = (a >= b) ? 1:0;
+                        result = (a >= b) ? 1 : 0;
                         break;
                     case "<":
-                        result = (a < b) ? 1:0;
+                        result = (a < b) ? 1 : 0;
                         break;
                     case "<=":
-                        result = (a <= b) ? 1:0;
+                        result = (a <= b) ? 1 : 0;
                         break;
 
                     case "and":
-                        result = (a != 0 && b != 0) ? 1:0;
+                        result = (a != 0 && b != 0) ? 1 : 0;
                         break;
                     case "or":
-                        result = (a != 0 || b != 0) ? 1:0;
+                        result = (a != 0 || b != 0) ? 1 : 0;
                         break;
                     case "xor":
-                        result = (a == 0 && b != 0 || a != 0 && b == 0) ? 1:0;
+                        result = (a == 0 && b != 0 || a != 0 && b == 0) ? 1 : 0;
                         break;
                     case "->":
-                        result = (a != 0 && b == 0) ? 0:1;
+                        result = (a != 0 && b == 0) ? 0 : 1;
                         break;
 
                     default:

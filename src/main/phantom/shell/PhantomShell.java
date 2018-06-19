@@ -38,7 +38,7 @@ public class PhantomShell {
     public void run() {
         while (scanner.isAvailable()) {
             char c = scanner.next();
-            out.print(":"+c+"");
+            out.print(":" + c + "");
         }
     }
 

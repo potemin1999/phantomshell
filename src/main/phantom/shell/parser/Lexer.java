@@ -21,7 +21,7 @@ public class Lexer {
         for (; i < 65; i++) letterMap[i] = false;
         for (; i < 91; i++) letterMap[i] = true;
         for (; i < 97; i++) letterMap[i] = false;
-        for (; i <123; i++) letterMap[i] = true;
+        for (; i < 123; i++) letterMap[i] = true;
     }
 
     public Token next() {

@@ -4,9 +4,11 @@ import phantom.shell.environment.Environment;
 import expressionEvaluator.ExpressionEvaluator;
 
 import javafx.util.Pair;
+
 import java.util.ArrayList;
 
 public class Test {
+
     public static Environment remove(Environment env) {
         env = null;
         return env;
@@ -17,7 +19,7 @@ public class Test {
         for (var i = 0; i < tokens.size(); ++i) {
             try {
                 System.out.printf("%8s %d\n", tokens.get(i).getKey(), tokens.get(i).getValue());
-            } catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 System.out.println(e);
             }
 

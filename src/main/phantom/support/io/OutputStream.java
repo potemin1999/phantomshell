@@ -6,25 +6,25 @@ public class OutputStream {
 
     private java.io.OutputStream stream;
 
-    public OutputStream(){
+    public OutputStream() {
         stream = null;
     }
 
-    public OutputStream(java.io.OutputStream wrap){
-        if (wrap==null)
+    public OutputStream(java.io.OutputStream wrap) {
+        if (wrap == null)
             throw new NullPointerException("Unable to wrap null stream");
         wrap(wrap);
     }
 
-    protected void wrap(java.io.OutputStream wrap){
+    protected void wrap(java.io.OutputStream wrap) {
         stream = wrap;
     }
 
-    java.io.OutputStream getStream(){
+    java.io.OutputStream getStream() {
         return stream;
     }
 
-    public void write(int b){
+    public void write(int b) {
         try {
             stream.write(b);
         } catch (java.io.IOException e) {
@@ -32,7 +32,7 @@ public class OutputStream {
         }
     }
 
-    public void write(byte[] buffer){
+    public void write(byte[] buffer) {
         try {
             stream.write(buffer);
         } catch (java.io.IOException e) {
@@ -40,7 +40,7 @@ public class OutputStream {
         }
     }
 
-    public void write(byte[] buffer,int offset,int length){
+    public void write(byte[] buffer, int offset, int length) {
         try {
             stream.write(buffer, offset, length);
         } catch (java.io.IOException e) {
@@ -48,7 +48,7 @@ public class OutputStream {
         }
     }
 
-    public void flush(){
+    public void flush() {
         try {
             stream.flush();
         } catch (java.io.IOException e) {
@@ -56,7 +56,7 @@ public class OutputStream {
         }
     }
 
-    public void close(){
+    public void close() {
         try {
             stream.close();
         } catch (java.io.IOException e) {
