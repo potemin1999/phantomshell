@@ -89,7 +89,7 @@ public class Lexer {
                     if (currentSymbol == '=' ||
                             currentSymbol == '>' ||
                             currentSymbol == '<' ||
-                            currentSymbol == "!") {
+                            currentSymbol == '!') {
 
                     }
                 }
