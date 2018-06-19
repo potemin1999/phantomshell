@@ -1,8 +1,8 @@
 package phantom.shell.expressionParser;
 
 import phantom.shell.environment.Environment;
-import structures.Character;
-import structures.Operator;
+import phantom.shell.structures.Character;
+import phantom.shell.structures.Operator;
 
 import javafx.util.Pair;
 

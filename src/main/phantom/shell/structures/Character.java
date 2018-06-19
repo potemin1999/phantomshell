@@ -1,4 +1,4 @@
-package structures;
+package phantom.shell.structures;
 
 public class Character {
     public boolean isLetter(char c) {

@@ -1,6 +1,6 @@
-package expressionEvaluator;
+package phantom.shell.expressionEvaluator;
 
-import structures.Operator;
+import phantom.shell.structures.Operator;
 
 import javafx.util.Pair;
 

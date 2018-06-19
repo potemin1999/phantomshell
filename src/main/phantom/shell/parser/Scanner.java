@@ -29,7 +29,10 @@ public class Scanner {
     }
 
     private char readNextChar() {
-        int res = stdIn.read();
+        int res;
+        do {
+            res = stdIn.read();
+        } while (res == '\r');
         if (res < 192)
             return (char) (res);
         if (res < 224) {

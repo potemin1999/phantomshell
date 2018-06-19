@@ -1,4 +1,4 @@
-package structures;
+package phantom.shell.structures;
 
 import java.util.HashMap;
 import java.util.HashSet;
