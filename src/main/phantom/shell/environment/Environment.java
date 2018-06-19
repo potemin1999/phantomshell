@@ -1,8 +1,9 @@
-package environment;
+package phantom.shell.environment;
 
 import java.util.HashMap;
 
 public class Environment {
+
     HashMap<Object, Object> definedVariables;
     Environment parent;
 

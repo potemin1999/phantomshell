@@ -1,13 +1,15 @@
-package expressionParser;
+package phantom.shell.expressionParser;
 
-import environment.Environment;
-import structures.Character;
-import structures.Operator;
+import phantom.shell.environment.Environment;
+import phantom.shell.structures.Character;
+import phantom.shell.structures.Operator;
 
 import javafx.util.Pair;
+
 import java.util.ArrayList;
 
 public class ExpressionParser {
+
     Character character;
     Operator operator;
 
