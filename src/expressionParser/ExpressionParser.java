@@ -1,4 +1,8 @@
-package ExpressionParser;
+package expressionParser;
+
+import environment.Environment;
+import structures.Character;
+import structures.Operator;
 
 import javafx.util.Pair;
 import java.util.ArrayList;
@@ -12,10 +16,10 @@ public class ExpressionParser {
         operator = new Operator();
     }
 
-    public ArrayList<Pair<Object, Integer>> parseInTokens(String expression) {
+    public ArrayList<Pair<Object, Integer>> parseInTokens(Environment environment, String expression) {
         ArrayList<Pair<Object, Integer>> tokens = new ArrayList<>();
 
-        tokens.add(new Pair("(", 2));
+        tokens.add(new Pair("(", 5));
 
         for (var currentIndex = 0; currentIndex < expression.length(); ++currentIndex) {
             var c = expression.charAt(currentIndex);
@@ -30,20 +34,41 @@ public class ExpressionParser {
                 var word = readWord(expression, currentIndex);
                 currentIndex += word.length() - 1;
 
-                tokens.add(new Pair(word, 1));
+                var variableValue = environment.getVariable(word);
+
+                if (variableValue != null) {
+                    tokens.add(new Pair(variableValue, 0));
+                } else if (operator.isLogicalOperator(word)) {
+                    tokens.add(new Pair(word, 4));
+                } else {
+                    // Throw some exception that variable is not defined
+
+                    tokens.add(null);
+                }
             } else if (character.isSymbol(c)) {
                 var op = readOperator(expression, currentIndex);
 
                 if (op != null) {
                     currentIndex += op.length() - 1;
-                    tokens.add(new Pair(op, 2));
+
+                    if (operator.isUnaryOperator(op)) {
+                        tokens.add(new Pair(op, 1));
+                    } else if (operator.isBinaryOperator(op)) {
+                        tokens.add(new Pair(op, 2));
+                    } else if (operator.isComparisonOperator(op)) {
+                        tokens.add(new Pair(op, 3));
+                    } else if (operator.isLogicalOperator(op)) {
+                        tokens.add(new Pair(op, 4));
+                    } else { // Priority operator
+                        tokens.add(new Pair(op, 5));
+                    }
                 } else {
                     tokens.add(new Pair(null, -1));
                 }
             }
         }
 
-        tokens.add(new Pair(")", 2));
+        tokens.add(new Pair(")", 5));
 
         return tokens;
     }
