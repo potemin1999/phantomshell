@@ -1,6 +1,5 @@
 package phantom.shell.expressionParser;
 
-import phantom.shell.environment.Environment;
 import phantom.shell.structures.Character;
 import phantom.shell.structures.Operator;
 
@@ -18,7 +17,7 @@ public class ExpressionParser {
         operator = new Operator();
     }
 
-    public ArrayList<Pair<Object, Integer>> parseInTokens(Environment environment, String expression) {
+    public ArrayList<Pair<Object, Integer>> parseInTokens(String expression) {
         ArrayList<Pair<Object, Integer>> tokens = new ArrayList<>();
 
         tokens.add(new Pair("(", 5));
@@ -36,16 +35,21 @@ public class ExpressionParser {
                 var word = readWord(expression, currentIndex);
                 currentIndex += word.length() - 1;
 
-                var variableValue = environment.getVariable(word);
-
-                if (variableValue != null) {
-                    tokens.add(new Pair(variableValue, 0));
-                } else if (operator.isLogicalOperator(word)) {
+                if (operator.isLogicalOperator(word)) {
                     tokens.add(new Pair(word, 4));
+                } else if (operator.isUnaryOperator(word)) {
+                    tokens.add(new Pair(word, 1));
                 } else {
-                    // Throw some exception that variable is not defined
-
-                    tokens.add(null);
+                    switch (word) {
+                        case "true":
+                            tokens.add(new Pair(1, 0));
+                            break;
+                        case "false":
+                            tokens.add(new Pair(0, 0));
+                            break;
+                        default:
+                            tokens.add(new Pair(word, 0));
+                    }
                 }
             } else if (character.isSymbol(c)) {
                 var op = readOperator(expression, currentIndex);
@@ -55,14 +59,18 @@ public class ExpressionParser {
 
                     if (operator.isUnaryOperator(op)) {
                         tokens.add(new Pair(op, 1));
-                    } else if (operator.isBinaryOperator(op)) {
+                    } else if (operator.isIncrementDecrementOperator(op)) {
+                        tokens.add(new Pair(op, 7));
+                    } else if (operator.isBinaryOperator(op) && !op.equals("=")) {
                         tokens.add(new Pair(op, 2));
                     } else if (operator.isComparisonOperator(op)) {
                         tokens.add(new Pair(op, 3));
                     } else if (operator.isLogicalOperator(op)) {
                         tokens.add(new Pair(op, 4));
-                    } else { // Priority operator
+                    } else if (operator.isPriorityOperator(op)){
                         tokens.add(new Pair(op, 5));
+                    } else if (op.equals("=")) {
+                        tokens.add(new Pair(op, 6));
                     }
                 } else {
                     tokens.add(new Pair(null, -1));

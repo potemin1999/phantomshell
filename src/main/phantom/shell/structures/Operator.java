@@ -4,25 +4,27 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Operator {
-    HashSet<Object> unaryOperators, binaryOperators, comparisonOperators, logicalOperators, priorityOperators;
+    HashSet<Object> unaryOperators, incrementDecrementOperators, binaryOperators, comparisonOperators, logicalOperators, priorityOperators;
 
     HashMap<Object, Integer> opPriority;
 
     public Operator() {
         unaryOperators = new HashSet<>();
+        incrementDecrementOperators = new HashSet<>();
         binaryOperators = new HashSet<>();
         priorityOperators = new HashSet<>();
         comparisonOperators = new HashSet<>();
         logicalOperators = new HashSet<>();
 
+        incrementDecrementOperators.add("++");      // increment
+        incrementDecrementOperators.add("--");      // decrement
+
+        binaryOperators.add("=");      // assigning
+
         binaryOperators.add("+");      // addition
         binaryOperators.add("-");      // subtraction
         binaryOperators.add("*");      // multiplication
         binaryOperators.add("/");      // division
-
-        unaryOperators.add("++");      // increment
-        unaryOperators.add("--");      // decrement
-
 
         unaryOperators.add("~");       // bitwise not
         binaryOperators.add("/\\");    // bitwise and
@@ -31,8 +33,6 @@ public class Operator {
         binaryOperators.add("<<");     // bitwise arithmetical shift left
         binaryOperators.add(">>");     // bitwise arithmetical shift right
 
-        //list.add("=");               // assigning
-
         comparisonOperators.add("=="); // equality
         comparisonOperators.add("!="); // inequality
         comparisonOperators.add(">");  // greater than
@@ -40,8 +40,8 @@ public class Operator {
         comparisonOperators.add("<");  // less than
         comparisonOperators.add("<="); // not greater than
 
-        logicalOperators.add("not");   // logical not
-        logicalOperators.add("!");     // logical not (these two are equivalent)
+        unaryOperators.add("!");     // logical not
+        unaryOperators.add("not");       // logical not (these two are equivalent)
         logicalOperators.add("and");   // logical conjunction
         logicalOperators.add("or");    // logical inclusive disjunction
         logicalOperators.add("xor");   // logical exclusive disjunction
@@ -49,7 +49,6 @@ public class Operator {
 
         priorityOperators.add("(");    // opening parenthesis
         priorityOperators.add(")");    // closing parenthesis
-
 
         opPriority = new HashMap<>();
 
@@ -68,15 +67,19 @@ public class Operator {
         opPriority.put("+", 6);
         opPriority.put("-", 6);
 
-        opPriority.put("and", 10);
-        opPriority.put("or", 11);
-        opPriority.put("xor", 11);
-        opPriority.put("->", 12);
+        opPriority.put("!", 10);
+        opPriority.put("not", 10);
+        opPriority.put("and", 11);
+        opPriority.put("or", 12);
+        opPriority.put("xor", 12);
+        opPriority.put("->", 13);
+
+        opPriority.put("=", 20);
     }
 
     public boolean isOperator(Object str) {
         return isUnaryOperator(str) || isBinaryOperator(str) || isComparisonOperator(str) || isLogicalOperator(str)
-                || isPriorityOperator(str);
+                || isPriorityOperator(str) || isIncrementDecrementOperator(str);
     }
 
     public boolean isUnaryOperator(Object str) {
@@ -97,6 +100,10 @@ public class Operator {
 
     public boolean isPriorityOperator(Object str) {
         return priorityOperators.contains(str);
+    }
+
+    public boolean isIncrementDecrementOperator(Object str) {
+        return incrementDecrementOperators.contains(str);
     }
 
     public int getPriority(Object op) {
