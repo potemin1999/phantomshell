@@ -1,0 +1,14 @@
+def function2(){
+    def a = 2;
+    def b = 3.6;
+    def c = "hello shell!"
+    if [ a + b > 6 and a - b <= 0]{
+        c = a + b;
+        c<< 2; //space does not matter
+    }
+    def boo = false
+    def foo = true
+    if [ boo or boo \'/ foo]{
+        boo = foo
+    }
+}

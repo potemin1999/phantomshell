@@ -61,6 +61,7 @@ public class StringBuilder {
             var bufferOld = buffer;
             var bufferNew = new char[capacity];
             copy(bufferNew, bufferOld, 0, 0, currentSize);
+            buffer = bufferNew;
         }
     }
 

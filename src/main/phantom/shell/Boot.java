@@ -26,6 +26,7 @@ public class Boot {
             }
         }
         shell = new PhantomShell(sourceInput, ttyInput, ttyOutput);
+        shell.setDebugMode(true);
     }
 
     public InputStream getStreamFromFile(String fileStr) {

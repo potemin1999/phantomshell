@@ -18,6 +18,8 @@ public class PhantomShell {
     private Scanner scanner;
     private Lexer lexer;
 
+    private boolean isInDebugMode = false;
+
 
     public PhantomShell(InputStream sourceInput, InputStream ttyInput, OutputStream ttyOutput) {
         this.sourceInput = sourceInput;
@@ -36,14 +38,19 @@ public class PhantomShell {
         }
     }
 
+    public void setDebugMode(boolean debug){
+        isInDebugMode = debug;
+    }
 
     //TODO: DO DO DO
     public void run() {
         while (!lexer.hasReachedEOF()){
             Token token = lexer.next();
-            out.print(token.toString());
-            if (token.getType() == TokenType.EOL)
-                out.println();
+            if (isInDebugMode) {
+                out.print(token.toString());
+                if (token.getType() == TokenType.EOL)
+                    out.println();
+            }
         }
     }
 
