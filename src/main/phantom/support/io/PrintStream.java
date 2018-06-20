@@ -36,17 +36,32 @@ public class PrintStream extends OutputStream {
     }
 
     private void newLine() {
-        write((int) ('\n'));
-        flush();
+        synchronized (this) {
+            write((int) ('\n'));
+            flush();
+        }
+    }
+
+    public void print(Object obj){
+        print(obj.toString());
     }
 
     public void print(String str) {
         write(str.getBytes());
     }
 
+    public void println(Object object){
+        synchronized (this) {
+            print(object);
+            newLine();
+        }
+    }
+
     public void println(String str) {
-        print(str);
-        newLine();
+        synchronized (this) {
+            print(str);
+            newLine();
+        }
     }
 
     public void println() {
@@ -54,17 +69,19 @@ public class PrintStream extends OutputStream {
     }
 
     public void print(RuntimeException exception) {
-        StackTraceElement[] stackTraceElements = exception.getStackTrace();
-        print(exception.getClass().getName());
-        if (exception.getMessage() != null) {
-            println(" : " + exception.getMessage());
-        } else {
-            println();
-        }
-        if (exception.getCause() != null)
-            println("caused by " + exception.getCause());
-        for (StackTraceElement ste : stackTraceElements) {
-            println("   at " + ste.getClassName() + "." + ste.getMethodName() + "(" + ste.getFileName() + ":" + ste.getLineNumber() + ")");
+        synchronized (this) {
+            StackTraceElement[] stackTraceElements = exception.getStackTrace();
+            print(exception.getClass().getName());
+            if (exception.getMessage() != null) {
+                println(" : " + exception.getMessage());
+            } else {
+                println();
+            }
+            if (exception.getCause() != null)
+                println("caused by " + exception.getCause());
+            for (StackTraceElement ste : stackTraceElements) {
+                println("   at " + ste.getClassName() + "." + ste.getMethodName() + "(" + ste.getFileName() + ":" + ste.getLineNumber() + ")");
+            }
         }
     }
 

@@ -1,0 +1,9 @@
+def a = 36+(6>>(3<<2)-8+5*6+5666+34<<111<<3<<7>>9+7-66*7
+def b = a+a+a-a+a-a+a-a+a+a-a+a+a-a+a-a+a-a+a+a+a+a+a-a+a-a+a-a+a/a
+def c = (3<<a++-666<<b--+66>>a--+6<<b++)*666
+def r(int a,int b,int c,int abc,bool boo,bool foo){
+    def ttt = a<<b + b<<c + c<<a ;
+    if [ boo \'/ foo or foo /\ (~boo and ~foo) ]{
+        ttt = ttt++ + (boo==foo)*123456789.0;
+    }
+}
