@@ -7,7 +7,6 @@ public class Keyword {
      * @return
      */
     public boolean isKeyword(char[] chars) {
-        if (true) return true;
         //         def
         return compare(chars, new char[]{'d', 'e', 'f'}) == 0 ||
                 // if
