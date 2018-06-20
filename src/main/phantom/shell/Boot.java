@@ -1,6 +1,8 @@
 package phantom.shell;
 
 import phantom.support.io.*;
+import phantom.support.lang.RuntimeException;
+import phantom.support.log.Log;
 
 public class Boot {
 
@@ -36,7 +38,16 @@ public class Boot {
     }
 
     private void run() {
-        shell.run();
+        try {
+            var startTime = System.currentTimeMillis();
+            shell.run();
+            var endTime = System.currentTimeMillis();
+            Log.out.println("run time "+(endTime-startTime)+" ms");
+        }catch (Throwable throwable){
+            Log.out.println("shell run failed due to "+throwable.toString());
+            Log.out.print(new RuntimeException(throwable));
+        }
+
     }
 
     private boolean isInteractiveModeEnabled(String[] args) {

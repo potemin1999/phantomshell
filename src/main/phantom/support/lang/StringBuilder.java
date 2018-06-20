@@ -11,7 +11,7 @@ public class StringBuilder {
     }
 
     public StringBuilder(int initialCapacity) {
-        buffer = new char[capacity];
+        buffer = new char[initialCapacity];
         capacity = 16;
         currentSize = 0;
     }
@@ -19,17 +19,20 @@ public class StringBuilder {
     public void append(String str) {
         int addSize = str.length();
         ensureCapacity(currentSize + addSize);
+        copy(buffer,str.toCharArray(),currentSize,0,addSize);
         currentSize += addSize;
     }
 
     public void append(char symbol) {
         ensureCapacity(currentSize + 1);
+        buffer[currentSize] = symbol;
         currentSize += 1;
     }
 
     public void append(char[] chars) {
         int addSize = chars.length;
         ensureCapacity(currentSize + addSize);
+        copy(buffer,chars,currentSize,0,addSize);
         currentSize += addSize;
     }
 
@@ -43,7 +46,12 @@ public class StringBuilder {
         return res;
     }
 
-    public void ensureCapacity(int newSize) {
+    public void clear() {
+        buffer = new char[capacity];
+        currentSize = 0;
+    }
+
+    private void ensureCapacity(int newSize) {
         var toResize = false;
         while (capacity <= newSize) {
             capacity *= 2;

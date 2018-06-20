@@ -9,7 +9,10 @@ import phantom.support.log.Log;
 public class Scanner {
 
     private InputStream stdIn;
-    private int bufferedValue = -1;
+    private boolean isInteractiveMode = false;
+    private char[] buffer = new char[16];
+    private int bufferCurrentPointer = 0;
+    private int bufferEndPointer = 0;
 
     public Scanner(String fullFileName) {
         try {
@@ -24,8 +27,12 @@ public class Scanner {
         stdIn = inputStream;
     }
 
+    public void setInteractiveMode(boolean is) {
+        isInteractiveMode = is;
+    }
+
     public boolean isAvailable() {
-        return stdIn.available() > 0;
+        return (stdIn.available() + (bufferEndPointer - bufferCurrentPointer)) > 0;
     }
 
     private char readNextChar() {
@@ -51,31 +58,49 @@ public class Scanner {
         int b4 = stdIn.read() & 0b00111111;
         res = res & 0b00000111;
         return (char) ((res << 18) + (b2 << 12) + (b3 << 6) + b4);
-
     }
 
     public char next() {
-        if (bufferedValue == -1) {
-            if (stdIn.available() < 0)
-                return (char) (-1);
-            return readNextChar();
+        if (bufferCurrentPointer < bufferEndPointer) {
+            var ret = buffer[bufferCurrentPointer % buffer.length];
+            bufferCurrentPointer++;
+            return ret;
         } else {
-            var ret = (char) bufferedValue;
-            bufferedValue = -1;
+            var ret = readNextChar();
+            buffer[bufferEndPointer % buffer.length] = ret;
+            bufferEndPointer++;
+            bufferCurrentPointer++;
             return ret;
         }
     }
 
+    public char prev() {
+        bufferCurrentPointer--;
+        return buffer[bufferCurrentPointer % buffer.length];
+    }
+
     public char peek() {
-        if (stdIn.available() < 0)
-            return (char) (-1);
-        if (bufferedValue == -1)
-            bufferedValue = readNextChar();
-        return (char) bufferedValue;
+        if (bufferCurrentPointer < bufferEndPointer) {
+            var ret = buffer[(bufferCurrentPointer) % buffer.length];
+            return ret;
+        } else {
+            if (stdIn.available() > (isInteractiveMode ? -1 : 0)) {
+                var ret = readNextChar();
+                buffer[(bufferCurrentPointer) % buffer.length] = ret;
+                bufferEndPointer++;
+                return ret;
+            } else {
+                return '\0';
+            }
+        }
     }
 
     public void skip() {
-        readNextChar();
+        if (bufferCurrentPointer == bufferEndPointer) {
+            buffer[bufferEndPointer % buffer.length] = readNextChar();
+            bufferEndPointer++;
+        }
+        bufferCurrentPointer++;
     }
 
 }

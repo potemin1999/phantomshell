@@ -2,6 +2,8 @@ package phantom.shell;
 
 import phantom.shell.parser.Lexer;
 import phantom.shell.parser.Scanner;
+import phantom.shell.parser.Token;
+import phantom.shell.parser.TokenType;
 import phantom.support.io.InputStream;
 import phantom.support.io.OutputStream;
 import phantom.support.io.PrintStream;
@@ -28,6 +30,7 @@ public class PhantomShell {
         out.println("phantom shell develop version");
         if (sourceInput == ttyInput) {
             out.println("interactive run");
+            scanner.setInteractiveMode(true);
         } else {
             out.println("non-interactive run");
         }
@@ -36,9 +39,11 @@ public class PhantomShell {
 
     //TODO: DO DO DO
     public void run() {
-        while (scanner.isAvailable()) {
-            char c = scanner.next();
-            out.print(":" + c + "");
+        while (!lexer.hasReachedEOF()){
+            Token token = lexer.next();
+            out.print(token.toString());
+            if (token.getType() == TokenType.EOL)
+                out.println();
         }
     }
 
