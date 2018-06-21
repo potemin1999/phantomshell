@@ -36,6 +36,7 @@ public class ExpressionEvaluationTests {
     }
 
     public static void main(String[] args) {
+        /*
         ExpressionParser parser = new ExpressionParser();
         ExpressionHandler handler = new ExpressionHandler();
 
@@ -221,5 +222,6 @@ public class ExpressionEvaluationTests {
 
         //int a = 1, b = 2;
         //System.out.println(++((a)));
+        */
     }
 }

@@ -1,9 +1,12 @@
 package phantom.shell.parser;
 
+import phantom.shell.expressions.Expression;
+import phantom.shell.expressions.ValueExpression;
 import phantom.shell.structures.Keyword;
 import phantom.support.lang.NullPointerException;
 import phantom.support.lang.RuntimeException;
 import phantom.support.lang.StringBuilder;
+import phantom.support.log.Log;
 import phantom.support.util.ArrayList;
 import phantom.support.util.List;
 
@@ -19,6 +22,7 @@ public class Lexer {
     private StringBuilder tokenBuffer;
     private boolean[] letterMap;
     private Token bufferedToken;
+    private Parser parser;
 
     public Lexer(Scanner sourceScanner) {
         isEofReached = false;
@@ -27,6 +31,7 @@ public class Lexer {
         keyword = new Keyword();
         letterMap = new boolean[255];
         fillLetterMap();
+        parser = new Parser(this);
     }
 
     public boolean hasNotReachedEOF() {
@@ -80,6 +85,7 @@ public class Lexer {
     public Token peek() {
         if (bufferedToken == null) {
             bufferedToken = readNextToken();
+            //Log.debug.print(bufferedToken);
         }
         return bufferedToken;
     }
@@ -90,7 +96,9 @@ public class Lexer {
             bufferedToken = null;
             return ret;
         } else {
-            return readNextToken();
+            var ret = readNextToken();
+            //Log.debug.print(ret);
+            return ret;
         }
     }
 
@@ -98,8 +106,19 @@ public class Lexer {
         List<Token> list = new ArrayList<>();
         do {
             var token = next();
-            list.addLast(token);
+            list.add(token);
             if (token.getType() == TokenType.EOL)
+                break;
+        } while (!isEofReached);
+        return list;
+    }
+
+    public List<Token> readToClosingBracket() {
+        List<Token> list = new ArrayList<>();
+        do {
+            var token = next();
+            list.addLast(token);
+            if (token.getType() == TokenType.BRACKET_CLOSE)
                 break;
         } while (!isEofReached);
         return list;

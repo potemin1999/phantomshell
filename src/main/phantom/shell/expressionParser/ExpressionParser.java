@@ -1,11 +1,15 @@
 package phantom.shell.expressionParser;
 
+import phantom.shell.parser.Token;
+import phantom.shell.parser.TokenType;
 import phantom.shell.structures.Character;
 import phantom.shell.structures.Operator;
 
 import javafx.util.Pair;
+import phantom.support.io.PrintStream;
+import phantom.support.util.ArrayList;
+import phantom.support.util.List;
 
-import java.util.ArrayList;
 
 public class ExpressionParser {
 
@@ -17,9 +21,10 @@ public class ExpressionParser {
         operator = new Operator();
     }
 
-    public ArrayList<Pair<Object, Integer>> parseInTokens(String expression) {
-        ArrayList<Pair<Object, Integer>> tokens = new ArrayList<>();
+    public ArrayList<Pair<Object, Integer>> parseTokens(List<Token> tokens) {
 
+
+        /*
         tokens.add(new Pair("(", 5));
 
         for (var currentIndex = 0; currentIndex < expression.length(); ++currentIndex) {
@@ -81,10 +86,96 @@ public class ExpressionParser {
         tokens.add(new Pair(")", 5));
 
         return tokens;
+        */
+        ArrayList<Pair<Object, Integer>> parsedTokens = new ArrayList<>();
+
+        parsedTokens.add(new Pair("(", 5));
+
+        while (tokens.size() > 0) {
+            var token = tokens.getFirst();
+            //System.out.println(token.getStringValue());
+            tokens.removeFirst();
+
+            switch (token.getType()) {
+                case TokenType.IDENTIFIER:
+                    var word = token.getStringValue();
+
+                    switch (word) {
+                        case "true":
+                            parsedTokens.add(new Pair(1, 0));
+                            break;
+                        case "false":
+                            parsedTokens.add(new Pair(0, 0));
+                            break;
+                        default:
+                            if (character.isDigit(word.charAt(0))) {
+                                parsedTokens.add(new Pair(readNumber(word), 0));
+                            } else {
+                                parsedTokens.add(new Pair(word, 0));
+                            }
+                    }
+
+                    break;
+
+                case TokenType.OPERATOR:
+                    var op = token.getStringValue();
+
+                    if (operator.isUnaryOperator(op)) {
+                        parsedTokens.add(new Pair(op, 1));
+                    } else if (operator.isIncrementDecrementOperator(op)) {
+                        parsedTokens.add(new Pair(op, 7));
+                    } else if (operator.isBinaryOperator(op) && !op.equals("=")) {
+                        parsedTokens.add(new Pair(op, 2));
+                    } else if (operator.isComparisonOperator(op)) {
+                        parsedTokens.add(new Pair(op, 3));
+                    } else if (operator.isLogicalOperator(op)) {
+                        parsedTokens.add(new Pair(op, 4));
+                    } else if (operator.isPriorityOperator(op)){
+                        parsedTokens.add(new Pair(op, 5));
+                    } else if (op.equals("=")) {
+                        break;
+                    } else {
+                        parsedTokens.add(new Pair(null, -1));
+                    }
+
+                    break;
+
+                case TokenType.PAREN_OPEN:
+                    parsedTokens.add(new Pair("(", 5));
+                    break;
+
+                case TokenType.PAREN_CLOSE:
+                    parsedTokens.add(new Pair(")", 5));
+                    break;
+
+                case TokenType.EOL:
+                    break;
+
+                case TokenType.BRACE_OPEN:
+                    parsedTokens.add(new Pair("{", 8));
+                    break;
+
+                case TokenType.BRACE_CLOSE:
+                    parsedTokens.add(new Pair("}", 8));
+                    break;
+
+                case TokenType.BRACKET_CLOSE:
+                    break;
+
+                default:
+                    System.out.println("Unexpected token");
+                    return null;
+            }
+        }
+
+        parsedTokens.add(new Pair(")", 5));
+
+        return parsedTokens;
     }
 
-    public Pair<Number, Integer> readNumber(String expression, int currentIndex) {
+    public Number readNumber(String expression) {
         var number = 0;
+        var currentIndex = 0;
         var c = expression.charAt(currentIndex);
 
         boolean isInteger = true;
@@ -121,9 +212,9 @@ public class ExpressionParser {
         }
 
         if (isInteger) {
-            return new Pair(number, currentIndex);
+            return number;
         } else {
-            return new Pair(number + fractional, currentIndex);
+            return number + fractional;
         }
     }
 

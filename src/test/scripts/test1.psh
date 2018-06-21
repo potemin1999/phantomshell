@@ -1,3 +1,8 @@
-def a = 4
-def b = 3
-def c = a + b
+def b = 5;
+if [b != 5] {
+    def c = b << 1
+} elif [10 == 10] {
+    def c = b << 2
+} else {
+    def c = b << 3
+}

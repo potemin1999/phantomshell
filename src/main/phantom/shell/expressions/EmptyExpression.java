@@ -1,17 +1,22 @@
 package phantom.shell.expressions;
 
 import phantom.shell.parser.Token;
-import phantom.support.lang.StringBuilder;
 import phantom.support.util.List;
 
-public class OperatorExpression extends Expression {
+public class EmptyExpression extends Expression {
+
     private List<Token> tokens;
 
-    public OperatorExpression(List<Token> tokens) {
-        this.tokens = tokens;
+    public EmptyExpression() {
+        this.tokens = null;
     }
 
     public List<Token> getTokens() {
         return this.tokens;
+    }
+
+    @Override
+    public String toString() {
+        return "EmptyExp";
     }
 }

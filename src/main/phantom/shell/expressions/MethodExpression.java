@@ -1,17 +1,20 @@
 package phantom.shell.expressions;
 
 import phantom.shell.environment.Environment;
+import phantom.support.lang.StringBuilder;
+import phantom.shell.parser.Token;
 import phantom.shell.values.Value;
+import phantom.support.util.List;
 
 public class MethodExpression extends Expression {
 
-    public MethodExpression() {
+    private List<Token> tokens;
 
+    public MethodExpression(List<Token> tokens) {
+        this.tokens = tokens;
     }
 
-    @Override
-    public Value exec(Environment env) {
-
-        return null;
+    public List<Token> getTokens() {
+        return this.tokens;
     }
 }

@@ -1,27 +1,25 @@
 package phantom.shell.expressions;
 
 import phantom.shell.environment.Environment;
+import phantom.shell.parser.Token;
 import phantom.shell.values.Value;
+import phantom.support.lang.StringBuilder;
+import phantom.support.util.List;
 
 public class ValueExpression extends Expression {
 
-    private Value value;
-    private OperatorExpression expression;
+    private List<Token> tokens;
 
-    public ValueExpression(OperatorExpression expression) {
-        this.expression = expression;
+    public ValueExpression(List<Token> tokens) {
+        this.tokens = tokens;
     }
 
-    public ValueExpression(Value value) {
-        this.value = value;
+    public List<Token> getTokens() {
+        return this.tokens;
     }
 
-    public Value exec(Environment env) {
-        compute();
-        return value;
-    }
-
-    private void compute() {
-        if (value != null) return;
+    @Override
+    public String toString() {
+        return "ValExp: "+tokens.toString();
     }
 }

@@ -17,12 +17,28 @@ public class Environment {
         definedVariables = new HashMap<>();
     }
 
+    public void defineVariable(char[] name) {
+        defineVariable(name, null);
+    }
+
+    public void defineVariable(char[] name, Object value) {
+        defineVariable(String.valueOf(name), value);
+    }
+
+    public void defineVariable(Object name) {
+        defineVariable(name, null);
+    }
+
     public void defineVariable(Object name, Object value) {
         if (!definedVariables.containsKey(name)) {
             definedVariables.put(name, value);
         } else {
             // Throw some exception that you can not define the same variable twice
         }
+    }
+
+    public void setVariable(char[] name, Object value) {
+        setVariable(String.valueOf(name), value);
     }
 
     public void setVariable(Object name, Object value) {
@@ -40,6 +56,10 @@ public class Environment {
                 current = current.parent;
             }
         }
+    }
+
+    public Object getVariable(char[] name){
+        return getVariable(String.valueOf(name));
     }
 
     public Object getVariable(Object name) {
@@ -60,7 +80,9 @@ public class Environment {
         return null;
     }
 
-    public Environment deleteEnvironment(Environment env) {
+    public Environment deleteEnvironment() {
+        Environment env = this;
+
         if (env.parent == null) {
             // Throw some exception that you can not delete the global environment
 

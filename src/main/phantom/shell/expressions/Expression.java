@@ -1,16 +1,12 @@
 package phantom.shell.expressions;
 
-import phantom.shell.environment.Environment;
+import phantom.shell.parser.Token;
+import phantom.support.util.List;
 
-public class Expression {
+public abstract class Expression {
 
-    public Expression() {
+    public Expression() {};
 
-    }
-
-    public Object exec(Environment env) {
-        return null;
-    }
-
+    public abstract List<Token> getTokens();
 
 }
