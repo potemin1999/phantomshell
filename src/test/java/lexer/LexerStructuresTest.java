@@ -13,7 +13,7 @@ public class LexerStructuresTest {
         var lexer = new Lexer(scanner);
         var startTime = System.currentTimeMillis();
         var counter = 0;
-        while (!lexer.hasReachedEOF()) {
+        while (lexer.hasNotReachedEOF()) {
             Token token = lexer.next();
             Log.out.print(token);
             if (token.getType() == TokenType.EOL) {

@@ -38,13 +38,13 @@ public class PhantomShell {
         }
     }
 
-    public void setDebugMode(boolean debug){
+    public void setDebugMode(boolean debug) {
         isInDebugMode = debug;
     }
 
     //TODO: DO DO DO
     public void run() {
-        while (!lexer.hasReachedEOF()){
+        while (lexer.hasNotReachedEOF()) {
             Token token = lexer.next();
             if (isInDebugMode) {
                 out.print(token.toString());

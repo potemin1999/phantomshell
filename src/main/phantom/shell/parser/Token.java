@@ -17,6 +17,10 @@ public class Token {
         return this.tokenType;
     }
 
+    public String getStringValue() {
+        return String.valueOf(tokenValue);
+    }
+
     public void setValue(char[] tokenValue) {
         this.tokenValue = tokenValue;
     }
@@ -25,12 +29,16 @@ public class Token {
         return this.tokenValue;
     }
 
-    public String toString(){
-        return "["+getStringType()+"] "+new String(
-                getValue()!=null ? getValue() : new char[]{'N','U','L'})+" ";
+    public String toString() {
+        return "[" + getStringType() + "] " + new String(
+                getValue() != null ? getValue() : new char[]{'N', 'U', 'L'}) + " ";
     }
 
-    private String getStringType(){
+    private String getStringType() {
+        return typeToString(tokenType);
+    }
+
+    public static String typeToString(int tokenType){
         switch (tokenType){
             case TokenType.EOL: return "EOL";
             case TokenType.IDENTIFIER: return "IDF";
@@ -42,8 +50,10 @@ public class Token {
             case TokenType.OPERATOR: return "OPR";
             case TokenType.PAREN_CLOSE: return "PC";
             case TokenType.PAREN_OPEN: return "PO";
+            case TokenType.BRACKET_OPEN: return "BRO";
+            case TokenType.BRACKET_CLOSE: return "BRC";
+            default: return "???";
         }
-        return "???";
     }
 
 }

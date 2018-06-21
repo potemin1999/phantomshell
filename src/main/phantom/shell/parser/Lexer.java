@@ -1,12 +1,16 @@
 package phantom.shell.parser;
 
-import phantom.shell.structures.Character;
 import phantom.shell.structures.Keyword;
 import phantom.support.lang.NullPointerException;
 import phantom.support.lang.RuntimeException;
 import phantom.support.lang.StringBuilder;
-import phantom.support.log.Log;
+import phantom.support.util.ArrayList;
+import phantom.support.util.List;
 
+/**
+ * Lexer can divide stream of chars to tokens
+ * Each token can be operator, keyword, identifier e.t.c
+ */
 public class Lexer {
 
     private boolean isEofReached;
@@ -14,6 +18,7 @@ public class Lexer {
     private Scanner scanner;
     private StringBuilder tokenBuffer;
     private boolean[] letterMap;
+    private Token bufferedToken;
 
     public Lexer(Scanner sourceScanner) {
         isEofReached = false;
@@ -24,8 +29,8 @@ public class Lexer {
         fillLetterMap();
     }
 
-    public boolean hasReachedEOF() {
-        return isEofReached;
+    public boolean hasNotReachedEOF() {
+        return !isEofReached;
     }
 
     private void fillLetterMap() {
@@ -72,7 +77,35 @@ public class Lexer {
         return 0;
     }
 
+    public Token peek() {
+        if (bufferedToken == null) {
+            bufferedToken = readNextToken();
+        }
+        return bufferedToken;
+    }
+
     public Token next() {
+        if (bufferedToken != null) {
+            var ret = bufferedToken;
+            bufferedToken = null;
+            return ret;
+        } else {
+            return readNextToken();
+        }
+    }
+
+    public List<Token> readToEOL() {
+        List<Token> list = new ArrayList<>();
+        do {
+            var token = next();
+            list.addLast(token);
+            if (token.getType() == TokenType.EOL)
+                break;
+        } while (!isEofReached);
+        return list;
+    }
+
+    private Token readNextToken() {
         var token = new Token();
         var currentSymbol = scanner.peek(); //look up our symbol
         while (currentSymbol == ' ' || currentSymbol == '\t') {
@@ -279,6 +312,14 @@ public class Lexer {
                     }
                     case ')': {
                         dst.setType(TokenType.PAREN_CLOSE);
+                        break;
+                    }
+                    case '[': {
+                        dst.setType(TokenType.BRACKET_OPEN);
+                        break;
+                    }
+                    case ']': {
+                        dst.setType(TokenType.BRACKET_CLOSE);
                         break;
                     }
                     case '{': {
