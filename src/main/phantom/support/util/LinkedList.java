@@ -85,6 +85,10 @@ public class LinkedList<T extends Object> extends List<T> {
         return size;
     }
 
+    public boolean isEmpty(){
+        return (size == 0);
+    }
+
     class Node
     {
         //Declare class variables
