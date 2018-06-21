@@ -1,7 +1,6 @@
 package phantom.shell.parser;
 
 public class TokenType {
-
     /**
      *    name, type    e.t.c.
      */
@@ -69,4 +68,13 @@ public class TokenType {
      */
     public static final int DOT = 10;
 
+    /**
+     *    [
+     */
+    public static final int BRACKET_OPEN = 11;
+
+    /**
+     *    ]
+     */
+    public static final int BRACKET_CLOSE = 12;
 }
