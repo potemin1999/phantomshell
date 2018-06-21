@@ -21,7 +21,7 @@ public class LexerPerformanceTest {
 
     public static int test(Lexer lexer,boolean output){
         var counter = 0;
-        while (!lexer.hasReachedEOF()){
+        while (lexer.hasNotReachedEOF()){
             Token token = lexer.next();
             if (output) {
                 Log.out.print(token);
