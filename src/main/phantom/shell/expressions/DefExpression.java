@@ -1,19 +1,27 @@
 package phantom.shell.expressions;
 
-import phantom.shell.environment.Environment;
+import phantom.shell.parser.Token;
+import phantom.support.util.List;
 
 public class DefExpression extends Expression {
 
     private char[] name;
-    private ValueExpression value;
+    private List<Token> tokens;
 
-    public DefExpression(char[] name, ValueExpression value) {
+    public DefExpression(char[] name,List<Token> tokens) {
         this.name = name;
-        this.value = value;
+        this.tokens = tokens;
     }
 
-    public Object exec(Environment env) {
-        return null;
+    public char[] getName(){
+        return name;
+    }
+    public List<Token> getTokens() {
+        return this.tokens;
     }
 
+    @Override
+    public String toString() {
+        return "DefExp:" + String.valueOf(name) + " = " + tokens.toString();
+    }
 }

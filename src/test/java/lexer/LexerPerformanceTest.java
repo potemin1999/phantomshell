@@ -16,7 +16,7 @@ public class LexerPerformanceTest {
         var counter = test(lexer,output);
         var endTime = System.currentTimeMillis();
         var time = endTime - startTime;
-        System.out.println(counter+" token(s) in "+time+"ms : "+((float)counter)/time+" t/ms");
+        System.out.println("\n"+counter+" token(s) in "+time+"ms : "+((float)counter)/time+" t/ms");
     }
 
     public static int test(Lexer lexer,boolean output){

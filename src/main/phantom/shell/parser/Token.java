@@ -34,10 +34,6 @@ public class Token {
                 getValue() != null ? getValue() : new char[]{'N', 'U', 'L'}) + " ";
     }
 
-    public String toStringWithoutType() {
-        return new String(getValue() != null ? getValue() : new char[]{'N', 'U', 'L'});
-    }
-
     private String getStringType() {
         return typeToString(tokenType);
     }

@@ -1,8 +1,18 @@
 package phantom.support.util;
 
-public abstract class List<T extends Object> {
+import java.util.Iterator;
+
+public abstract class List<T extends Object> implements Iterable<T>{
 
     public List() {
+    }
+
+    public final void add(Object obj) {
+        addLast(obj);
+    }
+
+    public final T remove(){
+        return removeLast();
     }
 
     public abstract void addFirst(Object obj);
@@ -18,4 +28,9 @@ public abstract class List<T extends Object> {
     public abstract T getLast();
 
     public abstract int size();
+
+    public abstract boolean isEmpty();
+
+    public abstract Iterator<T> iterator();
+
 }

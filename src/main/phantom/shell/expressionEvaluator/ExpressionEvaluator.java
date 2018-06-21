@@ -4,8 +4,8 @@ import phantom.shell.environment.Environment;
 import phantom.shell.structures.Operator;
 
 import javafx.util.Pair;
-
-import java.util.ArrayList;
+import phantom.support.util.ArrayList;
+import phantom.support.util.List;
 
 public class ExpressionEvaluator {
 
@@ -15,7 +15,7 @@ public class ExpressionEvaluator {
         operator = new Operator();
     }
 
-    public Object evaluateExpression(Environment environment, ArrayList<Pair<Object, Integer>> tokens, int startingIndex, int finishingIndex, ArrayList<Object> postChangingObjectStack, ArrayList<String> postOpStack) {
+    public Object evaluateExpression(Environment environment, ArrayList<Pair<Object, Integer>> tokens, int startingIndex, int finishingIndex, List<Object> postChangingObjectStack, List<String> postOpStack) {
         ArrayList<Object> objectStack = new ArrayList<>();
 
         ArrayList<String> opStack = new ArrayList<>();
@@ -27,8 +27,6 @@ public class ExpressionEvaluator {
 
         for (int i = startingIndex; i <= finishingIndex; ++i) {
             var token = tokens.get(i);
-            //System.out.println(token.getKey() + " " + token.getValue());
-            //System.out.println(opStack.size());
 
             switch (token.getValue()) {
                 case 0: // Object
@@ -61,14 +59,10 @@ public class ExpressionEvaluator {
                             }
                             --j;
 
-                            //System.out.println("HERE");
-                            //System.out.println(i + " " + j);
-
                             var a = evaluateExpression(environment, tokens, i + 1, j, postChangingObjectStack, postOpStack);
                             objectStack.add(evaluate(environment, op, a));
 
                             i = j;
-                            //System.out.println(i + " " + objectStack.size() + " " + opStack.size());
                         }
                     }
                     break;
@@ -155,8 +149,8 @@ public class ExpressionEvaluator {
                          */
                         if (operator.isComparisonOperator(op)) {
                             if (comparisonOp != null) {
-                                System.out.println("3 Invalid expression!");
-                                return null;
+                                throw new ExpressionEvaluationException("3 Invalid expression!");
+                                //return null;
                             }
 
                             comparisonOp = op;
@@ -165,8 +159,8 @@ public class ExpressionEvaluator {
                                 objectToCompare = objectStack.get(objectStack.size() - 1);
                                 objectStack.remove(objectStack.size() - 1);
                             } else {
-                                System.out.println("7 Invalid expression!");
-                                return null;
+                                throw new ExpressionEvaluationException("7 Invalid expression!");
+                                //return null;
                             }
 
                             continue;
@@ -193,8 +187,8 @@ public class ExpressionEvaluator {
                             comparisonOp = null;
                             objectToCompare = null;
                         } else {
-                            System.out.println("8 Invalid expression!");
-                            return null;
+                            throw new ExpressionEvaluationException("8 Invalid expression!");
+                            //return null;
                         }
                     }
 
@@ -265,8 +259,8 @@ public class ExpressionEvaluator {
                             op = opStack.get(opStack.size() - 1);
                             opStack.remove(opStack.size() - 1);
                         } else {
-                            System.out.println("2 Invalid expression!");
-                            return null;
+                            throw new ExpressionEvaluationException("2 Invalid expression!");
+                            //return null;
                         }
 
                         while (!op.equals("(")) {
@@ -276,8 +270,8 @@ public class ExpressionEvaluator {
                              */
                             if (operator.isComparisonOperator(op)) {
                                 if (comparisonOp != null) {
-                                    System.out.println("13 Invalid expression!");
-                                    return null;
+                                    throw new ExpressionEvaluationException("13 Invalid expression!");
+                                    //return null;
                                 }
 
                                 comparisonOp = op;
@@ -286,8 +280,8 @@ public class ExpressionEvaluator {
                                     objectToCompare = objectStack.get(objectStack.size() - 1);
                                     objectStack.remove(objectStack.size() - 1);
                                 } else {
-                                    System.out.println("4 Invalid expression!");
-                                    return null;
+                                    throw new ExpressionEvaluationException("4 Invalid expression!");
+                                    //return null;
                                 }
 
                                 op = opStack.get(opStack.size() - 1);
@@ -319,8 +313,8 @@ public class ExpressionEvaluator {
                                 comparisonOp = null;
                                 objectToCompare = null;
                             } else {
-                                System.out.println("5 Invalid expression!");
-                                return null;
+                                throw new ExpressionEvaluationException("5 Invalid expression!");
+                                //return null;
                             }
                         }
 
@@ -328,8 +322,8 @@ public class ExpressionEvaluator {
                             op = logicalOpStack.get(logicalOpStack.size() - 1);
                             logicalOpStack.remove(logicalOpStack.size() - 1);
                         } else {
-                            System.out.println("6 Invalid expression!");
-                            return null;
+                            throw new ExpressionEvaluationException("6 Invalid expression!");
+                            //return null;
                         }
 
                         while (!op.equals("(")) {
@@ -372,8 +366,16 @@ public class ExpressionEvaluator {
                         postOpStack.add(op);
                         postChangingObjectStack.add(prevToken.getKey());
                     } else {
-                        System.out.println("Expected variable");
-                        return null;
+                        throw new ExpressionEvaluationException("Expected variable");
+                        //return null;
+                    }
+
+                case 8: // Opening/closing brace
+                    op = (String) token.getKey();
+                    if (op.equals("{")) {
+                        environment = new Environment(environment);
+                    } else {
+                        environment = environment.deleteEnvironment();
                     }
             }
         }
@@ -383,8 +385,8 @@ public class ExpressionEvaluator {
             opStack.remove(opStack.size() - 1);
 
             if (op.equals("(")) {
-                System.out.println("10 Invalid expression!");
-                return null;
+                throw new ExpressionEvaluationException("10 Invalid expression!");
+                //return null;
             }
 
             /**
@@ -393,8 +395,8 @@ public class ExpressionEvaluator {
              */
             if (operator.isComparisonOperator(op)) {
                 if (comparisonOp != null) {
-                    System.out.println("14 Invalid expression!");
-                    return null;
+                    throw new ExpressionEvaluationException("14 Invalid expression!");
+                    //return null;
                 }
 
                 comparisonOp = op;
@@ -403,8 +405,8 @@ public class ExpressionEvaluator {
                     objectToCompare = objectStack.get(objectStack.size() - 1);
                     objectStack.remove(objectStack.size() - 1);
                 } else {
-                    System.out.println("7 Invalid expression!");
-                    return null;
+                    throw new ExpressionEvaluationException("7 Invalid expression!");
+                    //return null;
                 }
 
                 continue;
@@ -431,8 +433,8 @@ public class ExpressionEvaluator {
                 comparisonOp = null;
                 objectToCompare = null;
             } else {
-                System.out.println("8 Invalid expression!");
-                return null;
+                throw new ExpressionEvaluationException("8 Invalid expression!");
+                //return null;
             }
         }
 
@@ -441,8 +443,8 @@ public class ExpressionEvaluator {
             logicalOpStack.remove(logicalOpStack.size() - 1);
 
             if (op.equals("(")) {
-                System.out.println("10 Invalid expression!");
-                return null;
+                throw new ExpressionEvaluationException("10 Invalid expression!");
+                //return null;
             }
 
             var a = objectStack.get(objectStack.size() - 2);
@@ -472,10 +474,11 @@ public class ExpressionEvaluator {
             var val = environment.getVariable(obj);
 
             return val == null ? obj : val;
-        } else {
-            System.out.printf("Object stack has wrong size! It is %d\n",
-                    objectStack.size());
+        } else if (objectStack.size() == 0) {
             return null;
+        } else {
+            throw new ExpressionEvaluationException("Object stack has wrong size! It is "+objectStack.size());
+            //return null;
         }
     }
 
@@ -500,19 +503,14 @@ public class ExpressionEvaluator {
     }
 
     public Object evaluate(Environment environment, String op, Object obj1, Object obj2) {
-        var val2 = environment.getVariable(obj2);
-        if (val2 != null) {
-            obj2 = val2;
-        }
-
-        if (op.equals("=")) {
-            environment.setVariable(obj1, obj2);
-            return obj2;
-        }
-
         var val1 = environment.getVariable(obj1);
         if (val1 != null) {
             obj1 = val1;
+        }
+
+        var val2 = environment.getVariable(obj2);
+        if (val2 != null) {
+            obj2 = val2;
         }
 
         if (obj1 instanceof Number && obj2 instanceof Number) {
@@ -651,12 +649,12 @@ public class ExpressionEvaluator {
 
                 return result;
             } else {
-                System.out.println("Unknown number type");
-                return null;
+                throw new ExpressionEvaluationException("Unknown number type");
+                //return null;
             }
         } else {
-            System.out.println("Unknown object type");
-            return null;
+            throw new ExpressionEvaluationException("Unknown object type");
+            //return null;
         }
     }
 

@@ -1,1 +1,4 @@
-def a = 3 + 4;
+def aa = 3 + ( 4 << 1 );
+if [ aa == 11 ]{
+    def bb = aa - 1
+}

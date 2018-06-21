@@ -1,10 +1,9 @@
 package phantom.shell;
 
-import phantom.shell.distributor.Distributor;
-import phantom.shell.parser.Lexer;
-import phantom.shell.parser.Scanner;
-import phantom.shell.parser.Token;
-import phantom.shell.parser.TokenType;
+import phantom.shell.environment.Environment;
+import phantom.shell.executor.Executor;
+import phantom.shell.expressions.Expression;
+import phantom.shell.parser.*;
 import phantom.support.io.InputStream;
 import phantom.support.io.OutputStream;
 import phantom.support.io.PrintStream;
@@ -17,8 +16,10 @@ public class PhantomShell {
 
     private PrintStream out;
     private Scanner scanner;
+
     private Lexer lexer;
-    private Distributor distributor;
+    private Parser parser;
+    private Executor executor;
 
     private boolean isInDebugMode = false;
 
@@ -31,7 +32,8 @@ public class PhantomShell {
         out = new PrintStream(ttyOutput);
         scanner = new Scanner(sourceInput);
         lexer = new Lexer(scanner);
-        distributor = new Distributor();
+        parser = new Parser(lexer);
+        executor = new Executor(lexer);
 
         out.println("phantom shell develop version");
         if (sourceInput == ttyInput) {
@@ -49,13 +51,11 @@ public class PhantomShell {
     //TODO: DO DO DO
     public void run() {
         while (lexer.hasNotReachedEOF()) {
-            Token token = lexer.next();
-            distributor.receiveToken(token);
+            Expression expression = parser.next();
             if (isInDebugMode) {
-                out.print(token.toString());
-                if (token.getType() == TokenType.EOL)
-                    out.println();
+                out.println(expression.toString());
             }
+            var result = executor.execute(expression);
         }
     }
 

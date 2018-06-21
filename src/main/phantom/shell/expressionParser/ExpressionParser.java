@@ -7,9 +7,9 @@ import phantom.shell.structures.Operator;
 
 import javafx.util.Pair;
 import phantom.support.io.PrintStream;
+import phantom.support.util.ArrayList;
+import phantom.support.util.List;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class ExpressionParser {
 
@@ -21,7 +21,7 @@ public class ExpressionParser {
         operator = new Operator();
     }
 
-    public ArrayList<Pair<Object, Integer>> parseTokens(LinkedList<Token> tokens) {
+    public ArrayList<Pair<Object, Integer>> parseTokens(List<Token> tokens) {
 
 
         /*
@@ -91,13 +91,14 @@ public class ExpressionParser {
 
         parsedTokens.add(new Pair("(", 5));
 
-        while (!tokens.isEmpty()) {
+        while (tokens.size() > 0) {
             var token = tokens.getFirst();
+            //System.out.println(token.getStringValue());
             tokens.removeFirst();
 
             switch (token.getType()) {
                 case TokenType.IDENTIFIER:
-                    var word = token.toStringWithoutType();
+                    var word = token.getStringValue();
 
                     switch (word) {
                         case "true":
@@ -117,7 +118,7 @@ public class ExpressionParser {
                     break;
 
                 case TokenType.OPERATOR:
-                    var op = token.toStringWithoutType();
+                    var op = token.getStringValue();
 
                     if (operator.isUnaryOperator(op)) {
                         parsedTokens.add(new Pair(op, 1));
@@ -132,7 +133,7 @@ public class ExpressionParser {
                     } else if (operator.isPriorityOperator(op)){
                         parsedTokens.add(new Pair(op, 5));
                     } else if (op.equals("=")) {
-                        parsedTokens.add(new Pair(op, 6));
+                        break;
                     } else {
                         parsedTokens.add(new Pair(null, -1));
                     }
@@ -145,6 +146,20 @@ public class ExpressionParser {
 
                 case TokenType.PAREN_CLOSE:
                     parsedTokens.add(new Pair(")", 5));
+                    break;
+
+                case TokenType.EOL:
+                    break;
+
+                case TokenType.BRACE_OPEN:
+                    parsedTokens.add(new Pair("{", 8));
+                    break;
+
+                case TokenType.BRACE_CLOSE:
+                    parsedTokens.add(new Pair("}", 8));
+                    break;
+
+                case TokenType.BRACKET_CLOSE:
                     break;
 
                 default:
