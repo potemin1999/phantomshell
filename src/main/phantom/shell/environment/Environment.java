@@ -25,6 +25,14 @@ public class Environment {
         }
     }
 
+    public void defineVariable(Object name) {
+        if (!definedVariables.containsKey(name)) {
+            definedVariables.put(name, null);
+        } else {
+            // Throw some exception that you can not define the same variable twice
+        }
+    }
+
     public void setVariable(Object name, Object value) {
         if (definedVariables.containsKey(name)) {
             definedVariables.replace(name, value);

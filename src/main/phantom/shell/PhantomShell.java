@@ -1,5 +1,6 @@
 package phantom.shell;
 
+import phantom.shell.distributor.Distributor;
 import phantom.shell.parser.Lexer;
 import phantom.shell.parser.Scanner;
 import phantom.shell.parser.Token;
@@ -17,6 +18,7 @@ public class PhantomShell {
     private PrintStream out;
     private Scanner scanner;
     private Lexer lexer;
+    private Distributor distributor;
 
     private boolean isInDebugMode = false;
 
@@ -29,6 +31,8 @@ public class PhantomShell {
         out = new PrintStream(ttyOutput);
         scanner = new Scanner(sourceInput);
         lexer = new Lexer(scanner);
+        distributor = new Distributor();
+
         out.println("phantom shell develop version");
         if (sourceInput == ttyInput) {
             out.println("interactive run");
@@ -46,6 +50,7 @@ public class PhantomShell {
     public void run() {
         while (lexer.hasNotReachedEOF()) {
             Token token = lexer.next();
+            distributor.receiveToken(token);
             if (isInDebugMode) {
                 out.print(token.toString());
                 if (token.getType() == TokenType.EOL)
