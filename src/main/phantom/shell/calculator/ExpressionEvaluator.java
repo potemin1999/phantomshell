@@ -1,4 +1,4 @@
-package phantom.shell.expressionEvaluator;
+package phantom.shell.calculator;
 
 import phantom.shell.environment.Environment;
 import phantom.shell.structures.Operator;
@@ -15,7 +15,7 @@ public class ExpressionEvaluator {
         operator = new Operator();
     }
 
-    public Object evaluateExpression(Environment environment, ArrayList<Pair<Object, Integer>> tokens, int startingIndex, int finishingIndex, List<Object> postChangingObjectStack, List<String> postOpStack) {
+    public Pair<Object, Environment> evaluateExpression(Environment environment, ArrayList<Pair<Object, Integer>> tokens, int startingIndex, int finishingIndex, List<Object> postChangingObjectStack, List<String> postOpStack) {
         ArrayList<Object> objectStack = new ArrayList<>();
 
         ArrayList<String> opStack = new ArrayList<>();
@@ -59,7 +59,10 @@ public class ExpressionEvaluator {
                             }
                             --j;
 
-                            var a = evaluateExpression(environment, tokens, i + 1, j, postChangingObjectStack, postOpStack);
+                            var pair = evaluateExpression(environment, tokens, i + 1, j, postChangingObjectStack, postOpStack);
+                            var a = pair.getKey();
+                            environment = pair.getValue();
+
                             objectStack.add(evaluate(environment, op, a));
 
                             i = j;
@@ -85,7 +88,9 @@ public class ExpressionEvaluator {
                         objectStack.remove(objectStack.size() - 2);
                         objectStack.remove(objectStack.size() - 1);
 
-                        objectStack.add(evaluate(environment, prevOp, a, b));
+                        var pair = evaluate(environment, prevOp, a, b);
+                        objectStack.add(pair.getKey());
+                        environment = pair.getValue();
 
                         opStack.remove(opStack.size() - 1);
 
@@ -115,8 +120,13 @@ public class ExpressionEvaluator {
                         var a = objectStack.get(objectStack.size() - 1);
                         objectStack.remove(objectStack.size() - 1);
 
-                        var b = evaluateExpression(environment, tokens, i + 1, j, postChangingObjectStack, postOpStack);
-                        objectStack.add(evaluate(environment, op, a, b));
+                        var pair = evaluateExpression(environment, tokens, i + 1, j, postChangingObjectStack, postOpStack);
+                        var b = pair.getKey();
+                        environment = pair.getValue();
+
+                        pair = evaluate(environment, op, a, b);
+                        objectStack.add(pair.getKey());
+                        environment = pair.getValue();
 
                         i = j;
 
@@ -172,7 +182,9 @@ public class ExpressionEvaluator {
                         objectStack.remove(objectStack.size() - 2);
                         objectStack.remove(objectStack.size() - 1);
 
-                        objectStack.add(evaluate(environment, op, a, b));
+                        var pair = evaluate(environment, op, a, b);
+                        objectStack.add(pair.getKey());
+                        environment = pair.getValue();
                     }
 
                     if (comparisonOp != null) {
@@ -182,7 +194,9 @@ public class ExpressionEvaluator {
 
                             objectStack.remove(objectStack.size() - 1);
 
-                            objectStack.add(evaluate(environment, comparisonOp, a, b));
+                            var pair = evaluate(environment, comparisonOp, a, b);
+                            objectStack.add(pair.getKey());
+                            environment = pair.getValue();
 
                             comparisonOp = null;
                             objectToCompare = null;
@@ -207,7 +221,9 @@ public class ExpressionEvaluator {
                         objectStack.remove(objectStack.size() - 2);
                         objectStack.remove(objectStack.size() - 1);
 
-                        objectStack.add(evaluate(environment, prevOp, a, b));
+                        var pair = evaluate(environment, prevOp, a, b);
+                        objectStack.add(pair.getKey());
+                        environment = pair.getValue();
 
                         logicalOpStack.remove(logicalOpStack.size() - 1);
 
@@ -238,8 +254,13 @@ public class ExpressionEvaluator {
                         var a = objectStack.get(objectStack.size() - 1);
                         objectStack.remove(objectStack.size() - 1);
 
-                        var b = evaluateExpression(environment, tokens, i + 1, j, postChangingObjectStack, postOpStack);
-                        objectStack.add(evaluate(environment, op, a, b));
+                        var pair = evaluateExpression(environment, tokens, i + 1, j, postChangingObjectStack, postOpStack);
+                        var b = pair.getKey();
+                        environment = pair.getValue();
+
+                        pair = evaluate(environment, op, a, b);
+                        objectStack.add(pair.getKey());
+                        environment = pair.getValue();
 
                         i = j;
 
@@ -295,7 +316,9 @@ public class ExpressionEvaluator {
                             objectStack.remove(objectStack.size() - 2);
                             objectStack.remove(objectStack.size() - 1);
 
-                            objectStack.add(evaluate(environment, op, a, b));
+                            var pair = evaluate(environment, op, a, b);
+                            objectStack.add(pair.getKey());
+                            environment = pair.getValue();
 
                             op = opStack.get(opStack.size() - 1);
                             opStack.remove(opStack.size() - 1);
@@ -308,7 +331,9 @@ public class ExpressionEvaluator {
 
                                 objectStack.remove(objectStack.size() - 1);
 
-                                objectStack.add(evaluate(environment, comparisonOp, a, b));
+                                var pair = evaluate(environment, comparisonOp, a, b);
+                                objectStack.add(pair.getKey());
+                                environment = pair.getValue();
 
                                 comparisonOp = null;
                                 objectToCompare = null;
@@ -333,7 +358,9 @@ public class ExpressionEvaluator {
                             objectStack.remove(objectStack.size() - 2);
                             objectStack.remove(objectStack.size() - 1);
 
-                            objectStack.add(evaluate(environment, op, a, b));
+                            var pair = evaluate(environment, op, a, b);
+                            objectStack.add(pair.getKey());
+                            environment = pair.getValue();
 
                             op = logicalOpStack.get(logicalOpStack.size() - 1);
                             logicalOpStack.remove(logicalOpStack.size() - 1);
@@ -368,14 +395,6 @@ public class ExpressionEvaluator {
                     } else {
                         throw new ExpressionEvaluationException("Expected variable");
                         //return null;
-                    }
-
-                case 8: // Opening/closing brace
-                    op = (String) token.getKey();
-                    if (op.equals("{")) {
-                        environment = new Environment(environment);
-                    } else {
-                        environment = environment.deleteEnvironment();
                     }
             }
         }
@@ -418,7 +437,9 @@ public class ExpressionEvaluator {
             objectStack.remove(objectStack.size() - 2);
             objectStack.remove(objectStack.size() - 1);
 
-            objectStack.add(evaluate(environment, op, a, b));
+            var pair = evaluate(environment, op, a, b);
+            objectStack.add(pair.getKey());
+            environment = pair.getValue();
         }
 
         if (comparisonOp != null) {
@@ -428,7 +449,9 @@ public class ExpressionEvaluator {
 
                 objectStack.remove(objectStack.size() - 1);
 
-                objectStack.add(evaluate(environment, comparisonOp, a, b));
+                var pair = evaluate(environment, comparisonOp, a, b);
+                objectStack.add(pair.getKey());
+                environment = pair.getValue();
 
                 comparisonOp = null;
                 objectToCompare = null;
@@ -453,7 +476,9 @@ public class ExpressionEvaluator {
             objectStack.remove(objectStack.size() - 2);
             objectStack.remove(objectStack.size() - 1);
 
-            objectStack.add(evaluate(environment, op, a, b));
+            var pair = evaluate(environment, op, a, b);
+            objectStack.add(pair.getKey());
+            environment = pair.getValue();
         }
 
         while (!assigningOpStack.isEmpty()) {
@@ -466,27 +491,32 @@ public class ExpressionEvaluator {
             objectStack.remove(objectStack.size() - 2);
             objectStack.remove(objectStack.size() - 1);
 
-            objectStack.add(evaluate(environment, op, a, b));
+            var pair = evaluate(environment, op, a, b);
+            objectStack.add(pair.getKey());
+            environment = pair.getValue();
         }
 
         if (objectStack.size() == 1) {
             var obj = objectStack.get(0);
+
             var val = environment.getVariable(obj);
 
-            return val == null ? obj : val;
+            return val == null ? new Pair(obj, environment) : new Pair(val, environment);
         } else if (objectStack.size() == 0) {
-            return null;
+            return new Pair(null, environment);
         } else {
             throw new ExpressionEvaluationException("Object stack has wrong size! It is "+objectStack.size());
             //return null;
         }
     }
 
-    public Object evaluateExpression(Environment environment, ArrayList<Pair<Object, Integer>> tokens) {
+    public Pair<Object, Environment> evaluateExpression(Environment environment, ArrayList<Pair<Object, Integer>> tokens) {
         ArrayList<Object> postChangingObjectStack = new ArrayList<>();
         ArrayList<String> postOpStack = new ArrayList<>();
 
-        var result = evaluateExpression(environment, tokens, 0, tokens.size() - 1, postChangingObjectStack, postOpStack);
+        var pair = evaluateExpression(environment, tokens, 0, tokens.size() - 1, postChangingObjectStack, postOpStack);
+        var result = pair.getKey();
+        environment = pair.getValue();
 
         while (!postOpStack.isEmpty()) {
             var op = postOpStack.get(postOpStack.size() - 1);
@@ -499,19 +529,29 @@ public class ExpressionEvaluator {
             evaluate(environment, op, a);
         }
 
-        return result;
+        return new Pair(result, environment);
     }
 
-    public Object evaluate(Environment environment, String op, Object obj1, Object obj2) {
-        var val1 = environment.getVariable(obj1);
-        if (val1 != null) {
-            obj1 = val1;
-        }
+    public Pair<Object, Environment> evaluate(Environment environment, String op, Object obj1, Object obj2) {
+        //System.out.println(obj1 + " " + op + " " + obj2);
 
         var val2 = environment.getVariable(obj2);
         if (val2 != null) {
             obj2 = val2;
         }
+
+        if (op.equals("=")) {
+            environment.setVariable(obj1, obj2);
+
+            return new Pair(obj2, environment);
+        }
+
+        var val1 = environment.getVariable(obj1);
+        if (val1 != null) {
+            obj1 = val1;
+        }
+
+        //System.out.println(obj1 + " " + op + " " + obj2);
 
         if (obj1 instanceof Number && obj2 instanceof Number) {
             Number num1 = (Number) obj1;
@@ -570,11 +610,11 @@ public class ExpressionEvaluator {
                         break;
 
                     default:
-                        System.out.println("Operator " + op + " is not defined for floats.");
-                        result = 0;
+                        throw new ExpressionEvaluationException("Operator " + op + " is not defined for floats");
+                        //result = 0;
                 }
 
-                return result;
+                return new Pair(result, environment);
             } else if (num1 instanceof Integer || num2 instanceof Integer) {
                 var a = num1.intValue();
                 var b = num2.intValue();
@@ -643,11 +683,11 @@ public class ExpressionEvaluator {
                         break;
 
                     default:
-                        System.out.println("Operator " + op + " is not defined for integers.");
-                        result = 0;
+                        throw new ExpressionEvaluationException("Operator " + op + " is not defined for integers");
+                        //result = 0;
                 }
 
-                return result;
+                return new Pair(result, environment);
             } else {
                 throw new ExpressionEvaluationException("Unknown number type");
                 //return null;
@@ -690,8 +730,8 @@ public class ExpressionEvaluator {
                         break;
 
                     default:
-                        System.out.println("Operator " + op + " is not defined for floats.");
-                        result = 0;
+                        throw new ExpressionEvaluationException("Operator " + op + " is not defined for floats");
+                        //result = 0;
                 }
 
                 return result;
@@ -719,18 +759,18 @@ public class ExpressionEvaluator {
                         break;
 
                     default:
-                        System.out.println("Operator " + op + " is not defined for integers.");
-                        result = 0;
+                        throw new ExpressionEvaluationException("Operator " + op + " is not defined for integers");
+                        //result = 0;
                 }
 
                 return result;
             } else {
-                System.out.println("Unknown number type");
-                return null;
+                throw new ExpressionEvaluationException("Unknown number type");
+                //return null;
             }
         } else {
-            System.out.println("Unknown object type");
-            return null;
+            throw new ExpressionEvaluationException("Unknown object type");
+            //return null;
         }
     }
 }

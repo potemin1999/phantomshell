@@ -14,15 +14,6 @@ public class Parser {
         this.lexer = lexer;
     }
 
-    private void assertType(Token token, int tokenType) {
-        assertType(token, tokenType, Token.typeToString(tokenType) + " expected");
-    }
-
-    private void assertType(Token token, int tokenType, String errorMsg) {
-        if (token.getType() != tokenType)
-            throw new InvalidTokenException(errorMsg);
-    }
-
     public Expression next() {
         var token = lexer.next();
         while (token.getType() == TokenType.EOL && lexer.hasNotReachedEOF()) {
@@ -88,11 +79,11 @@ public class Parser {
                 var expressionTokens = lexer.readToEOL();
 
                 //reversed order to better performance in array list
-                //expressionTokens.add(operator);
-                //expressionTokens.addFirst(identifier);
 
+                expressionTokens.add(operator);
+                expressionTokens.addFirst(identifier);
 
-                return new DefExpression(identifier.getValue(), expressionTokens);
+                return new DefExpression(expressionTokens);
             }
 
             case "if": {
@@ -109,9 +100,10 @@ public class Parser {
 
                 ArrayList<Token> arrayList = new ArrayList<>();
                 arrayList.addLast(openBrace);
+
                 //TODO: read all expressions till closing brace
                 var blockExpressions = new ArrayList<Expression>();
-                //blockExpressions.addLast(new ValueExpression(arrayList));
+                blockExpressions.addLast(new ValueExpression(arrayList));
                 readToClosingBrace(blockExpressions);
                 var trueBlock = new BlockExpression(blockExpressions);
 
@@ -138,6 +130,30 @@ public class Parser {
                     return new IfExpression(valueExpression, trueBlock);
                 }
 
+            }
+
+            case "print": {
+                var identifier = lexer.next();
+                assertType(identifier, TokenType.BRACKET_OPEN);
+                var expressionTokens = lexer.readToClosingBracket();
+
+                expressionTokens.removeLast();
+
+                ValueExpression expression = new ValueExpression(expressionTokens);
+
+                return new PrintExpression(expression);
+            }
+
+            case "println": {
+                var identifier = lexer.next();
+                assertType(identifier, TokenType.BRACKET_OPEN);
+                var expressionTokens = lexer.readToClosingBracket();
+
+                expressionTokens.removeLast();
+
+                ValueExpression expression = new ValueExpression(expressionTokens);
+
+                return new PrintlnExpression(expression);
             }
 
             default:

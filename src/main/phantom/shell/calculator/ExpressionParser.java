@@ -1,4 +1,4 @@
-package phantom.shell.expressionParser;
+package phantom.shell.calculator;
 
 import phantom.shell.parser.Token;
 import phantom.shell.parser.TokenType;
@@ -133,7 +133,7 @@ public class ExpressionParser {
                     } else if (operator.isPriorityOperator(op)){
                         parsedTokens.add(new Pair(op, 5));
                     } else if (op.equals("=")) {
-                        break;
+                        parsedTokens.add(new Pair(op, 6));
                     } else {
                         parsedTokens.add(new Pair(null, -1));
                     }
@@ -149,14 +149,6 @@ public class ExpressionParser {
                     break;
 
                 case TokenType.EOL:
-                    break;
-
-                case TokenType.BRACE_OPEN:
-                    parsedTokens.add(new Pair("{", 8));
-                    break;
-
-                case TokenType.BRACE_CLOSE:
-                    parsedTokens.add(new Pair("}", 8));
                     break;
 
                 case TokenType.BRACKET_CLOSE:
