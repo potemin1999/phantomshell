@@ -1,4 +1,18 @@
 def aa = 3 + ( 4 << 1 );
-if [ aa == 11 ]{
+def bb = 0;
+bb = 2;
+println [ aa ]
+if [ aa == 1100 ] {
     def bb = aa - 1
+    println [ bb ]
+} else {
+    bb = aa * 3
+    println [ bb ]
 }
+println[bb = aa = !true];
+println[aa]
+println[bb]
+
+bb = aa = true
+println[aa]
+println[bb]

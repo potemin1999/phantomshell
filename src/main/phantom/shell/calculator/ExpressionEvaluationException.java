@@ -1,4 +1,4 @@
-package phantom.shell.expressionEvaluator;
+package phantom.shell.calculator;
 
 import phantom.support.lang.RuntimeException;
 

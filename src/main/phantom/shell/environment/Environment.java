@@ -12,9 +12,10 @@ public class Environment {
         definedVariables = new HashMap<>();
     }
 
-    public Environment(Environment par) {
-        parent = par;
-        definedVariables = new HashMap<>();
+    public Environment(Environment parent) {
+        //System.out.println("New env!");
+        this.parent = parent;
+        this.definedVariables = new HashMap<>();
     }
 
     public void defineVariable(char[] name) {
@@ -33,7 +34,7 @@ public class Environment {
         if (!definedVariables.containsKey(name)) {
             definedVariables.put(name, value);
         } else {
-            // Throw some exception that you can not define the same variable twice
+            throw new EnvironmentException("Can not define two variables with the same name in the same scope!");
         }
     }
 
@@ -42,14 +43,23 @@ public class Environment {
     }
 
     public void setVariable(Object name, Object value) {
+        //System.out.println("Trying to find " + name);
+
         if (definedVariables.containsKey(name)) {
+            //System.out.println("Found " + name);
+
             definedVariables.replace(name, value);
+            //System.out.println("ASDASD " + definedVariables.get(name));
         } else {
+
             Environment current = parent;
 
             while (current != null) {
                 if (current.definedVariables.containsKey(name)) {
-                    definedVariables.replace(name, value);
+                    //System.out.println("Not Found " + name);
+                    current.definedVariables.replace(name, value);
+                    //System.out.println(definedVariables.get(name));
+                    //System.out.println(value);
                     break;
                 }
 
@@ -63,30 +73,41 @@ public class Environment {
     }
 
     public Object getVariable(Object name) {
-        if (definedVariables.containsKey(name)) {
-            return definedVariables.get(name);
-        } else {
-            Environment current = parent;
+        if (name instanceof String) {
+            //System.out.println("Trying to find " + name);
 
-            while (current != null) {
-                if (current.definedVariables.containsKey(name)) {
-                    return current.definedVariables.get(name);
+            if (definedVariables.containsKey(name)) {
+                //System.out.println("Found " + name);
+                //System.out.println("VALUE = " + definedVariables.get(name));
+                return definedVariables.get(name);
+            } else {
+                //System.out.println("Not Found " + name);
+                Environment current = parent;
+
+                while (current != null) {
+
+                    if (current.definedVariables.containsKey(name)) {
+                        //System.out.println("Found " + name);
+                        //System.out.println("VALUE = " + current.definedVariables.get(name));
+                        return current.definedVariables.get(name);
+                    }
+
+                    current = current.parent;
                 }
-
-                current = current.parent;
             }
+
+            return null;
         }
 
-        return null;
+        return name;
     }
 
     public Environment deleteEnvironment() {
+        //System.out.println("Env deleted!");
         Environment env = this;
 
         if (env.parent == null) {
-            // Throw some exception that you can not delete the global environment
-
-            return env;
+            throw new EnvironmentException("Deletion of the global environment is prohibited!");
         }
 
         Environment parent = env.parent;

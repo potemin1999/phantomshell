@@ -43,7 +43,11 @@ public class PrintStream extends OutputStream {
     }
 
     public void print(Object obj){
-        print(obj.toString());
+        if (obj != null) {
+            print(obj.toString());
+        } else {
+            print("null");
+        }
     }
 
     public void print(String str) {

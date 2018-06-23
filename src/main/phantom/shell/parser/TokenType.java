@@ -1,6 +1,15 @@
 package phantom.shell.parser;
 
 public class TokenType {
+    public static void assertType(Token token, int tokenType) {
+        assertType(token, tokenType, Token.typeToString(tokenType) + " expected");
+    }
+
+    public static void assertType(Token token, int tokenType, String errorMsg) {
+        if (token.getType() != tokenType)
+            throw new InvalidTokenException(errorMsg);
+    }
+
     /**
      *    name, type    e.t.c.
      */

@@ -1,9 +1,5 @@
 package expressionEvaluation;
 
-import phantom.shell.environment.Environment;
-import phantom.shell.expressionHandler.ExpressionHandler;
-import phantom.shell.expressionParser.ExpressionParser;
-
 import javafx.util.Pair;
 
 import java.util.ArrayList;

@@ -36,7 +36,11 @@ public class Keyword {
                 // import
                 compare(chars, new char[]{'i','m','p','o','r','t'}) == 0 ||
                 // class
-                compare(chars, new char[]{'c', 'l', 'a', 's', 's'}) == 0 ;
+                compare(chars, new char[]{'c', 'l', 'a', 's', 's'}) == 0 ||
+                // print
+                compare(chars, new char[]{'p', 'r', 'i', 'n', 't'}) == 0 ||
+                // println
+                compare(chars, new char[]{'p', 'r', 'i', 'n', 't', 'l', 'n'}) == 0 ;
     }
 
     private int compare(char[] chars1, char[] chars2) {
