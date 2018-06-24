@@ -1,1 +1,5 @@
 .idea/
+.floo
+.flooignore
+out/
+PhantomShell.iml
