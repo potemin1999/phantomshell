@@ -1,18 +1,20 @@
 package phantom.shell.parser;
 
-import phantom.shell.expressions.Expression;
-import phantom.shell.expressions.ValueExpression;
 import phantom.shell.structures.Keyword;
 import phantom.support.lang.NullPointerException;
 import phantom.support.lang.RuntimeException;
 import phantom.support.lang.StringBuilder;
-import phantom.support.log.Log;
 import phantom.support.util.ArrayList;
 import phantom.support.util.List;
 
 /**
+ * @author Ilya Potemin
+ *
  * Lexer can divide stream of chars to tokens
  * Each token can be operator, keyword, identifier e.t.c
+ *
+ * @see Scanner
+ * @see Parser
  */
 public class Lexer {
 
@@ -103,23 +105,22 @@ public class Lexer {
     }
 
     public List<Token> readToEOL() {
-        List<Token> list = new ArrayList<>();
-        do {
-            var token = next();
-            list.add(token);
-            if (token.getType() == TokenType.EOL)
-                break;
-        } while (!isEofReached);
-        return list;
+        return readTo(new int[]{TokenType.EOL});
     }
 
     public List<Token> readToClosingBracket() {
+        return readTo(new int[]{TokenType.BRACKET_CLOSE});
+    }
+
+    public List<Token> readTo(int[] tokenTypes) {
         List<Token> list = new ArrayList<>();
         do {
             var token = next();
             list.addLast(token);
-            if (token.getType() == TokenType.BRACKET_CLOSE)
-                break;
+            for (var type : tokenTypes) {
+                if (token.getType() == type)
+                    return list;
+            }
         } while (!isEofReached);
         return list;
     }
@@ -152,8 +153,9 @@ public class Lexer {
                 token.setValue(new char[]{'\\', '\\'});
                 return token;
             } else {
-                commitSymbol(currentSymbol);
+                tokenBuffer.append(currentSymbol);
                 write(token, 0);
+                return token;
             }
             currentSymbol = scanner.peek();
         }
@@ -288,6 +290,7 @@ public class Lexer {
         }
     }
 
+    //TODO: use it
     private char escapeCharacters(char secondSymbol) {
         switch (secondSymbol) {
             case 'r':

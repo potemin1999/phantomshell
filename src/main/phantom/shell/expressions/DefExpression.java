@@ -14,4 +14,10 @@ public class DefExpression extends Expression {
     public List<Token> getTokens() {
         return this.tokens;
     }
+
+    @Override
+    public String toString() {
+        return "DefExp: " + tokens.toString();
+    }
+
 }

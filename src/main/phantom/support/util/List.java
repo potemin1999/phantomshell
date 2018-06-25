@@ -2,6 +2,13 @@ package phantom.support.util;
 
 import java.util.Iterator;
 
+/**
+ * @author Ilya Potemin
+ *
+ * Simple List template for extending
+ * @see ArrayList
+ * @param <T>
+ */
 public abstract class List<T extends Object> implements Iterable<T>{
 
     public List() {

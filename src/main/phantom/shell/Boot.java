@@ -4,6 +4,13 @@ import phantom.support.io.*;
 import phantom.support.lang.RuntimeException;
 import phantom.support.log.Log;
 
+/**
+ * @author Ilya Potemin
+ *
+ * Simple connection with outside world for PhantomShell
+ *
+ * @see PhantomShell
+ */
 public class Boot {
 
     public static void main(String[] args) {

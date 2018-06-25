@@ -3,10 +3,12 @@ package phantom.shell.calculator;
 import phantom.shell.environment.Environment;
 import phantom.shell.structures.Operator;
 
-import javafx.util.Pair;
+import phantom.support.util.Pair;
 import phantom.support.util.ArrayList;
 import phantom.support.util.List;
 
+
+//TODO: refactor it please
 public class ExpressionEvaluator {
 
     Operator operator;
@@ -159,7 +161,7 @@ public class ExpressionEvaluator {
                          */
                         if (operator.isComparisonOperator(op)) {
                             if (comparisonOp != null) {
-                                throw new ExpressionEvaluationException("3 Invalid expression!");
+                                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"3");
                                 //return null;
                             }
 
@@ -169,7 +171,7 @@ public class ExpressionEvaluator {
                                 objectToCompare = objectStack.get(objectStack.size() - 1);
                                 objectStack.remove(objectStack.size() - 1);
                             } else {
-                                throw new ExpressionEvaluationException("7 Invalid expression!");
+                                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"7");
                                 //return null;
                             }
 
@@ -201,7 +203,7 @@ public class ExpressionEvaluator {
                             comparisonOp = null;
                             objectToCompare = null;
                         } else {
-                            throw new ExpressionEvaluationException("8 Invalid expression!");
+                            throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"8");
                             //return null;
                         }
                     }
@@ -280,7 +282,7 @@ public class ExpressionEvaluator {
                             op = opStack.get(opStack.size() - 1);
                             opStack.remove(opStack.size() - 1);
                         } else {
-                            throw new ExpressionEvaluationException("2 Invalid expression!");
+                            throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"2");
                             //return null;
                         }
 
@@ -291,7 +293,7 @@ public class ExpressionEvaluator {
                              */
                             if (operator.isComparisonOperator(op)) {
                                 if (comparisonOp != null) {
-                                    throw new ExpressionEvaluationException("13 Invalid expression!");
+                                    throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"13");
                                     //return null;
                                 }
 
@@ -301,7 +303,7 @@ public class ExpressionEvaluator {
                                     objectToCompare = objectStack.get(objectStack.size() - 1);
                                     objectStack.remove(objectStack.size() - 1);
                                 } else {
-                                    throw new ExpressionEvaluationException("4 Invalid expression!");
+                                    throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"4");
                                     //return null;
                                 }
 
@@ -338,7 +340,7 @@ public class ExpressionEvaluator {
                                 comparisonOp = null;
                                 objectToCompare = null;
                             } else {
-                                throw new ExpressionEvaluationException("5 Invalid expression!");
+                                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"5");
                                 //return null;
                             }
                         }
@@ -347,7 +349,7 @@ public class ExpressionEvaluator {
                             op = logicalOpStack.get(logicalOpStack.size() - 1);
                             logicalOpStack.remove(logicalOpStack.size() - 1);
                         } else {
-                            throw new ExpressionEvaluationException("6 Invalid expression!");
+                            throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"6");
                             //return null;
                         }
 
@@ -404,17 +406,17 @@ public class ExpressionEvaluator {
             opStack.remove(opStack.size() - 1);
 
             if (op.equals("(")) {
-                throw new ExpressionEvaluationException("10 Invalid expression!");
+                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"10");
                 //return null;
             }
 
-            /**
+            /*
              * If there is need to compare, transfer object to compare from object stack
              * and comparison operator from operator stack.
              */
             if (operator.isComparisonOperator(op)) {
                 if (comparisonOp != null) {
-                    throw new ExpressionEvaluationException("14 Invalid expression!");
+                    throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"14");
                     //return null;
                 }
 
@@ -424,7 +426,7 @@ public class ExpressionEvaluator {
                     objectToCompare = objectStack.get(objectStack.size() - 1);
                     objectStack.remove(objectStack.size() - 1);
                 } else {
-                    throw new ExpressionEvaluationException("7 Invalid expression!");
+                    throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"7");
                     //return null;
                 }
 
@@ -456,7 +458,7 @@ public class ExpressionEvaluator {
                 comparisonOp = null;
                 objectToCompare = null;
             } else {
-                throw new ExpressionEvaluationException("8 Invalid expression!");
+                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"8");
                 //return null;
             }
         }
@@ -466,7 +468,7 @@ public class ExpressionEvaluator {
             logicalOpStack.remove(logicalOpStack.size() - 1);
 
             if (op.equals("(")) {
-                throw new ExpressionEvaluationException("10 Invalid expression!");
+                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"10");
                 //return null;
             }
 
@@ -505,7 +507,7 @@ public class ExpressionEvaluator {
         } else if (objectStack.size() == 0) {
             return new Pair(null, environment);
         } else {
-            throw new ExpressionEvaluationException("Object stack has wrong size! It is "+objectStack.size());
+            throw new ExpressionEvaluationException(ExpressionEvaluationFault.OBJ_STACK_WRONG_SIZE,""+objectStack.size());
             //return null;
         }
     }
@@ -529,7 +531,7 @@ public class ExpressionEvaluator {
             evaluate(environment, op, a);
         }
 
-        return new Pair(result, environment);
+        return new Pair<>(result, environment);
     }
 
     public Pair<Object, Environment> evaluate(Environment environment, String op, Object obj1, Object obj2) {
@@ -610,7 +612,7 @@ public class ExpressionEvaluator {
                         break;
 
                     default:
-                        throw new ExpressionEvaluationException("Operator " + op + " is not defined for floats");
+                        throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_FLOAT_OPERATOR,op);
                         //result = 0;
                 }
 
@@ -631,6 +633,8 @@ public class ExpressionEvaluator {
                         result = a * b;
                         break;
                     case "/":
+                        if (b==0)
+                            throw new ExpressionEvaluationException(ExpressionEvaluationFault.INTEGER_DIVISION_BY_ZERO);
                         result = a / b;
                         break;
 
@@ -683,17 +687,17 @@ public class ExpressionEvaluator {
                         break;
 
                     default:
-                        throw new ExpressionEvaluationException("Operator " + op + " is not defined for integers");
+                        throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_INT_OPERATOR,op);
                         //result = 0;
                 }
 
                 return new Pair(result, environment);
             } else {
-                throw new ExpressionEvaluationException("Unknown number type");
+                throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNKNOWN_NUMBER_TYPE);
                 //return null;
             }
         } else {
-            throw new ExpressionEvaluationException("Unknown object type");
+            throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNKNOWN_OBJ_TYPE);
             //return null;
         }
     }
@@ -730,7 +734,7 @@ public class ExpressionEvaluator {
                         break;
 
                     default:
-                        throw new ExpressionEvaluationException("Operator " + op + " is not defined for floats");
+                        throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_FLOAT_OPERATOR,op);
                         //result = 0;
                 }
 
@@ -759,17 +763,17 @@ public class ExpressionEvaluator {
                         break;
 
                     default:
-                        throw new ExpressionEvaluationException("Operator " + op + " is not defined for integers");
+                        throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_INT_OPERATOR,op);
                         //result = 0;
                 }
 
                 return result;
             } else {
-                throw new ExpressionEvaluationException("Unknown number type");
+                throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNKNOWN_NUMBER_TYPE);
                 //return null;
             }
         } else {
-            throw new ExpressionEvaluationException("Unknown object type");
+            throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNKNOWN_OBJ_TYPE);
             //return null;
         }
     }

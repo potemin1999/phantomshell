@@ -1,13 +1,14 @@
 package phantom.shell.calculator;
 
-import javafx.util.Pair;
 import phantom.shell.environment.Environment;
 import phantom.shell.parser.Token;
 import phantom.support.util.List;
+import phantom.support.util.Pair;
 
 public class ExpressionHandler {
-    ExpressionParser parser;
-    ExpressionEvaluator evaluator;
+
+    private ExpressionParser parser;
+    private ExpressionEvaluator evaluator;
 
     public ExpressionHandler() {
         parser = new ExpressionParser();
@@ -23,6 +24,6 @@ public class ExpressionHandler {
 
         //System.out.println("RESULT " + result);
 
-        return new Pair(result, environment);
+        return new Pair<>(result, environment);
     }
 }
