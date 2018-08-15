@@ -1,5 +1,6 @@
 package phantom.shell;
 
+import phantom.shell.executor.ExecutionFault;
 import phantom.shell.executor.Executor;
 import phantom.shell.expressions.Expression;
 import phantom.shell.parser.*;
@@ -7,7 +8,15 @@ import phantom.shell.printer.Printer;
 import phantom.support.io.InputStream;
 import phantom.support.io.OutputStream;
 import phantom.support.io.PrintStream;
+import phantom.support.log.Log;
 
+/**
+ * @author Ilya Potemin
+ * @author Bogdan Fedotov
+ * @author Michail Bobrov
+ * @author Salavat Dinmukhametov
+ * @author Gayaz Kamaletdinov
+ */
 public class PhantomShell {
 
     private InputStream sourceInput;
@@ -57,7 +66,12 @@ public class PhantomShell {
             if (isInDebugMode) {
                 out.println(expression.toString());
             }
-            var result = executor.execute(expression);
+
+            var result = (isInDebugMode ? executor.executeUnsafe(expression)
+                                        : executor.executeSafe(expression));
+            if (result instanceof ExecutionFault){
+                Log.out.println(result.toString());
+            }
         }
     }
 
