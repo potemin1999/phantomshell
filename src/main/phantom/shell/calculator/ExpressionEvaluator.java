@@ -8,23 +8,22 @@ import phantom.support.util.ArrayList;
 import phantom.support.util.List;
 
 
-//TODO: refactor it please
 public class ExpressionEvaluator {
 
-    Operator operator;
+    private Operator operator;
 
     public ExpressionEvaluator() {
         operator = new Operator();
     }
 
-    public Pair<Object, Environment> evaluateExpression(Environment environment, ArrayList<Pair<Object, Integer>> tokens, int startingIndex, int finishingIndex, List<Object> postChangingObjectStack, List<String> postOpStack) {
+    private Pair<Object, Environment> evaluateExpression(Environment environment, ArrayList<Pair<Object, Integer>> tokens, int startingIndex, int finishingIndex, List<Object> postChangingObjectStack, List<Object> postOpStack) {
         ArrayList<Object> objectStack = new ArrayList<>();
 
-        ArrayList<String> opStack = new ArrayList<>();
-        ArrayList<String> logicalOpStack = new ArrayList<>();
-        ArrayList<String> assigningOpStack = new ArrayList<>();
+        ArrayList<Integer> opStack = new ArrayList<>();
+        ArrayList<Integer> logicalOpStack = new ArrayList<>();
+        ArrayList<Integer> assigningOpStack = new ArrayList<>();
 
-        String comparisonOp = null;
+        Integer comparisonOp = null;
         Object objectToCompare = null;
 
         for (int i = startingIndex; i <= finishingIndex; ++i) {
@@ -36,7 +35,7 @@ public class ExpressionEvaluator {
                     break;
 
                 case 1: // Unary operator
-                    var op = (String) token.getKey();
+                    Integer op = (Integer) token.getKey();
                     Pair<Object, Integer> nextToken = null;
 
                     if (i < tokens.size() - 1) {
@@ -73,17 +72,17 @@ public class ExpressionEvaluator {
                     break;
 
                 case 2: // Binary operator
-                    op = (String) token.getKey();
+                    op = (Integer) token.getKey();
 
-                    String prevOp;
+                    Integer prevOp;
 
                     if (!opStack.isEmpty()) {
-                        prevOp = (String) opStack.get(opStack.size() - 1);
+                        prevOp = opStack.get(opStack.size() - 1);
                     } else {
                         prevOp = null;
                     }
 
-                    while (prevOp != null && !prevOp.equals("(") && operator.getPriority(prevOp) <= operator.getPriority(op)) {
+                    while (prevOp != null && prevOp != Operator.PAREN_OPEN && operator.getPriority(prevOp) <= operator.getPriority(op)) {
                         var a = objectStack.get(objectStack.size() - 2);
                         var b = objectStack.get(objectStack.size() - 1);
 
@@ -105,14 +104,14 @@ public class ExpressionEvaluator {
 
                     nextToken = tokens.get(i + 1);
 
-                    if (nextToken.getKey() == "(") {
+                    if (nextToken.getValue() == 5 && (Integer) nextToken.getKey() == Operator.PAREN_OPEN) {
                         var j = i + 2;
                         var balance = 1;
 
                         while (j <= finishingIndex && balance != 0) {
-                            if (tokens.get(j).getKey().equals("(")) {
+                            if ((Integer) tokens.get(j).getKey() == Operator.PAREN_OPEN) {
                                 ++balance;
-                            } else if (tokens.get(j).getKey().equals(")")) {
+                            } else if ((Integer) tokens.get(j).getKey() == Operator.PAREN_CLOSE) {
                                 --balance;
                             }
                             ++j;
@@ -139,29 +138,27 @@ public class ExpressionEvaluator {
                     break;
 
                 case 3: // Comparison operator
-                    op = (String) token.getKey();
+                    op = (Integer) token.getKey();
                     opStack.add(op);
                     break;
 
                 case 4: // Logical operator
-                    op = null;
-
                     while (!opStack.isEmpty()) {
                         op = opStack.get(opStack.size() - 1);
 
-                        if (op.equals("(")) {
+                        if (op == Operator.PAREN_OPEN) {
                             break;
                         }
 
                         opStack.remove(opStack.size() - 1);
 
-                        /**
+                        /*
                          * If there is need to compare, transfer object to compare from object stack
                          * and comparison operator from operator stack.
                          */
                         if (operator.isComparisonOperator(op)) {
                             if (comparisonOp != null) {
-                                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"3");
+                                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION, "3");
                                 //return null;
                             }
 
@@ -171,7 +168,7 @@ public class ExpressionEvaluator {
                                 objectToCompare = objectStack.get(objectStack.size() - 1);
                                 objectStack.remove(objectStack.size() - 1);
                             } else {
-                                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"7");
+                                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION, "7");
                                 //return null;
                             }
 
@@ -208,7 +205,7 @@ public class ExpressionEvaluator {
                         }
                     }
 
-                    op = (String) token.getKey();
+                    op = (Integer) token.getKey();
 
                     if (!logicalOpStack.isEmpty()) {
                         prevOp = logicalOpStack.get(logicalOpStack.size() - 1);
@@ -216,7 +213,7 @@ public class ExpressionEvaluator {
                         prevOp = null;
                     }
 
-                    while (prevOp != null && !prevOp.equals("(") && operator.getPriority(prevOp) <= operator.getPriority(op)) {
+                    while (prevOp != null && prevOp != Operator.PAREN_OPEN && operator.getPriority(prevOp) <= operator.getPriority(op)) {
                         var a = objectStack.get(objectStack.size() - 2);
                         var b = objectStack.get(objectStack.size() - 1);
 
@@ -239,7 +236,7 @@ public class ExpressionEvaluator {
 
                     nextToken = tokens.get(i + 1);
 
-                    if (nextToken.getKey() == "(") {
+                    if ((Integer) nextToken.getKey() == Operator.PAREN_OPEN) {
                         var j = i + 2;
                         var balance = 1;
 
@@ -273,21 +270,21 @@ public class ExpressionEvaluator {
                     break;
 
                 case 5: // Priority operator
-                    op = (String) token.getKey();
-                    if (op.equals("(")) {
+                    op = (Integer) token.getKey();
+                    if (op == Operator.PAREN_OPEN) {
                         opStack.add(op);
                         logicalOpStack.add(op);
-                    } else if (op.equals(")")) {
+                    } else if (op == Operator.PAREN_CLOSE) {
                         if (!opStack.isEmpty()) {
                             op = opStack.get(opStack.size() - 1);
                             opStack.remove(opStack.size() - 1);
                         } else {
-                            throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"2");
+                            throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION, "2");
                             //return null;
                         }
 
-                        while (!op.equals("(")) {
-                            /**
+                        while (op != Operator.PAREN_OPEN) {
+                            /*
                              * If there is need to compare, transfer object to compare from object stack
                              * and comparison operator from operator stack.
                              */
@@ -353,7 +350,7 @@ public class ExpressionEvaluator {
                             //return null;
                         }
 
-                        while (!op.equals("(")) {
+                        while (op != Operator.PAREN_OPEN) {
                             var a = objectStack.get(objectStack.size() - 2);
                             var b = objectStack.get(objectStack.size() - 1);
 
@@ -371,12 +368,12 @@ public class ExpressionEvaluator {
                     break;
 
                 case 6: // Assign operator
-                    op = (String) token.getKey();
+                    op = (Integer) token.getKey();
                     assigningOpStack.add(op);
                     break;
 
                 case 7: // Increment/decrement operator
-                    op = (String) token.getKey();
+                    op = (Integer) token.getKey();
                     Pair<Object, Integer> prevToken = null;
                     nextToken = null;
 
@@ -405,8 +402,8 @@ public class ExpressionEvaluator {
             var op = opStack.get(opStack.size() - 1);
             opStack.remove(opStack.size() - 1);
 
-            if (op.equals("(")) {
-                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"10");
+            if (op == Operator.PAREN_OPEN) {
+                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION, "10");
                 //return null;
             }
 
@@ -416,7 +413,7 @@ public class ExpressionEvaluator {
              */
             if (operator.isComparisonOperator(op)) {
                 if (comparisonOp != null) {
-                    throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"14");
+                    throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION, "14");
                     //return null;
                 }
 
@@ -426,7 +423,7 @@ public class ExpressionEvaluator {
                     objectToCompare = objectStack.get(objectStack.size() - 1);
                     objectStack.remove(objectStack.size() - 1);
                 } else {
-                    throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"7");
+                    throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION, "7");
                     //return null;
                 }
 
@@ -447,18 +444,14 @@ public class ExpressionEvaluator {
         if (comparisonOp != null) {
             if (!objectStack.isEmpty()) {
                 var a = objectStack.get(objectStack.size() - 1);
-                var b = objectToCompare;
 
                 objectStack.remove(objectStack.size() - 1);
 
-                var pair = evaluate(environment, comparisonOp, a, b);
+                var pair = evaluate(environment, comparisonOp, a, objectToCompare);
                 objectStack.add(pair.getKey());
                 environment = pair.getValue();
-
-                comparisonOp = null;
-                objectToCompare = null;
             } else {
-                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"8");
+                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION, "8");
                 //return null;
             }
         }
@@ -467,8 +460,8 @@ public class ExpressionEvaluator {
             var op = logicalOpStack.get(logicalOpStack.size() - 1);
             logicalOpStack.remove(logicalOpStack.size() - 1);
 
-            if (op.equals("(")) {
-                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION,"10");
+            if (op == Operator.PAREN_OPEN) {
+                throw new ExpressionEvaluationException(ExpressionEvaluationFault.INVALID_EXPRESSION, "10");
                 //return null;
             }
 
@@ -514,14 +507,14 @@ public class ExpressionEvaluator {
 
     public Pair<Object, Environment> evaluateExpression(Environment environment, ArrayList<Pair<Object, Integer>> tokens) {
         ArrayList<Object> postChangingObjectStack = new ArrayList<>();
-        ArrayList<String> postOpStack = new ArrayList<>();
+        ArrayList<Object> postOpStack = new ArrayList<>();
 
         var pair = evaluateExpression(environment, tokens, 0, tokens.size() - 1, postChangingObjectStack, postOpStack);
         var result = pair.getKey();
         environment = pair.getValue();
 
         while (!postOpStack.isEmpty()) {
-            var op = postOpStack.get(postOpStack.size() - 1);
+            var op = (Integer) postOpStack.get(postOpStack.size() - 1);
             postOpStack.remove(postOpStack.size() - 1);
 
             var a = postChangingObjectStack.get(postChangingObjectStack.size() - 1);
@@ -534,7 +527,7 @@ public class ExpressionEvaluator {
         return new Pair<>(result, environment);
     }
 
-    public Pair<Object, Environment> evaluate(Environment environment, String op, Object obj1, Object obj2) {
+    private Pair<Object, Environment> evaluate(Environment environment, Integer op, Object obj1, Object obj2) {
         //System.out.println(obj1 + " " + op + " " + obj2);
 
         var val2 = environment.getVariable(obj2);
@@ -542,7 +535,7 @@ public class ExpressionEvaluator {
             obj2 = val2;
         }
 
-        if (op.equals("=")) {
+        if (op == Operator.ASSIGNING) {
             environment.setVariable(obj1, obj2);
 
             return new Pair(obj2, environment);
@@ -563,56 +556,57 @@ public class ExpressionEvaluator {
                 var a = num1.doubleValue();
                 var b = num2.doubleValue();
                 var result = 0.0;
+                final var EPS = 1e-9;
 
                 switch (op) {
-                    case "+":
+                    case Operator.ADDITION:
                         result = a + b;
                         break;
-                    case "-":
+                    case Operator.SUBTRACTION:
                         result = a - b;
                         break;
-                    case "*":
+                    case Operator.MULTIPLICATION:
                         result = a * b;
                         break;
-                    case "/":
+                    case Operator.DIVISION:
                         result = a / b;
                         break;
 
                     //TODO: compare by EPS
-                    case "==":
-                        result = (a == b) ? 1 : 0;
+                    case Operator.EQUAL:
+                        result = Math.abs(a - b) < EPS ? 1 : 0;
                         break;
-                    case "!=":
-                        result = (a != b) ? 1 : 0;
+                    case Operator.NOT_EQUAL:
+                        result = Math.abs(a - b) >= EPS ? 1 : 0;
                         break;
-                    case ">":
-                        result = (a > b) ? 1 : 0;
+                    case Operator.GREATER_THAN:
+                        result = a - b > EPS ? 1 : 0;
                         break;
-                    case ">=":
-                        result = (a >= b) ? 1 : 0;
+                    case Operator.NOT_LESS_THAN:
+                        result = a - b >= EPS ? 1 : 0;
                         break;
-                    case "<":
-                        result = (a < b) ? 1 : 0;
+                    case Operator.LESS_THAN:
+                        result = b - a > EPS ? 1 : 0;
                         break;
-                    case "<=":
-                        result = (a <= b) ? 1 : 0;
+                    case Operator.NOT_GREATER_THAN:
+                        result = b - a >= EPS ? 1 : 0;
                         break;
 
-                    case "and":
+                    case Operator.LOGICAL_AND:
                         result = (a != 0 && b != 0) ? 1 : 0;
                         break;
-                    case "or":
+                    case Operator.LOGICAL_OR:
                         result = (a != 0 || b != 0) ? 1 : 0;
                         break;
-                    case "xor":
+                    case Operator.LOGICAL_XOR:
                         result = (a == 0 && b != 0 || a != 0 && b == 0) ? 1 : 0;
                         break;
-                    case "->":
+                    case Operator.LOGICAL_IMPLICATION:
                         result = (a != 0 && b == 0) ? 0 : 1;
                         break;
 
                     default:
-                        throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_FLOAT_OPERATOR,op);
+                        throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_FLOAT_OPERATOR, op.toString());
                         //result = 0;
                 }
 
@@ -623,71 +617,71 @@ public class ExpressionEvaluator {
                 var result = 0;
 
                 switch (op) {
-                    case "+":
+                    case Operator.ADDITION:
                         result = a + b;
                         break;
-                    case "-":
+                    case Operator.SUBTRACTION:
                         result = a - b;
                         break;
-                    case "*":
+                    case Operator.MULTIPLICATION:
                         result = a * b;
                         break;
-                    case "/":
-                        if (b==0)
+                    case Operator.DIVISION:
+                        if (b == 0)
                             throw new ExpressionEvaluationException(ExpressionEvaluationFault.INTEGER_DIVISION_BY_ZERO);
                         result = a / b;
                         break;
 
-                    case "/\\":
+                    case Operator.BITWISE_AND:
                         result = a & b;
                         break;
-                    case "\\/":
+                    case Operator.BITWISE_OR:
                         result = a | b;
                         break;
-                    case "\\\'/":
+                    case Operator.BITWISE_XOR:
                         result = a ^ b;
                         break;
-                    case "<<":
+                    case Operator.BITWISE_SHIFT_L:
                         result = a << b;
                         break;
-                    case ">>":
+                    case Operator.BITWISE_SHIFT_R:
                         result = a >> b;
                         break;
 
-                    case "==":
+                    case Operator.EQUAL:
                         result = (a == b) ? 1 : 0;
                         break;
-                    case "!=":
+                    case Operator.NOT_EQUAL:
                         result = (a != b) ? 1 : 0;
                         break;
-                    case ">":
+                    case Operator.GREATER_THAN:
                         result = (a > b) ? 1 : 0;
                         break;
-                    case ">=":
+                    case Operator.NOT_LESS_THAN:
                         result = (a >= b) ? 1 : 0;
                         break;
-                    case "<":
+                    case Operator.LESS_THAN:
                         result = (a < b) ? 1 : 0;
                         break;
-                    case "<=":
+                    case Operator.NOT_GREATER_THAN:
                         result = (a <= b) ? 1 : 0;
                         break;
 
-                    case "and":
+                    case Operator.LOGICAL_AND:
                         result = (a != 0 && b != 0) ? 1 : 0;
                         break;
-                    case "or":
+                    case Operator.LOGICAL_OR:
                         result = (a != 0 || b != 0) ? 1 : 0;
                         break;
-                    case "xor":
+                    case Operator.LOGICAL_XOR:
                         result = (a == 0 && b != 0 || a != 0 && b == 0) ? 1 : 0;
                         break;
-                    case "->":
+                    case Operator.LOGICAL_IMPLICATION:
                         result = (a != 0 && b == 0) ? 0 : 1;
                         break;
 
                     default:
-                        throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_INT_OPERATOR,op);
+                        throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_INT_OPERATOR, op.toString());
                         //result = 0;
                 }
 
@@ -702,7 +696,7 @@ public class ExpressionEvaluator {
         }
     }
 
-    public Object evaluate(Environment environment, String op, Object obj) {
+    private Object evaluate(Environment environment, Integer op, Object obj) {
         var name = obj;
 
         var val = environment.getVariable(name);
@@ -718,23 +712,20 @@ public class ExpressionEvaluator {
                 var result = 0.0;
 
                 switch (op) {
-                    case "++":
+                    case Operator.INCREMENT:
                         environment.setVariable(name, a + 1);
                         result = ((Number) environment.getVariable(name)).doubleValue();
                         break;
-                    case "--":
+                    case Operator.DECREMENT:
                         environment.setVariable(name, a - 1);
                         result = ((Number) environment.getVariable(name)).doubleValue();
                         break;
-                    case "!":
-                        result = a != 0 ? 0 : 1;
-                        break;
-                    case "not":
+                    case Operator.LOGICAL_NOT:
                         result = a != 0 ? 0 : 1;
                         break;
 
                     default:
-                        throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_FLOAT_OPERATOR,op);
+                        throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_FLOAT_OPERATOR, op.toString());
                         //result = 0;
                 }
 
@@ -744,26 +735,23 @@ public class ExpressionEvaluator {
                 var result = 0;
 
                 switch (op) {
-                    case "++":
+                    case Operator.INCREMENT:
                         environment.setVariable(name, a + 1);
                         result = ((Number) environment.getVariable(name)).intValue();
                         break;
-                    case "--":
+                    case Operator.DECREMENT:
                         environment.setVariable(name, a - 1);
                         result = ((Number) environment.getVariable(name)).intValue();
                         break;
-                    case "~":
+                    case Operator.BITWISE_NOT:
                         result = ~a;
                         break;
-                    case "!":
-                        result = a != 0 ? 0 : 1;
-                        break;
-                    case "not":
+                    case Operator.LOGICAL_NOT:
                         result = a != 0 ? 0 : 1;
                         break;
 
                     default:
-                        throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_INT_OPERATOR,op);
+                        throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_INT_OPERATOR, op.toString());
                         //result = 0;
                 }
 
