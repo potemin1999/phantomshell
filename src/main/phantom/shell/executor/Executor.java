@@ -9,6 +9,17 @@ import phantom.shell.parser.Token;
 import phantom.shell.parser.TokenType;
 import phantom.shell.printer.Printer;
 import phantom.support.io.PrintStream;
+import phantom.support.util.Pair;
+
+/**
+ * @author Ilya Potemin
+ * @author Bodgan Fedotov
+ *
+ * Executor takes and expressions from Parser and turns them into actions
+ *
+ * @see Parser
+ * @see Expression
+ */
 
 public class Executor {
 
@@ -26,8 +37,38 @@ public class Executor {
         this.printer = new Printer(out);
     }
 
+    private Object assertExecution(int result) {
+        if (result == 0) {
+            return 0;
+        } else {
+            return new ExecutionFault(result);
+        }
+    }
 
-    public Object execute(Expression expression) {
+    public Object executeUnsafe(Expression expression) {
+        return execute(expression);
+    }
+
+    public Object executeSafe(Expression expression) {
+        try {
+            return execute(expression);
+        } catch (ExecutionFaultException fault) {
+            if (fault.getCode() == 0 || fault.getCode() == -1)
+                throw fault;
+            return fault.makeFault();
+        } catch (Throwable throwable) {
+            return new ExecutionFault(-1, throwable);
+        }
+    }
+
+    /**
+     * @param expression
+     * @return Any object if execution was succeed
+     * ExecutionFault object if not
+     */
+    protected Object execute(Expression expression) {
+        //if (expression == null)
+        // throw new NullPointerException("expression can not be null");
         if (expression instanceof DefExpression) {
             var tokens = expression.getTokens();
             var name = tokens.getFirst().getStringValue();
@@ -49,11 +90,8 @@ public class Executor {
             var pair = handler.evaluate(env, tokens);
             var result = pair.getKey();
             env = pair.getValue();
-
-            return result;
         } else if (expression instanceof IfExpression) {
             var result = execute(((IfExpression) expression).getCondition());
-
             if (!result.equals(0)) {
                 execute(((IfExpression) expression).getTrueBlock());
             } else {
@@ -72,7 +110,10 @@ public class Executor {
             env = new Environment(env);
 
             while (expressionList.size() > 1) {
-                execute(expressionList.removeFirst());
+                var result = execute(expressionList.removeFirst());
+                if (result instanceof ExecutionFault) {
+                    return result;
+                }
             }
 
             token = expressionList.removeLast().getTokens().getLast();
@@ -84,9 +125,8 @@ public class Executor {
             var tokens = valueExpression.getTokens();
 
             var pair = handler.evaluate(env, tokens);
-            var result = pair.getKey();
-            env = pair.getValue();
-
+            var result = ((Pair) pair).getKey();
+            env = (Environment) ((Pair) pair).getValue();
             printer.print(result);
 
             //Log.out.println("defined variable \"" + String.valueOf(name) + "\" with value " + result);
@@ -96,15 +136,14 @@ public class Executor {
             var tokens = valueExpression.getTokens();
 
             var pair = handler.evaluate(env, tokens);
-            var result = pair.getKey();
-            env = pair.getValue();
-
+            var result = ((Pair) pair).getKey();
+            env = (Environment) ((Pair) pair).getValue();
             printer.println(result);
 
             //Log.out.println("defined variable \"" + String.valueOf(name) + "\" with value " + result);
             return result;
         }
 
-        return null;
+        return 0;
     }
 }

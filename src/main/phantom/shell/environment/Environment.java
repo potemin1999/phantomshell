@@ -1,5 +1,8 @@
 package phantom.shell.environment;
 
+import phantom.shell.executor.ExecutionFault;
+import phantom.shell.executor.ExecutionFaultException;
+
 import java.util.HashMap;
 
 public class Environment {
@@ -34,7 +37,7 @@ public class Environment {
         if (!definedVariables.containsKey(name)) {
             definedVariables.put(name, value);
         } else {
-            throw new EnvironmentException("Can not define two variables with the same name in the same scope!");
+            throw new ExecutionFaultException(ExecutionFault.DEF_TWICE);
         }
     }
 

@@ -6,6 +6,15 @@ import phantom.support.util.List;
 
 import static phantom.shell.parser.TokenType.*;
 
+/**
+ * @author Ilya Potemin
+ *
+ * Takes tokens from lexers and makes expressions from them
+ * Expressions can be directly executed by Executor
+ *
+ * @see phantom.shell.executor.Executor
+ * @see Lexer
+ */
 public class Parser {
 
     private Lexer lexer;
@@ -133,9 +142,12 @@ public class Parser {
             }
 
             case "print": {
-                var identifier = lexer.next();
-                assertType(identifier, TokenType.BRACKET_OPEN);
-                var expressionTokens = lexer.readToClosingBracket();
+                if (lexer.peek().getType() == TokenType.BRACKET_OPEN) {
+                    lexer.next();
+                }
+                /*var identifier = lexer.next();
+                assertType(identifier, TokenType.BRACKET_OPEN);*/
+                var expressionTokens = lexer.readTo(new int[]{TokenType.EOL, TokenType.BRACKET_CLOSE});
 
                 expressionTokens.removeLast();
 
@@ -145,9 +157,12 @@ public class Parser {
             }
 
             case "println": {
-                var identifier = lexer.next();
-                assertType(identifier, TokenType.BRACKET_OPEN);
-                var expressionTokens = lexer.readToClosingBracket();
+                if (lexer.peek().getType() == TokenType.BRACKET_OPEN) {
+                    lexer.next();
+                }
+                /*var identifier = lexer.next();
+                assertType(identifier, TokenType.BRACKET_OPEN);*/
+                var expressionTokens = lexer.readTo(new int[]{TokenType.EOL, TokenType.BRACKET_CLOSE});
 
                 expressionTokens.removeLast();
 

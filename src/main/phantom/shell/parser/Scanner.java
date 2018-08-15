@@ -6,6 +6,14 @@ import phantom.support.io.FileNotFoundException;
 import phantom.support.io.InputStream;
 import phantom.support.log.Log;
 
+/**
+ * @author Ilya Potemin
+ *
+ * Scanner converts byte stream to UTF-8 encoded char sequence
+ *
+ * @see InputStream
+ * @see Lexer
+ */
 public class Scanner {
 
     private InputStream stdIn;
