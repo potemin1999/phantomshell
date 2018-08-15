@@ -17,21 +17,30 @@ public class ExecutionFault {
         this.throwable = throwable;
     }
 
-    public String getDescription(){
-        switch (code){
-            case DEF_TWICE: return "Variable with the same name is already defined in this scope" ;
-            case EVAL_OPSTACK_FAULT: return "Execution of sequence to evaluate has failed";
-            default: return "Unknown execution fault";
+    public String getDescription() {
+        switch (code) {
+            case DEF_TWICE:
+                return "Variable with the same name is already defined in this scope";
+            case EVAL_OPSTACK_FAULT:
+                return "Execution of sequence to evaluate has failed";
+            default:
+                return "Unknown execution fault";
         }
     }
 
 
-    public String toString(){
-        if (code!=-1) {
-            return "EXEC_FAULT " + code + " : " + getDescription();
-        }else{
-            return "EXEC_FAULT : " + (throwable==null ? code : throwable.toString());
+    public String toString() {
+        if (throwable == null) {
+            if (code != -1) {
+                return "EXEC_FAULT " + code + " : " + getDescription();
+            } else {
+                return "EXEC_FAULT : " + code;
+            }
+        } else {
+            StackTraceElement element = throwable.getStackTrace()[0];
+            return "EXEC_FAULT : " + element.getClassName() + "." + element.getMethodName()
+                    + "(line:" + element.getLineNumber() + ") : " + throwable.getMessage();
         }
     }
-
 }
+

@@ -16,3 +16,6 @@ println[bb]
 bb = aa = true
 println[aa]
 println[bb]
+
+aa = 23.45 + 0.26
+println [aa]

@@ -87,13 +87,13 @@ public class ExpressionParser {
 
         return tokens;
         */
+
         ArrayList<Pair<Object, Integer>> parsedTokens = new ArrayList<>();
 
-        parsedTokens.add(new Pair<>("(", 5));
+        parsedTokens.add(new Pair<>(Operator.PAREN_OPEN, 5));
 
         while (tokens.size() > 0) {
             var token = tokens.getFirst();
-            //System.out.println(token.getStringValue());
             tokens.removeFirst();
 
             switch (token.getType()) {
@@ -119,21 +119,22 @@ public class ExpressionParser {
 
                 case TokenType.OPERATOR:
                     var op = token.getStringValue();
+                    var opcode = operator.map(op);
 
                     if (operator.isUnaryOperator(op)) {
-                        parsedTokens.add(new Pair<>(op, 1));
+                        parsedTokens.add(new Pair<>(opcode, 1));
                     } else if (operator.isIncrementDecrementOperator(op)) {
-                        parsedTokens.add(new Pair<>(op, 7));
+                        parsedTokens.add(new Pair<>(opcode, 7));
                     } else if (operator.isBinaryOperator(op) && !op.equals("=")) {
-                        parsedTokens.add(new Pair<>(op, 2));
+                        parsedTokens.add(new Pair<>(opcode, 2));
                     } else if (operator.isComparisonOperator(op)) {
-                        parsedTokens.add(new Pair<>(op, 3));
+                        parsedTokens.add(new Pair<>(opcode, 3));
                     } else if (operator.isLogicalOperator(op)) {
-                        parsedTokens.add(new Pair<>(op, 4));
+                        parsedTokens.add(new Pair<>(opcode, 4));
                     } else if (operator.isPriorityOperator(op)){
-                        parsedTokens.add(new Pair<>(op, 5));
+                        parsedTokens.add(new Pair<>(opcode, 5));
                     } else if (op.equals("=")) {
-                        parsedTokens.add(new Pair<>(op, 6));
+                        parsedTokens.add(new Pair<>(opcode, 6));
                     } else {
                         parsedTokens.add(new Pair<>(null, -1));
                     }
@@ -141,11 +142,11 @@ public class ExpressionParser {
                     break;
 
                 case TokenType.PAREN_OPEN:
-                    parsedTokens.add(new Pair<>("(", 5));
+                    parsedTokens.add(new Pair<>(operator.PAREN_OPEN, 5));
                     break;
 
                 case TokenType.PAREN_CLOSE:
-                    parsedTokens.add(new Pair<>(")", 5));
+                    parsedTokens.add(new Pair<>(operator.PAREN_CLOSE, 5));
                     break;
 
                 case TokenType.EOL:
@@ -160,7 +161,7 @@ public class ExpressionParser {
             }
         }
 
-        parsedTokens.add(new Pair<>(")", 5));
+        parsedTokens.add(new Pair<>(Operator.PAREN_CLOSE, 5));
 
         return parsedTokens;
     }
@@ -194,7 +195,7 @@ public class ExpressionParser {
         var divider = 10;
 
         while (currentIndex < expression.length() && character.isDigit(c)) {
-            fractional = (fractional + (int) (c - '0')) / divider;
+            fractional += (double) (c - '0') / divider;
             divider *= 10;
 
             ++currentIndex;

@@ -25,34 +25,34 @@ public class Operator {
      *   5 - logical operators
      *   15 - reserved
      */
-    public static final int INCREMENT          = 0x0000; // ++
-    public static final int DECREMENT          = 0x0001; // --
-    public static final int ASSIGNING          = 0x2f10; // =
-    public static final int ADDITION           = 0x2620; // +
-    public static final int SUBTRACTION        = 0x2621; // -
-    public static final int MULTIPLICATION     = 0x2522; // *
-    public static final int DIVISION           = 0x2523; // /
-    public static final int BITWISE_NOT        = 0x1230; // ~
-    public static final int BITWISE_AND        = 0x2331; // /\
-    public static final int BITWISE_OR         = 0x2432; // \/
-    public static final int BITWISE_XOR        = 0x2433; // \'/
-    public static final int BITWISE_SHIFT_L    = 0x2134; // <<
-    public static final int BITWISE_SHIFT_R    = 0x2135; // >>
+    public static final int INCREMENT           = 0x0000; // ++
+    public static final int DECREMENT           = 0x0001; // --
+    public static final int ASSIGNING           = 0x2f10; // =
+    public static final int ADDITION            = 0x2620; // +
+    public static final int SUBTRACTION         = 0x2621; // -
+    public static final int MULTIPLICATION      = 0x2522; // *
+    public static final int DIVISION            = 0x2523; // /
+    public static final int BITWISE_NOT         = 0x1230; // ~
+    public static final int BITWISE_AND         = 0x2331; // /\
+    public static final int BITWISE_OR          = 0x2432; // \/
+    public static final int BITWISE_XOR         = 0x2433; // \'/
+    public static final int BITWISE_SHIFT_L     = 0x2134; // <<
+    public static final int BITWISE_SHIFT_R     = 0x2135; // >>
     //TODO: add/ignore priority of comparison operators
-    public static final int EQUAL              = 0x4040; // ==
-    public static final int NOT_EQUAL          = 0x4041; // !=
-    public static final int GREATER_THAN       = 0x4042; // >
-    public static final int LESS_THAN          = 0x4043; // <
-    public static final int NOT_GREATER_THAN   = 0x4044; // <=
-    public static final int NOT_LESS_THAN      = 0x4045; // >=
-    public static final int LOGICAL_NOT        = 0x1a50; // ! / not
-    public static final int LOGICAL_AND        = 0x5b51; // and
-    public static final int LOGICAL_OR         = 0x5c52; // or
-    public static final int LOGICAL_XOR        = 0x5c53; // xor
+    public static final int EQUAL               = 0x4040; // ==
+    public static final int NOT_EQUAL           = 0x4041; // !=
+    public static final int GREATER_THAN        = 0x4042; // >
+    public static final int LESS_THAN           = 0x4043; // <
+    public static final int NOT_GREATER_THAN    = 0x4044; // <=
+    public static final int NOT_LESS_THAN       = 0x4045; // >=
+    public static final int LOGICAL_NOT         = 0x1a50; // ! / not
+    public static final int LOGICAL_AND         = 0x5b51; // and
+    public static final int LOGICAL_OR          = 0x5c52; // or
+    public static final int LOGICAL_XOR         = 0x5c53; // xor
     public static final int LOGICAL_IMPLICATION = 0x5d54; // ->
     //TODO: add/ignore priority of priority operators
-    public static final int PAREN_OPEN         = 0x3060; // (
-    public static final int PAREN_CLOSE        = 0x3061; // )
+    public static final int PAREN_OPEN          = 0x3060; // (
+    public static final int PAREN_CLOSE         = 0x3061; // )
 
     private HashMap<Object, Integer> opCodeMap;
 
@@ -92,7 +92,7 @@ public class Operator {
      * @param op
      * @return
      */
-    private int map(Object op) {
+    public int map(Object op) {
         return opCodeMap.getOrDefault(op, 0xffff);
     }
 

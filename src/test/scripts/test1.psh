@@ -1,8 +1,11 @@
 def b = 5;
+def c = 0;
 if [b != 5] {
-    def c = b << 1
-} elif [10 == 10] {
-    def c = b << 2
+    c = b << 1
+} elif [10 == 11] {
+    c = b << 2
 } else {
-    def c = b << 3
+    c = b << 3
 }
+
+println [c]
