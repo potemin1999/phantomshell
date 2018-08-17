@@ -1,0 +1,6 @@
+def a = 10;
+a++;
+++a;
+println [a++];
+println [a]
+println [++a]

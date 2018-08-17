@@ -23,7 +23,8 @@ public class ExpressionHandler {
         environment = pair.getValue();
 
         //System.out.println("RESULT " + result);
+        //System.out.println("RESULT VALUE " + result.getValue());
 
-        return new Pair<>(result, environment);
+        return new Pair<>(result.getValue(), environment);
     }
 }

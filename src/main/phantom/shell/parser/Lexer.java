@@ -127,7 +127,8 @@ public class Lexer {
 
     private Token readNextToken() {
         var token = new Token();
-        var currentSymbol = scanner.peek(); //look up our symbol
+        var currentSymbol = scanner.peek();
+        int i = 0;//look up our symbol
         while (currentSymbol == ' ' || currentSymbol == '\t') {
             scanner.skip();
             currentSymbol = scanner.peek();

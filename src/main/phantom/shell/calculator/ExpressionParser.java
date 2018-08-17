@@ -1,11 +1,10 @@
 package phantom.shell.calculator;
-
 import phantom.shell.parser.Token;
 import phantom.shell.parser.TokenType;
 import phantom.shell.structures.Character;
 import phantom.shell.structures.Operator;
+import phantom.shell.values.*;
 
-import phantom.support.io.PrintStream;
 import phantom.support.util.ArrayList;
 import phantom.support.util.List;
 import phantom.support.util.Pair;
@@ -21,76 +20,11 @@ public class ExpressionParser {
         operator = new Operator();
     }
 
-    public ArrayList<Pair<Object, Integer>> parseTokens(List<Token> tokens) {
+    public ArrayList<Pair<Value, Integer>> parseTokens(List<Token> tokens) {
 
+        ArrayList<Pair<Value, Integer>> parsedTokens = new ArrayList<>();
 
-        /*
-        tokens.add(new Pair("(", 5));
-
-        for (var currentIndex = 0; currentIndex < expression.length(); ++currentIndex) {
-            var c = expression.charAt(currentIndex);
-
-            if (character.isDigit(c)) {
-                var result = readNumber(expression, currentIndex);
-                var number = result.getKey();
-                currentIndex = result.getValue() - 1;
-
-                tokens.add(new Pair(number, 0));
-            } else if (character.isLetter(c) || c == '_' || c == '$') {
-                var word = readWord(expression, currentIndex);
-                currentIndex += word.length() - 1;
-
-                if (operator.isLogicalOperator(word)) {
-                    tokens.add(new Pair(word, 4));
-                } else if (operator.isUnaryOperator(word)) {
-                    tokens.add(new Pair(word, 1));
-                } else {
-                    switch (word) {
-                        case "true":
-                            tokens.add(new Pair(1, 0));
-                            break;
-                        case "false":
-                            tokens.add(new Pair(0, 0));
-                            break;
-                        default:
-                            tokens.add(new Pair(word, 0));
-                    }
-                }
-            } else if (character.isSymbol(c)) {
-                var op = readOperator(expression, currentIndex);
-
-                if (op != null) {
-                    currentIndex += op.length() - 1;
-
-                    if (operator.isUnaryOperator(op)) {
-                        tokens.add(new Pair(op, 1));
-                    } else if (operator.isIncrementDecrementOperator(op)) {
-                        tokens.add(new Pair(op, 7));
-                    } else if (operator.isBinaryOperator(op) && !op.equals("=")) {
-                        tokens.add(new Pair(op, 2));
-                    } else if (operator.isComparisonOperator(op)) {
-                        tokens.add(new Pair(op, 3));
-                    } else if (operator.isLogicalOperator(op)) {
-                        tokens.add(new Pair(op, 4));
-                    } else if (operator.isPriorityOperator(op)){
-                        tokens.add(new Pair(op, 5));
-                    } else if (op.equals("=")) {
-                        tokens.add(new Pair(op, 6));
-                    }
-                } else {
-                    tokens.add(new Pair(null, -1));
-                }
-            }
-        }
-
-        tokens.add(new Pair(")", 5));
-
-        return tokens;
-        */
-
-        ArrayList<Pair<Object, Integer>> parsedTokens = new ArrayList<>();
-
-        parsedTokens.add(new Pair<>(Operator.PAREN_OPEN, 5));
+        parsedTokens.add(new Pair<>(new IntValue(Operator.PAREN_OPEN), 5));
 
         while (tokens.size() > 0) {
             var token = tokens.getFirst();
@@ -102,16 +36,16 @@ public class ExpressionParser {
 
                     switch (word) {
                         case "true":
-                            parsedTokens.add(new Pair<>(1, 0));
+                            parsedTokens.add(new Pair<>(new BoolValue(true), 0));
                             break;
                         case "false":
-                            parsedTokens.add(new Pair<>(0, 0));
+                            parsedTokens.add(new Pair<>(new BoolValue(false), 0));
                             break;
                         default:
                             if (character.isDigit(word.charAt(0))) {
                                 parsedTokens.add(new Pair<>(readNumber(word), 0));
                             } else {
-                                parsedTokens.add(new Pair<>(word, 0));
+                                parsedTokens.add(new Pair<>(new StringValue(word), 0));
                             }
                     }
 
@@ -119,7 +53,7 @@ public class ExpressionParser {
 
                 case TokenType.OPERATOR:
                     var op = token.getStringValue();
-                    var opcode = operator.map(op);
+                    var opcode = new IntValue(operator.map(op));
 
                     if (operator.isUnaryOperator(op)) {
                         parsedTokens.add(new Pair<>(opcode, 1));
@@ -142,11 +76,11 @@ public class ExpressionParser {
                     break;
 
                 case TokenType.PAREN_OPEN:
-                    parsedTokens.add(new Pair<>(operator.PAREN_OPEN, 5));
+                    parsedTokens.add(new Pair<>(new IntValue(operator.PAREN_OPEN), 5));
                     break;
 
                 case TokenType.PAREN_CLOSE:
-                    parsedTokens.add(new Pair<>(operator.PAREN_CLOSE, 5));
+                    parsedTokens.add(new Pair<>(new IntValue(operator.PAREN_CLOSE), 5));
                     break;
 
                 case TokenType.EOL:
@@ -161,12 +95,12 @@ public class ExpressionParser {
             }
         }
 
-        parsedTokens.add(new Pair<>(Operator.PAREN_CLOSE, 5));
+        parsedTokens.add(new Pair<>(new IntValue(Operator.PAREN_CLOSE), 5));
 
         return parsedTokens;
     }
 
-    public Number readNumber(String expression) {
+    public Value readNumber(String expression) {
         var number = 0;
         var currentIndex = 0;
         var c = expression.charAt(currentIndex);
@@ -205,9 +139,9 @@ public class ExpressionParser {
         }
 
         if (isInteger) {
-            return number;
+            return new IntValue(number);
         } else {
-            return number + fractional;
+            return new FloatValue(number + fractional);
         }
     }
 

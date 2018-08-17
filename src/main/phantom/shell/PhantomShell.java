@@ -63,6 +63,7 @@ public class PhantomShell {
     public void run() {
         while (lexer.hasNotReachedEOF()) {
             Expression expression = parser.next();
+            int i = 0;
             if (isInDebugMode) {
                 out.println(expression.toString());
             }
