@@ -2,12 +2,14 @@ package phantom.shell.environment;
 
 import phantom.shell.executor.ExecutionFault;
 import phantom.shell.executor.ExecutionFaultException;
+import phantom.shell.values.StringValue;
+import phantom.shell.values.Value;
 
 import java.util.HashMap;
 
 public class Environment {
 
-    HashMap<Object, Object> definedVariables;
+    HashMap<String, Value> definedVariables;
     Environment parent;
 
     public Environment() {
@@ -25,74 +27,79 @@ public class Environment {
         defineVariable(name, null);
     }
 
-    public void defineVariable(char[] name, Object value) {
-        defineVariable(String.valueOf(name), value);
+    public void defineVariable(char[] name, Value value) {
+        defineVariable(new StringValue(String.valueOf(name)), value);
     }
 
-    public void defineVariable(Object name) {
+    public void defineVariable(StringValue name) {
         defineVariable(name, null);
     }
 
-    public void defineVariable(Object name, Object value) {
-        if (!definedVariables.containsKey(name)) {
-            definedVariables.put(name, value);
+    public void defineVariable(StringValue name, Value value) {
+        String str = name.getValue();
+        if (!definedVariables.containsKey(str)) {
+            definedVariables.put(str, value);
         } else {
             throw new ExecutionFaultException(ExecutionFault.DEF_TWICE);
         }
     }
 
-    public void setVariable(char[] name, Object value) {
-        setVariable(String.valueOf(name), value);
+    public void setVariable(char[] name, Value value) {
+        setVariable(new StringValue(String.valueOf(name)), value);
     }
 
-    public void setVariable(Object name, Object value) {
-        //System.out.println("Trying to find " + name);
+    public void setVariable(Value name, Value value) {
+        if (name instanceof StringValue) {
+            String str = ((StringValue) name).getValue();
+            //System.out.println("Trying to find " + str);
 
-        if (definedVariables.containsKey(name)) {
-            //System.out.println("Found " + name);
+            if (definedVariables.containsKey(str)) {
+                //System.out.println("Found " + str);
 
-            definedVariables.replace(name, value);
-            //System.out.println("ASDASD " + definedVariables.get(name));
-        } else {
+                definedVariables.replace(str, value);
+                //System.out.println("ASDASD " + definedVariables.get(str));
+            } else {
 
-            Environment current = parent;
+                Environment current = parent;
 
-            while (current != null) {
-                if (current.definedVariables.containsKey(name)) {
-                    //System.out.println("Not Found " + name);
-                    current.definedVariables.replace(name, value);
-                    //System.out.println(definedVariables.get(name));
-                    //System.out.println(value);
-                    break;
+                while (current != null) {
+                    if (current.definedVariables.containsKey(str)) {
+                        //System.out.println("Not Found " + str);
+                        current.definedVariables.replace(str, value);
+                        //System.out.println(definedVariables.get(str));
+                        //System.out.println(value);
+                        break;
+                    }
+
+                    current = current.parent;
                 }
-
-                current = current.parent;
             }
         }
     }
 
-    public Object getVariable(char[] name){
-        return getVariable(String.valueOf(name));
+    public Value getVariable(char[] name){
+        return getVariable(new StringValue(String.valueOf(name)));
     }
 
-    public Object getVariable(Object name) {
-        if (name instanceof String) {
+    public Value getVariable(Value name) {
+        if (name instanceof StringValue) {
+            String str = ((StringValue) name).getValue();
             //System.out.println("Trying to find " + name);
 
-            if (definedVariables.containsKey(name)) {
+            if (definedVariables.containsKey(str)) {
                 //System.out.println("Found " + name);
                 //System.out.println("VALUE = " + definedVariables.get(name));
-                return definedVariables.get(name);
+                return definedVariables.get(str);
             } else {
                 //System.out.println("Not Found " + name);
                 Environment current = parent;
 
                 while (current != null) {
 
-                    if (current.definedVariables.containsKey(name)) {
+                    if (current.definedVariables.containsKey(str)) {
                         //System.out.println("Found " + name);
                         //System.out.println("VALUE = " + current.definedVariables.get(name));
-                        return current.definedVariables.get(name);
+                        return current.definedVariables.get(str);
                     }
 
                     current = current.parent;

@@ -2,9 +2,17 @@ def aa = 3 + ( 4 << 1 );
 def bb = 0;
 bb = 2;
 println [ aa ]
-if [ aa == 1100 ] {
+if [ aa == 11 ] {
     def bb = aa - 1
     println [ bb ]
+
+    if [bb != 10] {
+        println [23]
+    } elif [10 == 10] {
+        println [24]
+    } else {
+        println ["KEK"]
+    }
 } else {
     bb = aa * 3
     println [ bb ]

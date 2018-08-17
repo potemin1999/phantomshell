@@ -61,6 +61,9 @@ public class Parser {
             case KEYWORD: {
                 return makeKeywordExpression(token);
             }
+            case OPERATOR: {
+                return makeValueExpression(token);
+            }
             case IDENTIFIER: {
                 return makeValueExpression(token);
             }

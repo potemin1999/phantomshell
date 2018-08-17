@@ -8,6 +8,7 @@ import phantom.shell.parser.Parser;
 import phantom.shell.parser.Token;
 import phantom.shell.parser.TokenType;
 import phantom.shell.printer.Printer;
+import phantom.shell.values.StringValue;
 import phantom.support.io.PrintStream;
 import phantom.support.util.Pair;
 
@@ -73,7 +74,7 @@ public class Executor {
             var tokens = expression.getTokens();
             var name = tokens.getFirst().getStringValue();
 
-            env.defineVariable(name);
+            env.defineVariable(new StringValue(name));
 
             var pair = handler.evaluate(env, tokens);
             var result = pair.getKey();
@@ -90,9 +91,12 @@ public class Executor {
             var pair = handler.evaluate(env, tokens);
             var result = pair.getKey();
             env = pair.getValue();
+
+            return result;
         } else if (expression instanceof IfExpression) {
             var result = execute(((IfExpression) expression).getCondition());
-            if (!result.equals(0)) {
+
+            if (result.equals(true)) {
                 execute(((IfExpression) expression).getTrueBlock());
             } else {
                 if (((IfExpression) expression).getNext() != null) {
@@ -101,6 +105,8 @@ public class Executor {
                     execute(((IfExpression) expression).getFalseBlock());
                 }
             }
+
+            return result;
         } else if (expression instanceof BlockExpression) {
             var expressionList = ((BlockExpression) expression).getExpressionList();
 
