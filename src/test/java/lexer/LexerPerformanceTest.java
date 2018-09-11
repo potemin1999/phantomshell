@@ -1,5 +1,6 @@
 package lexer;
 
+import org.junit.Test;
 import phantom.shell.parser.Lexer;
 import phantom.shell.parser.Scanner;
 import phantom.shell.parser.Token;
@@ -8,7 +9,8 @@ import phantom.support.log.Log;
 
 public class LexerPerformanceTest {
 
-    public static void main(String[] args){
+    @Test
+    public void test1(){
         var scanner = new Scanner("src/test/scripts/lexer_performance_test.psh");
         var lexer = new Lexer(scanner);
         var startTime = System.currentTimeMillis();

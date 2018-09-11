@@ -6,6 +6,8 @@ import phantom.support.util.List;
 
 public class BlockExpression extends Expression {
 
+    public static final int TYPE = 10;
+
     private List<Expression> expressionList;
 
     public BlockExpression(List<Expression> expressionList) {
@@ -18,6 +20,11 @@ public class BlockExpression extends Expression {
 
     public List<Token> getTokens() {
         return null;
+    }
+
+    @Override
+    public int getType() {
+        return TYPE;
     }
 
     public String toString() {

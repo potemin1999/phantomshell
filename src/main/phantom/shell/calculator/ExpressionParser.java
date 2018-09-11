@@ -20,32 +20,36 @@ public class ExpressionParser {
         operator = new Operator();
     }
 
-    public ArrayList<Pair<Value, Integer>> parseTokens(List<Token> tokens) {
+    public ArrayList<ExpressionToken> parseTokens(List<Token> tokens) {
 
-        ArrayList<Pair<Value, Integer>> parsedTokens = new ArrayList<>();
+        ArrayList<ExpressionToken> parsedTokens = new ArrayList<>();
 
-        parsedTokens.add(new Pair<>(new IntValue(Operator.PAREN_OPEN), 5));
+        parsedTokens.add(new ExpressionToken(5,Operator.PAREN_OPEN));//new Pair<>(new IntValue(Operator.PAREN_OPEN), 5));
 
         while (tokens.size() > 0) {
-            var token = tokens.getFirst();
-            tokens.removeFirst();
+            var token = tokens.removeFirst();
 
             switch (token.getType()) {
                 case TokenType.IDENTIFIER:
-                    var word = token.getStringValue();
-
-                    switch (word) {
+                    var word = token.getValue();
+                    //TODO: get rid of string type
+                    var wordStr = new String(word);
+                    switch (wordStr) {
                         case "true":
-                            parsedTokens.add(new Pair<>(new BoolValue(true), 0));
+                            parsedTokens.add(new ExpressionToken(0,new BoolValue(true)));
+                            //parsedTokens.add(new Pair<>(new BoolValue(true), 0));
                             break;
                         case "false":
-                            parsedTokens.add(new Pair<>(new BoolValue(false), 0));
+                            parsedTokens.add(new ExpressionToken(0,new BoolValue(false)));
+                            //parsedTokens.add(new Pair<>(new BoolValue(false), 0));
                             break;
                         default:
-                            if (character.isDigit(word.charAt(0))) {
-                                parsedTokens.add(new Pair<>(readNumber(word), 0));
+                            if (character.isDigit(word[0])) {
+                                parsedTokens.add(new ExpressionToken(0,readNumber(word)));
+                                //parsedTokens.add(new Pair<>(readNumber(word), 0));
                             } else {
-                                parsedTokens.add(new Pair<>(new StringValue(word), 0));
+                                parsedTokens.add(new ExpressionToken(0,new StringValue(word)));
+                                //parsedTokens.add(new Pair<>(new StringValue(word), 0));
                             }
                     }
 
@@ -53,34 +57,47 @@ public class ExpressionParser {
 
                 case TokenType.OPERATOR:
                     var op = token.getStringValue();
-                    var opcode = new IntValue(operator.map(op));
-
-                    if (operator.isUnaryOperator(op)) {
-                        parsedTokens.add(new Pair<>(opcode, 1));
+                    var opcode = operator.map(op);
+                    var operatorType = getOperatorType(op);
+                    if (operatorType==-1){
+                        parsedTokens.add(new ExpressionToken(-1,null));
+                    }else{
+                        parsedTokens.add(new ExpressionToken(operatorType,opcode));
+                    }
+                    /*if (operator.isUnaryOperator(op)) {
+                        parsedTokens.add(new ExpressionToken(1,opcode));
+                        //parsedTokens.add(new Pair<>(opcode, 1));
                     } else if (operator.isIncrementDecrementOperator(op)) {
-                        parsedTokens.add(new Pair<>(opcode, 7));
+                        parsedTokens.add(new ExpressionToken(7,opcode));
+                        //parsedTokens.add(new Pair<>(opcode, 7));
                     } else if (operator.isBinaryOperator(op) && !op.equals("=")) {
-                        parsedTokens.add(new Pair<>(opcode, 2));
+                        parsedTokens.add(new ExpressionToken(2,opcode));
+                        //parsedTokens.add(new Pair<>(opcode, 2));
                     } else if (operator.isComparisonOperator(op)) {
-                        parsedTokens.add(new Pair<>(opcode, 3));
+                        parsedTokens.add(new ExpressionToken(3,opcode));
+                        //parsedTokens.add(new Pair<>(opcode, 3));
                     } else if (operator.isLogicalOperator(op)) {
-                        parsedTokens.add(new Pair<>(opcode, 4));
+                        parsedTokens.add(new ExpressionToken(4,opcode));
+                        //parsedTokens.add(new Pair<>(opcode, 4));
                     } else if (operator.isPriorityOperator(op)){
+                        parsedTokens.add();
                         parsedTokens.add(new Pair<>(opcode, 5));
                     } else if (op.equals("=")) {
                         parsedTokens.add(new Pair<>(opcode, 6));
                     } else {
                         parsedTokens.add(new Pair<>(null, -1));
-                    }
+                    }*/
 
                     break;
 
                 case TokenType.PAREN_OPEN:
-                    parsedTokens.add(new Pair<>(new IntValue(operator.PAREN_OPEN), 5));
+                    parsedTokens.add(new ExpressionToken(5,Operator.PAREN_OPEN));
+                    //parsedTokens.add(new Pair<>(new IntValue(Operator.PAREN_OPEN), 5));
                     break;
 
                 case TokenType.PAREN_CLOSE:
-                    parsedTokens.add(new Pair<>(new IntValue(operator.PAREN_CLOSE), 5));
+                    parsedTokens.add(new ExpressionToken(5,Operator.PAREN_CLOSE));
+                    //parsedTokens.add(new Pair<>(new IntValue(Operator.PAREN_CLOSE), 5));
                     break;
 
                 case TokenType.EOL:
@@ -94,10 +111,34 @@ public class ExpressionParser {
                     return null;
             }
         }
-
-        parsedTokens.add(new Pair<>(new IntValue(Operator.PAREN_CLOSE), 5));
+        parsedTokens.add(new ExpressionToken(5,Operator.PAREN_CLOSE));
+        //parsedTokens.add(new Pair<>(new IntValue(Operator.PAREN_CLOSE), 5));
 
         return parsedTokens;
+    }
+
+    public int getOperatorType(String op){
+        if (operator.isUnaryOperator(op)) {
+            return 1;
+        } else if (operator.isIncrementDecrementOperator(op)) {
+            return 7;
+        } else if (operator.isBinaryOperator(op) && !op.equals("=")) {
+            return 2;
+        } else if (operator.isComparisonOperator(op)) {
+            return 3;
+        } else if (operator.isLogicalOperator(op)) {
+            return 4;
+        } else if (operator.isPriorityOperator(op)){
+            return 5;
+        } else if (op.equals("=")) {
+            return 6;
+        } else {
+            return -1;
+        }
+    }
+
+    public Value readNumber(char[] expression){
+        return readNumber(String.valueOf(expression));
     }
 
     public Value readNumber(String expression) {

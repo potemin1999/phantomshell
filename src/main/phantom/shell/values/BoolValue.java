@@ -40,6 +40,6 @@ public class BoolValue extends Value {
     }
 
     public BoolValue operatorLogicalImplication(BoolValue other) {
-        return new BoolValue(this.val && !other.val ? false : true);
+        return new BoolValue(!this.val || other.val);
     }
 }

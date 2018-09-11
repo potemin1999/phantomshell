@@ -54,6 +54,7 @@ public class Executor {
         try {
             return execute(expression);
         } catch (ExecutionFaultException fault) {
+            fault.printStackTrace();
             if (fault.getCode() == 0 || fault.getCode() == -1)
                 throw fault;
             return fault.makeFault();
@@ -68,70 +69,28 @@ public class Executor {
      * ExecutionFault object if not
      */
     protected Object execute(Expression expression) {
-        //if (expression == null)
-        // throw new NullPointerException("expression can not be null");
-        if (expression instanceof DefExpression) {
-            var tokens = expression.getTokens();
-            var name = tokens.getFirst().getStringValue();
-
-            env.defineVariable(new StringValue(name));
-
-            var pair = handler.evaluate(env, tokens);
-            var result = pair.getKey();
-            env = pair.getValue();
-
-            //Variable is already set inside the ExpressionEvaluator
-            //env.setVariable(name, result);
-
-            //Log.out.println("defined variable \"" + String.valueOf(name) + "\" with value " + result);
-            return result;
-        } else if (expression instanceof ValueExpression) {
-            var tokens = expression.getTokens();
-
-            var pair = handler.evaluate(env, tokens);
-            var result = pair.getKey();
-            env = pair.getValue();
-
-            return result;
-        } else if (expression instanceof IfExpression) {
-            var result = execute(((IfExpression) expression).getCondition());
-
-            if (result.equals(true)) {
-                execute(((IfExpression) expression).getTrueBlock());
-            } else {
-                if (((IfExpression) expression).getNext() != null) {
-                    execute(((IfExpression) expression).getNext());
-                } else {
-                    execute(((IfExpression) expression).getFalseBlock());
-                }
+        if (expression == null)
+         throw new NullPointerException("expression can not be null");
+        switch (expression.getType()){
+            case DefExpression.TYPE:{
+                return executeDefExpression(((DefExpression) expression));
             }
-
-            return result;
-        } else if (expression instanceof BlockExpression) {
-            var expressionList = ((BlockExpression) expression).getExpressionList();
-
-            Token token = expressionList.removeFirst().getTokens().getFirst();
-            TokenType.assertType(token, TokenType.BRACE_OPEN);
-
-            env = new Environment(env);
-
-            while (expressionList.size() > 1) {
-                var result = execute(expressionList.removeFirst());
-                if (result instanceof ExecutionFault) {
-                    return result;
-                }
+            case ValueExpression.TYPE:{
+                return executeValueExpression(((ValueExpression) expression));
             }
-
-            token = expressionList.removeLast().getTokens().getLast();
-            TokenType.assertType(token, TokenType.BRACE_CLOSE);
-
-            env = env.deleteEnvironment();
-        } else if (expression instanceof PrintExpression) {
+            case IfExpression.TYPE:{
+                return executeIfExpression(((IfExpression) expression));
+            }
+            case BlockExpression.TYPE:{
+                return executeBlockExpression(((BlockExpression) expression));
+            }
+        }
+        /*if (expression instanceof PrintExpression) {
             var valueExpression = ((PrintExpression) expression).valueExpressionToPrint();
             var tokens = valueExpression.getTokens();
 
             var pair = handler.evaluate(env, tokens);
-            var result = ((Pair) pair).getKey();
+            var result = pair.getKey();
             env = (Environment) ((Pair) pair).getValue();
             printer.print(result);
 
@@ -142,14 +101,71 @@ public class Executor {
             var tokens = valueExpression.getTokens();
 
             var pair = handler.evaluate(env, tokens);
-            var result = ((Pair) pair).getKey();
+            var result = pair.getKey();
             env = (Environment) ((Pair) pair).getValue();
             printer.println(result);
 
             //Log.out.println("defined variable \"" + String.valueOf(name) + "\" with value " + result);
             return result;
+        }*/
+
+        return 0;
+    }
+
+    protected Object executeDefExpression(DefExpression expression){
+        var tokens = expression.getTokens();
+        var name = tokens.getFirst().getValue();
+
+        env.defineVariable(new StringValue(name));
+
+        var result = handler.evaluate(env, tokens);
+
+        return result;
+    }
+
+    protected Object executeValueExpression(ValueExpression expression){
+        var tokens = expression.getTokens();
+
+        var result = handler.evaluate(env, tokens);
+
+        return result;
+    }
+
+    protected Object executeIfExpression(IfExpression expression){
+        var result = execute(expression.getCondition());
+
+        if (result.equals(true)) {
+            execute(expression.getTrueBlock());
+        } else {
+            if (expression.getNext() != null) {
+                execute(expression.getNext());
+            } else {
+                execute(expression.getFalseBlock());
+            }
         }
 
+        return result;
+    }
+
+    protected Object executeBlockExpression(BlockExpression expression){
+        var expressionList = expression.getExpressionList();
+
+        Token token = expressionList.removeFirst().getTokens().getFirst();
+        TokenType.assertType(token, TokenType.BRACE_OPEN);
+
+        env = new Environment(env);
+
+        while (expressionList.size() > 1) {
+            var result = execute(expressionList.removeFirst());
+            if (result instanceof ExecutionFault) {
+                return result;
+            }
+        }
+
+        token = expressionList.removeLast().getTokens().getLast();
+        TokenType.assertType(token, TokenType.BRACE_CLOSE);
+
+        env = env.deleteEnvironment();
         return 0;
     }
 }

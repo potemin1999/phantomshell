@@ -2,6 +2,7 @@ package phantom.shell.calculator;
 
 import phantom.shell.environment.Environment;
 import phantom.shell.parser.Token;
+import phantom.shell.values.Value;
 import phantom.support.util.List;
 import phantom.support.util.Pair;
 
@@ -15,16 +16,16 @@ public class ExpressionHandler {
         evaluator = new ExpressionEvaluator();
     }
 
-    public Pair<Object, Environment> evaluate(Environment environment, List<Token> tokens) {
+    public Value evaluate(Environment environment, List<Token> tokens) {
         var parsedTokens = parser.parseTokens(tokens);
 
-        var pair = evaluator.evaluateExpression(environment, parsedTokens);
-        var result = pair.getKey();
-        environment = pair.getValue();
+        var result = evaluator.evaluateExpression(environment, parsedTokens);
+        //var result = pair.getKey();
+        //environment = pair.getValue();
 
         //System.out.println("RESULT " + result);
         //System.out.println("RESULT VALUE " + result.getValue());
 
-        return new Pair<>(result.getValue(), environment);
+        return result;
     }
 }

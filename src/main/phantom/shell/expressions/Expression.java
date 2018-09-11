@@ -5,8 +5,10 @@ import phantom.support.util.List;
 
 public abstract class Expression {
 
-    public Expression() {};
+    public Expression() {}
 
     public abstract List<Token> getTokens();
+
+    public abstract int getType();
 
 }

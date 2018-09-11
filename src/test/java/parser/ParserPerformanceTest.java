@@ -1,11 +1,13 @@
 package parser;
 
+import org.junit.Test;
 import phantom.shell.parser.*;
 import phantom.support.log.Log;
 
 public class ParserPerformanceTest {
 
-    public static void main(String[] args){
+    @Test
+    public void test1(){
         var scanner = new Scanner("src/test/scripts/lexer_performance_test.psh");
         var lexer = new Lexer(scanner);
         var parser = new Parser(lexer);

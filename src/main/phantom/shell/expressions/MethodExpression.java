@@ -8,6 +8,8 @@ import phantom.support.util.List;
 
 public class MethodExpression extends Expression {
 
+    public static final int TYPE = 4;
+
     private List<Token> tokens;
 
     public MethodExpression(List<Token> tokens) {
@@ -16,5 +18,10 @@ public class MethodExpression extends Expression {
 
     public List<Token> getTokens() {
         return this.tokens;
+    }
+
+    @Override
+    public int getType() {
+        return TYPE;
     }
 }

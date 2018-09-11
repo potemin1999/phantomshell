@@ -5,6 +5,8 @@ import phantom.support.util.List;
 
 public class EmptyExpression extends Expression {
 
+    public static int TYPE = 0;
+
     private List<Token> tokens;
 
     public EmptyExpression() {
@@ -16,7 +18,13 @@ public class EmptyExpression extends Expression {
     }
 
     @Override
+    public int getType() {
+        return TYPE;
+    }
+
+    @Override
     public String toString() {
         return "EmptyExp";
     }
+
 }

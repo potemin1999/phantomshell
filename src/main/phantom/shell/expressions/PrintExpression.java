@@ -18,4 +18,10 @@ public class PrintExpression extends Expression {
     public List<Token> getTokens() {
         return null;
     }
+
+    @Override
+    public int getType() {
+        return -1;
+    }
+
 }

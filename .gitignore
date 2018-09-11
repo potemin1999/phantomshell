@@ -1,5 +1,11 @@
 .idea/
+.gradle/
 .floo
 .flooignore
+build/
+gradle/
 out/
+gradlew
+gradlew.bat
+phantomshell.iml
 PhantomShell.iml

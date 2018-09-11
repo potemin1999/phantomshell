@@ -6,6 +6,8 @@ import phantom.support.lang.StringBuilder;
 
 public class IfExpression extends Expression {
 
+    public static final int TYPE = 3;
+
     private ValueExpression condition;
     private IfExpression next;
     private BlockExpression trueBlock;
@@ -26,7 +28,6 @@ public class IfExpression extends Expression {
         this.falseBlock = falseBlock;
     }
 
-
     public ValueExpression getCondition() {
         return condition;
     }
@@ -45,6 +46,11 @@ public class IfExpression extends Expression {
 
     public List<Token> getTokens() {
         return null;
+    }
+
+    @Override
+    public int getType() {
+        return TYPE;
     }
 
     @Override
