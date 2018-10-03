@@ -1,6 +1,6 @@
-package phantom.shell.calculator;
+package phantom.shell.interpreter.calculator;
 
-import phantom.shell.executor.ExecutionFault;
+import phantom.shell.interpreter.executor.ExecutionFault;
 
 public class ExpressionEvaluationFault extends ExecutionFault {
 

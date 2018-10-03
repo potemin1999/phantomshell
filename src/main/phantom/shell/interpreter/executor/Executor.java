@@ -1,16 +1,15 @@
-package phantom.shell.executor;
+package phantom.shell.interpreter.executor;
 
-import phantom.shell.environment.Environment;
-import phantom.shell.calculator.ExpressionHandler;
+import phantom.shell.interpreter.environment.Environment;
+import phantom.shell.interpreter.calculator.ExpressionHandler;
 import phantom.shell.expressions.*;
 import phantom.shell.parser.Lexer;
 import phantom.shell.parser.Parser;
 import phantom.shell.parser.Token;
 import phantom.shell.parser.TokenType;
-import phantom.shell.printer.Printer;
+import phantom.shell.interpreter.printer.Printer;
 import phantom.shell.values.StringValue;
 import phantom.support.io.PrintStream;
-import phantom.support.util.Pair;
 
 /**
  * @author Ilya Potemin

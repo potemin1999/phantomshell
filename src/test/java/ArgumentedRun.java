@@ -9,4 +9,17 @@ public class ArgumentedRun {
         Boot.main(args);
     }
 
+    @Test
+    public void test2(){
+        String[] args = new String[]{"src/test/scripts/function_test.psh"};
+        Boot.main(args);
+    }
+
+    @Test
+    public void test3(){
+        for (int i = 0;i<10;i++){
+            test2();
+        }
+    }
+
 }

@@ -1,7 +1,7 @@
-package phantom.shell.environment;
+package phantom.shell.interpreter.environment;
 
-import phantom.shell.executor.ExecutionFault;
-import phantom.shell.executor.ExecutionFaultException;
+import phantom.shell.interpreter.executor.ExecutionFault;
+import phantom.shell.interpreter.executor.ExecutionFaultException;
 import phantom.shell.structures.Function;
 import phantom.shell.values.StringValue;
 import phantom.shell.values.Value;

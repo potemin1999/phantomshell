@@ -1,5 +1,7 @@
 package phantom.shell.structures;
 
+import phantom.shell.values.Value;
+
 import java.util.HashMap;
 
 /**
@@ -53,8 +55,11 @@ public class Operator {
     //TODO: add/ignore priority of priority operators
     public static final int PAREN_OPEN          = 0x3060; // (
     public static final int PAREN_CLOSE         = 0x3061; // )
+    // maximum operator id - 0x61 or 97
+    private static final int MAX_OPERATOR_ID = 97;
 
     private HashMap<Object, Integer> opCodeMap;
+    private OperatorExecutor[] operators;
 
     public Operator() {
         opCodeMap = new HashMap<>();
@@ -85,6 +90,165 @@ public class Operator {
         opCodeMap.put("->", LOGICAL_IMPLICATION);
         opCodeMap.put("(", PAREN_OPEN);
         opCodeMap.put(")", PAREN_CLOSE);
+        //next code may be represented x6 shorter, using lambdas
+        //operator executors allow us to execute operator without switch-cases in O(1)
+        operators = new OperatorExecutor[MAX_OPERATOR_ID+1];
+        operators[getId(INCREMENT)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorIncrement();
+            }
+        };
+        operators[getId(DECREMENT)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorDecrement();
+            }
+        };
+        operators[getId(ASSIGNING)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorAssigning(value2);
+            }
+        };
+        operators[getId(ADDITION)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorAddition(value2);
+            }
+        };
+        operators[getId(SUBTRACTION)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorSubtraction(value2);
+            }
+        };
+        operators[getId(MULTIPLICATION)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorMultiplication(value2);
+            }
+        };
+        operators[getId(DIVISION)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorDivision(value2);
+            }
+        };
+        operators[getId(BITWISE_NOT)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorBitwiseNot();
+            }
+        };
+        operators[getId(BITWISE_SHIFT_L)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorBitwiseShiftLeft(value2);
+            }
+        };
+        operators[getId(BITWISE_SHIFT_R)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorBitwiseShiftRight(value2);
+            }
+        };
+        operators[getId(BITWISE_AND)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorBitwiseAnd(value2);
+            }
+        };
+        operators[getId(BITWISE_OR)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorBitwiseOr(value2);
+            }
+        };
+        operators[getId(BITWISE_XOR)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorBitwiseXor(value2);
+            }
+        };
+        operators[getId(EQUAL)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorEqual(value2);
+            }
+        };
+        operators[getId(NOT_EQUAL)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorNotEqual(value2);
+            }
+        };
+        operators[getId(GREATER_THAN)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorGreaterThan(value2);
+            }
+        };
+        operators[getId(LESS_THAN)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorLessThan(value2);
+            }
+        };
+        operators[getId(NOT_GREATER_THAN)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorNotGreaterThan(value2);
+            }
+        };
+        operators[getId(NOT_LESS_THAN)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorNotLessThan(value2);
+            }
+        };
+        operators[getId(LOGICAL_NOT)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorLogicalNot();
+            }
+        };
+        operators[getId(LOGICAL_AND)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorLogicalAnd(value2);
+            }
+        };
+        operators[getId(LOGICAL_OR)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorLogicalOr(value2);
+            }
+        };
+        operators[getId(LOGICAL_XOR)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorLogicalXor(value2);
+            }
+        };
+        operators[getId(LOGICAL_IMPLICATION)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return value1.operatorLogicalImplication(value2);
+            }
+        };
+        operators[getId(PAREN_OPEN)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return null;
+            }
+        };
+        operators[getId(PAREN_CLOSE)] = new OperatorExecutor() {
+            @Override
+            public Value execute(Value value1, Value value2) {
+                return null;
+            }
+        };
     }
 
     /**
@@ -159,4 +323,21 @@ public class Operator {
     public int getPriority(int code) {
         return (code & 0x0f00) >> 8;
     }
+
+    public int getId(int code){
+        return code&0x00ff;
+    }
+
+    public Value executeBinaryOperator(int operator,Value value1,Value value2){
+        return operators[operator & 0x00ff].execute(value1, value2);
+    }
+
+    public Value executeUnaryOperator(int operator,Value value){
+        return operators[operator & 0x00ff].execute(value,null);
+    }
+
+    private abstract class OperatorExecutor{
+        public abstract Value execute(Value value1,Value value2);
+    }
+
 }

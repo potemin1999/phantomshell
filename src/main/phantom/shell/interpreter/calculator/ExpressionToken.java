@@ -1,4 +1,4 @@
-package phantom.shell.calculator;
+package phantom.shell.interpreter.calculator;
 
 import phantom.shell.values.Value;
 
@@ -13,9 +13,9 @@ public class ExpressionToken {
     public static final int OPTYPE_ASSIGN_OPERATOR = 6;
     public static final int OPTYPE_INCDEC_OPERATOR = 7;
 
-    int opType;
-    int opCode;
-    Value value;
+    private int opType;
+    private int opCode;
+    private Value value;
 
     public ExpressionToken(int opType,int operator){
         this.opType = opType;

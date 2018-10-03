@@ -1,7 +1,7 @@
-package phantom.shell.calculator;
+package phantom.shell.interpreter.calculator;
 
-import phantom.shell.executor.ExecutionFault;
-import phantom.shell.executor.ExecutionFaultException;
+import phantom.shell.interpreter.executor.ExecutionFault;
+import phantom.shell.interpreter.executor.ExecutionFaultException;
 
 public class ExpressionEvaluationException extends ExecutionFaultException {
 

@@ -3,7 +3,8 @@ package phantom.shell.parser;
 public class TokenType {
 
     public static void assertType(Token token, int tokenType) {
-        assertType(token, tokenType, Token.typeToString(tokenType) + " expected");
+        assertType(token, tokenType, Token.typeToString(tokenType)
+                + " expected, "+ Token.typeToString(token.getType())+" got");
     }
 
     public static void assertType(Token token, int tokenType, int parseFaultCode){

@@ -4,9 +4,9 @@ package phantom.support.util;
  * @author Ilya Potemin
  *
  * Simple pair for expression's evaluations
- * @see phantom.shell.calculator.ExpressionEvaluator
- * @see phantom.shell.calculator.ExpressionHandler
- * @see phantom.shell.calculator.ExpressionParser
+ * @see phantom.shell.interpreter.calculator.ExpressionEvaluator
+ * @see phantom.shell.interpreter.calculator.ExpressionHandler
+ * @see phantom.shell.interpreter.calculator.ExpressionParser
  *
  * @param <K> key type
  * @param <V> value type

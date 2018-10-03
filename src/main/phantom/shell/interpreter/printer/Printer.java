@@ -1,4 +1,4 @@
-package phantom.shell.printer;
+package phantom.shell.interpreter.printer;
 
 import phantom.support.io.PrintStream;
 

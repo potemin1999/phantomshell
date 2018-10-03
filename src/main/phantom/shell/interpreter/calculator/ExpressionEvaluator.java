@@ -1,6 +1,6 @@
-package phantom.shell.calculator;
+package phantom.shell.interpreter.calculator;
 
-import phantom.shell.environment.Environment;
+import phantom.shell.interpreter.environment.Environment;
 import phantom.shell.structures.Operator;
 
 import phantom.shell.values.BoolValue;
@@ -20,8 +20,8 @@ public class ExpressionEvaluator {
     }
 
     private Value evaluateExpression(Environment environment, ArrayList<ExpressionToken> tokens,
-                                                        int startingIndex, int finishingIndex,
-                                                        List<Value> postChangingObjectStack, List<Integer> postOpStack) {
+                                     int startingIndex, int finishingIndex,
+                                     List<Value> postChangingObjectStack, List<Integer> postOpStack) {
         ArrayList<Value> objectStack = new ArrayList<>();
 
         ArrayList<Integer> opStack = new ArrayList<>();
@@ -58,30 +58,9 @@ public class ExpressionEvaluator {
                             objectStack.add(evaluate(environment, op, nextToken.getValue()));
                             ++i;
                         } else if (nextToken.getOpCode() == Operator.PAREN_OPEN) {
-                            //if (nextToken.getValue().operatorEqual(new IntValue(Operator.PAREN_OPEN)).getValue()) {
-
-                            var j = i + 2;
-                            var balance = 1;
-
-                            while (j <= finishingIndex && balance != 0) {
-                                if (token.getOpCode() == Operator.PAREN_OPEN) {
-                                    ++balance;
-                                }
-                                if (token.getOpCode() == Operator.PAREN_CLOSE) {
-                                    --balance;
-                                }
-                                /*if (tokens.get(j).getKey().getValue().equals("(")) {
-                                    ++balance;
-                                } else if (tokens.get(j).getKey().getValue().equals(")")) {
-                                    --balance;
-                                }*/
-                                ++j;
-                            }
-                            --j;
+                            var j = getBalance(i, tokens, finishingIndex);
 
                             var a = evaluateExpression(environment, tokens, i + 1, j, postChangingObjectStack, postOpStack);
-                            //var a = resultValue;//pair.getKey();
-                            //environment = pair.getValue();
 
                             objectStack.add(evaluate(environment, op, a));
 
@@ -92,9 +71,7 @@ public class ExpressionEvaluator {
                 }
                 case ExpressionToken.OPTYPE_BINARY_OPERATOR: { // 2 - Binary operator
                     int op = token.getOpCode();
-                    //op = (IntValue) token.getKey();
                     int prevOp = 0;
-                    //IntValue prevOp;
 
                     if (!opStack.isEmpty()) {
                         prevOp = opStack.get(opStack.size() - 1);
@@ -110,7 +87,6 @@ public class ExpressionEvaluator {
 
                         var resultValue = evaluate(environment, prevOp, a, b);
                         objectStack.add(resultValue);
-                        //environment = pair.getValue();
 
                         opStack.remove(opStack.size() - 1);
 
@@ -124,30 +100,15 @@ public class ExpressionEvaluator {
                     var nextToken = tokens.get(i + 1);
 
                     if (nextToken.getOpType() == 5 && nextToken.getOpCode() == Operator.PAREN_OPEN) {
-                        var j = i + 2;
-                        var balance = 1;
-
-                        while (j <= finishingIndex && balance != 0) {
-                            if (token.getOpCode() == Operator.PAREN_OPEN) {
-                                ++balance;
-                            }
-                            if (token.getOpCode() == Operator.PAREN_CLOSE) {
-                                --balance;
-                            }
-                            ++j;
-                        }
-                        --j;
+                        var j = getBalance(i, tokens, finishingIndex);
 
                         Value a = objectStack.get(objectStack.size() - 1);
                         objectStack.remove(objectStack.size() - 1);
 
                         var b = evaluateExpression(environment, tokens, i + 1, j, postChangingObjectStack, postOpStack);
-                        //Value b = resultValue;
-                        //environment = pair.getValue();
 
                         var resultValue = evaluate(environment, op, a, b);
                         objectStack.add(resultValue);
-                        //environment = pair.getValue();
 
                         i = j;
 
@@ -158,8 +119,6 @@ public class ExpressionEvaluator {
                     break;
                 }
                 case ExpressionToken.OPTYPE_COMPARISON_OPERATOR: { // 3 - Comparison operator
-                    //op = (IntValue) token.getKey();
-                    //opStack.add(op);
                     opStack.add(token.getOpCode());
                     break;
                 }
@@ -247,7 +206,6 @@ public class ExpressionEvaluator {
 
                         var resultValue = evaluate(environment, prevOp, a, b);
                         objectStack.add(resultValue);
-                        //environment = pair.getValue();
 
                         logicalOpStack.remove(logicalOpStack.size() - 1);
 
@@ -262,26 +220,12 @@ public class ExpressionEvaluator {
                     nextToken = tokens.get(i + 1);
 
                     if (nextToken.getOpCode() == Operator.PAREN_OPEN) {
-                        var j = i + 2;
-                        var balance = 1;
-
-                        while (j <= finishingIndex && balance != 0) {
-                            if (tokens.get(i).getOpCode() == Operator.PAREN_OPEN) {
-                                ++balance;
-                            }
-                            if (tokens.get(i).getOpCode() == Operator.PAREN_CLOSE) {
-                                --balance;
-                            }
-                            ++j;
-                        }
-                        --j;
+                        var j = getBalance(i, tokens, finishingIndex);
 
                         var a = objectStack.get(objectStack.size() - 1);
                         objectStack.remove(objectStack.size() - 1);
 
                         var b = evaluateExpression(environment, tokens, i + 1, j, postChangingObjectStack, postOpStack);
-                        //var b = pair.getKey();
-                        //environment = pair.getValue();
 
                         var resultObject = evaluate(environment, op, a, b);
                         objectStack.add(resultObject);
@@ -517,10 +461,8 @@ public class ExpressionEvaluator {
 
             var val = environment.getVariable(obj);
             return val == null ? obj : val;
-            //return val == null ? new Pair(obj, environment) : new Pair(val, environment);
         } else if (objectStack.size() == 0) {
             return null;
-            //return new Pair(null, environment);
         } else {
             throw new ExpressionEvaluationException(ExpressionEvaluationFault.OBJ_STACK_WRONG_SIZE, "" + objectStack.size());
         }
@@ -531,8 +473,6 @@ public class ExpressionEvaluator {
         ArrayList<Integer> postOpStack = new ArrayList<>();
 
         var result = evaluateExpression(environment, tokens, 0, tokens.size() - 1, postChangingObjectStack, postOpStack);
-        //var result = pair.getKey();
-        //environment = pair.getValue();
 
         while (!postOpStack.isEmpty()) {
             var op = postOpStack.get(postOpStack.size() - 1);
@@ -559,74 +499,7 @@ public class ExpressionEvaluator {
         var val1 = environment.getVariable(obj1);
         Value result;
 
-        //System.out.println(val1);
-        //System.out.println(val2);
-
-        switch (opCode) {
-            case Operator.ADDITION:
-                result = val1.operatorAddition(val2);
-                break;
-            case Operator.SUBTRACTION:
-                result = val1.operatorSubtraction(val2);
-                break;
-            case Operator.MULTIPLICATION:
-                result = val1.operatorMultiplication(val2);
-                break;
-            case Operator.DIVISION:
-                result = val1.operatorDivision(val2);
-                break;
-
-            case Operator.BITWISE_AND:
-                result = val1.operatorBitwiseAnd(val2);
-                break;
-            case Operator.BITWISE_OR:
-                result = val1.operatorBitwiseOr(val2);
-                break;
-            case Operator.BITWISE_XOR:
-                result = val1.operatorBitwiseXor(val2);
-                break;
-            case Operator.BITWISE_SHIFT_L:
-                result = val1.operatorBitwiseShiftLeft(val2);
-                break;
-            case Operator.BITWISE_SHIFT_R:
-                result = val1.operatorBitwiseShiftRight(val2);
-                break;
-
-            case Operator.EQUAL:
-                result = val1.operatorEqual(val2);
-                break;
-            case Operator.NOT_EQUAL:
-                result = val1.operatorNotEqual(val2);
-                break;
-            case Operator.GREATER_THAN:
-                result = val1.operatorGreaterThan(val2);
-                break;
-            case Operator.NOT_LESS_THAN:
-                result = val1.operatorNotLessThan(val2);
-                break;
-            case Operator.LESS_THAN:
-                result = val1.operatorLessThan(val2);
-                break;
-            case Operator.NOT_GREATER_THAN:
-                result = val1.operatorNotGreaterThan(val2);
-                break;
-
-            case Operator.LOGICAL_AND:
-                result = val1.operatorLogicalAnd(val2);
-                break;
-            case Operator.LOGICAL_OR:
-                result = val1.operatorLogicalOr(val2);
-                break;
-            case Operator.LOGICAL_XOR:
-                result = val1.operatorLogicalXor(val2);
-                break;
-            case Operator.LOGICAL_IMPLICATION:
-                result = val1.operatorLogicalImplication(val2);
-                break;
-
-            default:
-                throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_INT_OPERATOR, "" + opCode);
-        }
+        result = operator.executeBinaryOperator(opCode, val1, val2);
 
         return result;
 
@@ -641,26 +514,10 @@ public class ExpressionEvaluator {
         }
 
         if (obj instanceof IntValue || obj instanceof FloatValue || obj instanceof BoolValue) {
-            Value result;
 
-            switch (opcode) {
-                case Operator.INCREMENT:
-                    result = obj.operatorIncrement();
-                    environment.setVariable(name, result);
-                    break;
-                case Operator.DECREMENT:
-                    result = obj.operatorDecrement();
-                    environment.setVariable(name, result);
-                    break;
-                case Operator.BITWISE_NOT:
-                    result = obj.operatorBitwiseNot();
-                    break;
-                case Operator.LOGICAL_NOT:
-                    result = obj.operatorLogicalNot();
-                    break;
-
-                default:
-                    throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNDEFINED_INT_OPERATOR, opcode + "");
+            var result = operator.executeUnaryOperator(opcode, obj);
+            if (operator.isIncrementDecrementOperator(opcode)) {
+                environment.setVariable(name, result);
             }
 
             return result;
@@ -669,4 +526,22 @@ public class ExpressionEvaluator {
             throw new ExpressionEvaluationException(ExpressionEvaluationFault.UNKNOWN_OBJ_TYPE);
         }
     }
+
+    private int getBalance(int i, ArrayList<ExpressionToken> tokens, int finishingIndex) {
+        var j = i + 2;
+        var balance = 1;
+
+        while (j <= finishingIndex && balance != 0) {
+            if (tokens.get(j).getOpCode() == Operator.PAREN_OPEN) {
+                ++balance;
+            }
+            if (tokens.get(j).getOpCode() == Operator.PAREN_CLOSE) {
+                --balance;
+            }
+            ++j;
+        }
+        --j;
+        return j;
+    }
+
 }

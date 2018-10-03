@@ -1,0 +1,7 @@
+def a = 0
+
+def func1(int a,int b){
+ def aa = 0
+ def bb = aa + 1
+ def cc = aa + bb + 1
+}

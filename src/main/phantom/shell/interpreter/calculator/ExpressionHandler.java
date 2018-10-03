@@ -1,10 +1,9 @@
-package phantom.shell.calculator;
+package phantom.shell.interpreter.calculator;
 
-import phantom.shell.environment.Environment;
+import phantom.shell.interpreter.environment.Environment;
 import phantom.shell.parser.Token;
 import phantom.shell.values.Value;
 import phantom.support.util.List;
-import phantom.support.util.Pair;
 
 public class ExpressionHandler {
 
