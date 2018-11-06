@@ -1,10 +1,10 @@
 ﻿Скрипты для Phantom Shell будут иметь следующие условные конструкции:
 
-1. if (<boolean expression>) {
+1. if [<boolean expression>] {
 	...
-    } elif (<boolean expression>) {
+    } elif [<boolean expression>] {
     	...
-    } else (<boolean expression>) {
+    } else [<boolean expression>] {
 	...
     }
 
@@ -12,7 +12,7 @@
 последовательно и код из блока выполняется в случае, если соответствующее выражение является истинным, а после контроль переходит к
 коду, находящемуся за закрывающей фигурной скобкой блока if.
 
-2. switch (variable) {
+2. switch [variable] {
         case <const-expression-1>:
             ...
         case <const-expression-2>:
