@@ -1,10 +1,11 @@
 package phantom.shell.values;
 
 public class Value {
+
     public Value() {}
 
     public Object getValue() {return null;}
-    public void setValue() {}
+    public void setValue(Object value) {}
 
     public Value operatorIncrement() {return null;}
     public Value operatorDecrement() {return null;}
@@ -33,4 +34,5 @@ public class Value {
     public BoolValue operatorLogicalOr(Value other) {return null;}
     public BoolValue operatorLogicalXor(Value other) {return null;}
     public BoolValue operatorLogicalImplication(Value other) {return null;}
+
 }

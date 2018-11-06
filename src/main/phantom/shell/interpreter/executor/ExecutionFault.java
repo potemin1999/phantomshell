@@ -1,4 +1,4 @@
-package phantom.shell.executor;
+package phantom.shell.interpreter.executor;
 
 public class ExecutionFault {
 

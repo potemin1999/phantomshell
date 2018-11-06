@@ -1,10 +1,10 @@
 package phantom.shell;
 
-import phantom.shell.executor.ExecutionFault;
-import phantom.shell.executor.Executor;
+import phantom.shell.interpreter.executor.ExecutionFault;
+import phantom.shell.interpreter.executor.Executor;
 import phantom.shell.expressions.Expression;
 import phantom.shell.parser.*;
-import phantom.shell.printer.Printer;
+import phantom.shell.interpreter.printer.Printer;
 import phantom.support.io.InputStream;
 import phantom.support.io.OutputStream;
 import phantom.support.io.PrintStream;

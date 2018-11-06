@@ -30,8 +30,8 @@ public class Token {
     }
 
     public String toString() {
-        return "[" + getStringType() + "] " + new String(
-                getValue() != null ? getValue() : new char[]{'N', 'U', 'L'}) + " ";
+        return "[" + getStringType() + "](" + new String(
+                getValue() != null ? getValue() : new char[]{'N', 'U', 'L'}) + ") ";
     }
 
     private String getStringType() {

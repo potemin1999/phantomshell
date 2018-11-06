@@ -33,12 +33,12 @@ public class Boot {
             }
         }
         shell = new PhantomShell(sourceInput, ttyInput, ttyOutput);
-        shell.setDebugMode(false);
+        shell.setDebugMode(true);
     }
 
     public InputStream getStreamFromFile(String fileStr) {
         try {
-            File file = new File(fileStr);
+            var file = new File(fileStr);
             return new FileInputStream(file);
         } catch (FileNotFoundException exception) {
             return null;

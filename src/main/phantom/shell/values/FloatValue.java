@@ -1,7 +1,7 @@
 package phantom.shell.values;
 
-import phantom.shell.calculator.ExpressionEvaluationException;
-import phantom.shell.calculator.ExpressionEvaluationFault;
+import phantom.shell.interpreter.calculator.ExpressionEvaluationException;
+import phantom.shell.interpreter.calculator.ExpressionEvaluationFault;
 
 public class FloatValue extends Value {
     private double val;

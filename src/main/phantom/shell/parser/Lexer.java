@@ -108,8 +108,37 @@ public class Lexer {
         return readTo(new int[]{TokenType.EOL});
     }
 
-    public List<Token> readToClosingBracket() {
+    public List<Token> readToFirstClosingBracket() {
         return readTo(new int[]{TokenType.BRACKET_CLOSE});
+    }
+
+    public List<Token> readToEqualClosingBracket() {
+        return readWithBalance(TokenType.BRACKET_OPEN,TokenType.BRACKET_CLOSE);
+    }
+
+    public List<Token> readToEqualClosingBrace(){
+        return readWithBalance(TokenType.BRACE_OPEN,TokenType.BRACE_CLOSE);
+    }
+
+    public List<Token> readWithBalance(int tokenBalancePlus,int tokenBalanceMinus) {
+        List<Token> list = new ArrayList<>();
+        int balance = 0;
+        do {
+            var token = next();
+            list.addLast(token);
+            if (token.getType()==tokenBalancePlus) {
+                ++balance;
+                continue;
+            }
+            if (token.getType()==tokenBalanceMinus){
+                if (balance==0){
+                    return list;
+                }else{
+                    --balance;
+                }
+            }
+        } while (!isEofReached);
+        return list;
     }
 
     public List<Token> readTo(int[] tokenTypes) {

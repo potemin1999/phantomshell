@@ -1,4 +1,4 @@
-package phantom.shell.executor;
+package phantom.shell.interpreter.executor;
 
 import phantom.support.lang.RuntimeException;
 

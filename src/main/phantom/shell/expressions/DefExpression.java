@@ -5,6 +5,8 @@ import phantom.support.util.List;
 
 public class DefExpression extends Expression {
 
+    public static final int TYPE = ExpressionTypes.DEF_EXPRESSION_TYPE;
+
     private List<Token> tokens;
 
     public DefExpression(List<Token> tokens) {
@@ -13,6 +15,11 @@ public class DefExpression extends Expression {
 
     public List<Token> getTokens() {
         return this.tokens;
+    }
+
+    @Override
+    public int getType() {
+        return TYPE;
     }
 
     @Override

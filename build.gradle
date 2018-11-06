@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+}
+
+group 'phantom.shell'
+version '0.02'
+
+sourceCompatibility = 1.10
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+sourceSets {
+    main{
+        java{
+            srcDirs 'src/main'
+        }
+    }
+    test{
+        java{
+            srcDirs 'src/test/java'
+        }
+    }
+}
