@@ -5,3 +5,5 @@ def func1(int a,int b){
  def bb = aa + 1
  def cc = aa + bb + 1
 }
+
+a = func1(a,a)

@@ -6,7 +6,7 @@ import phantom.support.util.List;
 
 public class BlockExpression extends Expression {
 
-    public static final int TYPE = 10;
+    public static final int TYPE = ExpressionTypes.BLOCK_EXPRESSION_TYPE;
 
     private List<Expression> expressionList;
 

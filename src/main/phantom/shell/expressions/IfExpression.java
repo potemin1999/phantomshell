@@ -6,7 +6,7 @@ import phantom.support.lang.StringBuilder;
 
 public class IfExpression extends Expression {
 
-    public static final int TYPE = 3;
+    public static final int TYPE = ExpressionTypes.IF_EXPRESSION_TYPE;
 
     private ValueExpression condition;
     private IfExpression next;

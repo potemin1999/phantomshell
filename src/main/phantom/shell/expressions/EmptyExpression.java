@@ -5,7 +5,7 @@ import phantom.support.util.List;
 
 public class EmptyExpression extends Expression {
 
-    public static int TYPE = 0;
+    public static int TYPE = ExpressionTypes.EMPTY_EXPRESSION_TYPE;
 
     private List<Token> tokens;
 

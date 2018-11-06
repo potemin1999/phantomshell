@@ -7,7 +7,7 @@ import phantom.support.util.Pair;
 
 public class FunctionExpression extends Expression {
 
-    public static final int TYPE = 4;
+    public static final int TYPE = ExpressionTypes.FUNCTION_EXPRESSION_TYPE;
 
     private List<Token> tokens;
     private List<Pair<char[],char[]>> args;

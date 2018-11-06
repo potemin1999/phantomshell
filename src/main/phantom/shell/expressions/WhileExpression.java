@@ -6,7 +6,7 @@ import phantom.support.util.List;
 
 public class WhileExpression extends Expression {
 
-    public static final int TYPE = 6;
+    public static final int TYPE = ExpressionTypes.WHILE_EXPRESSION_TYPE;
 
     private List<Token> tokens;
 

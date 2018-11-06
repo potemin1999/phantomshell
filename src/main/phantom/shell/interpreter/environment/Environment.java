@@ -11,16 +11,19 @@ import java.util.HashMap;
 public class Environment {
 
     HashMap<Integer, Value> definedVariables;
+    HashMap<Integer, Function> definedFunctions;
     Environment parent;
 
     public Environment() {
         parent = null;
         definedVariables = new HashMap<>();
+        definedFunctions = new HashMap<>();
     }
 
     public Environment(Environment parent) {
         this.parent = parent;
         this.definedVariables = new HashMap<>();
+        this.definedFunctions = new HashMap<>();
     }
 
     public void defineVariable(char[] name) {
@@ -93,6 +96,10 @@ public class Environment {
     }
 
     public void defineFunction(Function function){
+        //definedFunctions.put();
+    }
+
+    public void callFunction(Function function){
 
     }
 

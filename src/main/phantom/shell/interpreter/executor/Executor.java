@@ -83,6 +83,12 @@ public class Executor {
             case BlockExpression.TYPE:{
                 return executeBlockExpression(((BlockExpression) expression));
             }
+            case FunctionExpression.TYPE:{
+                return executeFunctionExpression((FunctionExpression) expression);
+            }
+            case CallExpression.TYPE:{
+                return executeCallExpression( (CallExpression) expression);
+            }
         }
         /*if (expression instanceof PrintExpression) {
             var valueExpression = ((PrintExpression) expression).valueExpressionToPrint();
@@ -166,5 +172,13 @@ public class Executor {
 
         env = env.deleteEnvironment();
         return 0;
+    }
+
+    protected Object executeFunctionExpression(FunctionExpression expression){
+        return null;
+    }
+
+    protected Object executeCallExpression(CallExpression expression){
+        return null;
     }
 }

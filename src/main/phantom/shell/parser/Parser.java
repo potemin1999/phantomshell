@@ -241,8 +241,13 @@ public class Parser {
     private Expression makeValueExpression(Token token) {
         var identifier = token;
         var expressionTokens = lexer.readToEOL();
-        expressionTokens.addFirst(identifier);
-
-        return new ValueExpression(expressionTokens);
+        if (expressionTokens.getFirst().getType()==TokenType.OPERATOR) {
+            // a = something, value expression
+            expressionTokens.addFirst(identifier);
+            return new ValueExpression(expressionTokens);
+        }else{
+            //looks like function call
+            return null;
+        }
     }
 }

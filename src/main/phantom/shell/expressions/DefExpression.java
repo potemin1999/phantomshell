@@ -5,7 +5,7 @@ import phantom.support.util.List;
 
 public class DefExpression extends Expression {
 
-    public static final int TYPE = 1;
+    public static final int TYPE = ExpressionTypes.DEF_EXPRESSION_TYPE;
 
     private List<Token> tokens;
 
