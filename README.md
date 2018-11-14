@@ -9,5 +9,5 @@ Language description in Backus-Naur form:
 Google Document with progress report:
 [link](https://docs.google.com/document/d/1rpUreIA2q9YWvVVwrffp1-9_4z8CCf1YBDnZvLOxU74) 
 
-Parent project (Phantom OS): 
+Parent project (Phantom OS) on GitHub: 
 [link](https://github.com/dzavalishin/phantomuserland)
