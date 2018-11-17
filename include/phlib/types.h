@@ -21,4 +21,35 @@
 #include <phantom_types.h>
 #endif //__simbuild__
 
+/**
+ * byte types
+ */
+typedef signed char byte; /**< [7]sign, [6:0] value,*/
+typedef unsigned char ubyte; /**< [7:0] value */
+
+/**
+ * integer types
+ */
+typedef byte int8; /**< same as byte */
+typedef ubyte uint8; /**< same as ubyte */
+typedef int16_t int16; /**< [15] sign, [14;0] value */
+typedef u_int16_t uint16; /**< [15:0] value */
+typedef int32_t int32; /**< [31] sign, [30:0] value */
+typedef u_int32_t uint32; /**< [31:0] value */
+typedef int64_t int64; /**< [63] sign, [62:0] value */
+typedef u_int64_t uint64; /** [63:0] value */
+
+/**
+ * symbol types
+ */
+typedef signed char char8; /** [7] sign, [6:0] value */
+typedef unsigned char uchar8; /** [7:0] value */
+typedef signed short char16; /** type with 2 byte width for UTF-16 encoding */
+typedef signed short char32; /** type with 4 byte width for UTF-32 encoding */
+
+/**
+ * other types
+ */
+typedef void *ptr_t;
+
 #endif //PHANTOMSHELL_TYPES_H

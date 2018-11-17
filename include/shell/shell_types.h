@@ -20,6 +20,8 @@ namespace psh {
  * @brief This structure stores all information from shell startup arguments
  */
 typedef struct psh_arguments_t {
+    unsigned show_usage: 1; /**< flag, which requires usage of shell to be shown*/
+    unsigned show_version: 1; /**< this flag requires version to be shown */
     unsigned debug_mode: 1; /**< If shell is running in debug mode, this is 1 */
     unsigned interactive_shell: 1; /**< 1 if shell is running in interactive mode */
     unsigned login_shell: 1; /**< 1 if shell is used as login shell */

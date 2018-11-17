@@ -12,12 +12,13 @@
 #define PHANTOMSHELL_STRING_H
 
 #include "alloc.h"
+#include "types.h"
 
 #define STRING_VALUE_TERMINATOR 1
 
 namespace phlib {
 
-typedef unsigned int string_length;
+typedef uint32 string_length;
 
 /**
  * @class string is wrap class for char*
@@ -193,8 +194,8 @@ public:
      * @brief Computes hash code of string by Java-like method
      * @return hash code of the string
      */
-    unsigned int hash_code() {
-        unsigned int hash = 0;
+    uint32 hash_code() {
+        uint32 hash = 0;
         if (str_length > 0) {
             for (int i = 0; i < str_length; i++) {
                 hash = (hash << 5) - hash + str_value[i];
@@ -256,11 +257,11 @@ private:
 #endif //STRING_VALUE_TERMINATOR
     }
 
-    inline static void copy_str(char *dst, const char *src, int length) {
+    inline static void copy_str(char *dst, const char *src, uint32 length) {
         for (int i = 0; i < length; dst[i] = src[i], i++);
     }
 
-    inline static void add_str(char *dst, const char *src1, int src1_length, const char *src2, int src2_length) {
+    inline static void add_str(char *dst, const char *src1, uint32 src1_length, const char *src2, uint32 src2_length) {
         copy_str(dst, src1, src1_length);
         copy_str(dst + src1_length, src2, src2_length);
     }

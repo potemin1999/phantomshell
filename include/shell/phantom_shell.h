@@ -11,25 +11,41 @@
 #ifndef PHANTOMSHELL_PHANTOM_SHELL_H
 #define PHANTOMSHELL_PHANTOM_SHELL_H
 
+#define PHANTOM_SHELL_VERSION "PhantomShell version 0.001"
+
 #include "shell_types.h"
 
 namespace psh {
 
 /**
  * @brief Parses shell flags from program startup arguments
- * @param flags struct to write into
+ * @param args struct to write into
  * @param argc arguments count, including program name
  * @param argv arguments - const char[][]
  * @return 0 if parsing was succeed, psh::shell_exit_code otherwise
  */
-int parse_shell_flags(psh_arguments_t *flags, int argc, const char **argv);
+uint32 parse_shell_args(psh_arguments_t *args, int argc, const char **argv);
+
+/**
+ * @brief Shows shell usage
+ * @param args ,from which the output stream wil be taken
+ * @return exit code value
+ */
+shell_exit_codes shell_show_usage(psh_arguments_t *args);
+
+/**
+ * @brief Shows shell version
+ * @param args ,where output stream to write into is stored
+ * @return exit code value
+ */
+shell_exit_codes shell_show_version(psh_arguments_t *args);
 
 /**
  * @brief Shell entry point
- * @param flags with flags data
+ * @param args with flags data
  * @return psh::shell_exit_code
  */
-int shell_main(psh_arguments_t *flags);
+shell_exit_codes shell_main(psh_arguments_t *args);
 
 } //namespace psh
 

@@ -27,13 +27,13 @@ namespace phlib {
  * @param size in bytes requested to allocate
  * @return pointer to allocated memory if succeed, 0 otherwise
  */
-void *malloc(size_t size);
+ptr_t malloc(size_t size);
 
 /**
  * @brief OS independent wrap for free function
  * @param p pointer to allocated by phlib::malloc memory
  */
-void free(void *p);
+void free(ptr_t p);
 
 } //namespace phlib
 
@@ -41,9 +41,9 @@ void free(void *p);
  * INLINE DEFINITIONS ARE BELOW
  */
 
-inline void *phlib::malloc(size_t size) {
+inline ptr_t phlib::malloc(size_t size) {
 #ifdef __simbuild__
-    void *pointer = ::malloc(size);
+    ptr_t pointer = ::malloc(size);
 #ifdef __debug__
     DEBUG_LOG("alloc.h: allocated %lu bytes at address %p\n", size, pointer);
 #endif //__debug__
@@ -53,7 +53,7 @@ inline void *phlib::malloc(size_t size) {
 #endif //__simbuild__
 }
 
-inline void phlib::free(void *p) {
+inline void phlib::free(ptr_t p) {
 #ifdef __simbuild__
     ::free(p);
 #ifdef __debug__
