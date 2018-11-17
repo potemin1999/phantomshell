@@ -11,4 +11,6 @@
 #ifndef PHANTOMSHELL_LEXER_H
 #define PHANTOMSHELL_LEXER_H
 
+namespace psh {
+}
 #endif //PHANTOMSHELL_LEXER_H

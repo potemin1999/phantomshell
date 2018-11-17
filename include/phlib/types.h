@@ -17,7 +17,7 @@
 #include <sys/types.h>
 
 #endif //__unix__
-#else
+#else //__simbuild__
 #include <phantom_types.h>
 #endif //__simbuild__
 

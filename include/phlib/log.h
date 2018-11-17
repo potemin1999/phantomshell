@@ -14,11 +14,11 @@
 #ifdef __debug__
 #ifdef __simbuild__
 
-#include <cstdio>
-#include <cstdarg>
+#include <stdio.h>
+#include <stdarg.h>
 
 #endif //__simbuild__
-#endif
+#endif //__debug__
 
 
 namespace phlib {
@@ -27,29 +27,43 @@ namespace phlib {
 
 /**
  * @brief Prints formatted string, if compiled with debug mode enabled
+ *
+ * keyword inline let us implement this function below
  * @param format string for arguments
  * @param ... format args
  */
-void debug_log_func(const char *file, unsigned line, const char *format, ...) {
-#ifdef __simbuild__
-    std::printf("%s:%u\n", file, line);
-    std::va_list list;
-    va_start(list, format);
-    std::vprintf(format, list);
-    va_end(list);
-
-#endif //__simbuild__
-}
+inline void debug_log_func(const char *file, unsigned line, const char *format, ...);
 
 #endif //__debug__
+
+} //namespace phlib
 
 #ifdef __debug__
 #ifdef __simbuild__
-#define DEBUG_LOG(...); debug_log_func(__FILE__,__LINE__,__VA_ARGS__)
+#define DEBUG_LOG(...) phlib::debug_log_func(__FILE__,__LINE__,__VA_ARGS__)
+#else
+#define DEBUG_LOG(...)
 #endif //__simbuild__
 #else  //__debug__
-#define DEBUG_LOG(...);
+#define DEBUG_LOG(...)
 #endif //__debug__
 
+/*
+ *  INLINE DEFINITIONS ARE BELOW
+ */
+
+#ifdef __debug__
+
+void phlib::debug_log_func(const char *file, unsigned line, const char *format, ...) {
+#ifdef __simbuild__
+    printf("%s:%u\n", file, line);
+    va_list list;
+    va_start(list, format);
+    vprintf(format, list);
+    va_end(list);
+#endif //__simbuild__
 }
+
+#endif //__debug__
+
 #endif //PHANTOMSHELL_LOG_H

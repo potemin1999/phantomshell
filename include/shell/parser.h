@@ -11,4 +11,6 @@
 #ifndef PHANTOMSHELL_PARSER_H
 #define PHANTOMSHELL_PARSER_H
 
+namespace psh {
+}
 #endif //PHANTOMSHELL_PARSER_H
