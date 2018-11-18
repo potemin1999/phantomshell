@@ -2,7 +2,6 @@
  * @file
  * @author Ilya Potemin
  * @date 11/6/18.
- * @section LICENSE
  * This file is part of Phantom Shell project,
  * which is child project of Phantom OS.
  * GNU Lesser General Public License v3.0
@@ -21,9 +20,79 @@
  */
 void *__gxx_personality_v0;
 
+using namespace psh;
 using namespace phlib;
 
-uint32 psh::parse_shell_args(psh_arguments_t *args, int argc, const char **argv) {
+PhantomShell::PhantomShell(PshArguments *args) {
+    psh_arguments = args;
+    lexer = new Lexer(args->input_stream);
+}
+
+PhantomShell::~PhantomShell() {
+    delete lexer;
+}
+
+ShellExitCode PhantomShell::run() {
+    while (lexer != nullptr) {
+        Token *token = lexer->get_next_token();
+        if (token == nullptr) break;
+    }
+    return ShellExitCode::EXIT_NORMAL;
+}
+
+uint32 psh::parse_shell_short_options(psh::PshArguments *args, const char *option) {
+    if (option[0] != '-') return 1;
+    switch (option[1]) {
+        case 'd': {
+#ifndef __debug__
+            if (args->debug_mode == 1)
+                    return ShellExitCode::EXIT_DUPLICATED_ARGUMENT;
+#endif //__debug__
+            args->debug_mode = 1;
+            DEBUG_LOG("debug mode activated\n");
+            break;
+        }
+        case 'i': {
+            if (args->interactive_shell == 1)
+                return ShellExitCode::EXIT_DUPLICATED_ARGUMENT;
+            args->interactive_shell = 1;
+            DEBUG_LOG("starting as interactive shell\n");
+            break;
+        }
+        case 'l': {
+            if (args->login_shell == 1)
+                return ShellExitCode::EXIT_DUPLICATED_ARGUMENT;
+            args->login_shell = 1;
+            args->interactive_shell = 1;
+            DEBUG_LOG("used as login shell\n");
+            break;
+        }
+        case 'h': {
+            if (args->show_usage == 1)
+                return ShellExitCode::EXIT_DUPLICATED_ARGUMENT;
+            args->show_usage = 1;
+            break;
+        }
+        case 'v': {
+            if (args->show_version == 1)
+                return ShellExitCode::EXIT_DUPLICATED_ARGUMENT;
+            args->show_version = 1;
+            break;
+        }
+        default: {
+            DEBUG_LOG("flag cannot be recognized\n");
+            return ShellExitCode::EXIT_INVALID_ARGUMENTS;
+        }
+    }
+    return 0;
+}
+
+uint32 psh::parse_shell_long_options(psh::PshArguments *args, const char *option) {
+    //TODO: implement
+    return 0;
+}
+
+uint32 psh::parse_shell_args(PshArguments *args, int argc, const char **argv) {
 #ifndef __debug__
     args->debug_mode = 0;
 #else //__debug__
@@ -36,59 +105,41 @@ uint32 psh::parse_shell_args(psh_arguments_t *args, int argc, const char **argv)
     args->output_stream = nullptr;
     args->input_stream = nullptr;
     for (int i = 0; i < argc; i++) {
-        string arg_str = argv[i];
-        DEBUG_LOG("string %s\n", arg_str.value());
-        if (arg_str.starts_with("-")) {
-            if (arg_str.equals("-d")) {
-#ifndef __debug__
-                if (args->debug_mode == 1)
-                    return shell_exit_codes::EXIT_DUPLICATED_ARGUMENT;
-#endif //__debug__
-                args->debug_mode = 1;
-                DEBUG_LOG("debug mode activated\n");
-            } else if (arg_str.equals("-i")) {
-                if (args->interactive_shell == 1)
-                    return shell_exit_codes::EXIT_DUPLICATED_ARGUMENT;
-                args->interactive_shell = 1;
-                DEBUG_LOG("starting as interactive shell\n");
-            } else if (arg_str.equals("-l")) {
-                if (args->login_shell == 1)
-                    return shell_exit_codes::EXIT_DUPLICATED_ARGUMENT;
-                args->login_shell = 1;
-                args->interactive_shell = 1;
-                DEBUG_LOG("used as login shell\n");
-            } else if (arg_str.equals("-h")) {
-                if (args->show_usage == 1)
-                    return shell_exit_codes::EXIT_DUPLICATED_ARGUMENT;
-                args->show_usage = 1;
-            } else if (arg_str.equals("-v")) {
-                if (args->show_version == 1)
-                    return shell_exit_codes::EXIT_DUPLICATED_ARGUMENT;
-                args->show_version = 1;
-            } else {
-                DEBUG_LOG("flag cannot be recognized\n");
-                return shell_exit_codes::EXIT_INVALID_ARGUMENTS;
-            }
+        String arg_str = argv[i];
+        DEBUG_LOG("string %s\n", arg_str.char_value());
+        if (arg_str.starts_with("--")) {
+            parse_shell_long_options(args, argv[i]);
+        } else if (arg_str.starts_with("-")) {
+            parse_shell_short_options(args, argv[i]);
         } else {
             if (args->interactive_shell || args->login_shell) {
                 DEBUG_LOG("interactive and login shell does not accept other parameters\n");
-                return shell_exit_codes::EXIT_INVALID_ARGUMENTS;
+                return ShellExitCode::EXIT_INVALID_ARGUMENTS;
             }
 #ifdef __simbuild__
             if (arg_str.ends_with(".psh")) {
-                DEBUG_LOG("found script location : %s\n", arg_str.value());
-                args->input_stream = new istream(arg_str);
+                DEBUG_LOG("found script location : %s\n", arg_str.char_value());
+                args->input_stream = new IStream(arg_str);
+                break;
+            } else {
+                DEBUG_LOG("invalid script file : %s\n", arg_str.char_value());
+                return ShellExitCode::EXIT_INVALID_ARGUMENTS;
             }
 #endif //__simbuild__
         }
     }
     if (args->output_stream == nullptr) {
-        args->output_stream = new ostream();
+        args->output_stream = new OStream();
     }
     return 0;
 }
 
-psh::shell_exit_codes psh::shell_show_usage(psh::psh_arguments_t *args) {
+uint32 psh::cleanup_shell_args(psh::PshArguments *args) {
+    delete args->input_stream;
+    delete args->output_stream;
+}
+
+psh::ShellExitCode psh::shell_show_usage(PshArguments *args) {
     psh::shell_show_version(args);
     const char *usage = "Usage: psh [options]\n"\
                         "       psh [options] script_file\n"\
@@ -98,30 +149,32 @@ psh::shell_exit_codes psh::shell_show_usage(psh::psh_arguments_t *args) {
                         "   -i: start shell in interactive mode\n"\
                         "   -d: start shell in debug mode\n"\
                         "";
-    phlib::string usage_str(usage);
+    String usage_str(usage);
     args->output_stream->write(usage_str.value(), usage_str.length());
-    return shell_exit_codes::EXIT_NORMAL;
+    return ShellExitCode::EXIT_NORMAL;
 }
 
-psh::shell_exit_codes psh::shell_show_version(psh::psh_arguments_t *args) {
-    const char *version = PHANTOM_SHELL_VERSION "\n";
-    phlib::string version_str(version);
+psh::ShellExitCode psh::shell_show_version(PshArguments *args) {
+    String version_str = PHANTOM_SHELL_VERSION "\n";
     args->output_stream->write(version_str.value(), version_str.length());
-    return shell_exit_codes::EXIT_NORMAL;
+    return ShellExitCode::EXIT_NORMAL;
 }
 
-psh::shell_exit_codes psh::shell_main(psh_arguments_t *args) {
-    return shell_exit_codes::EXIT_NORMAL;
+psh::ShellExitCode psh::shell_main(PshArguments *args) {
+    PhantomShell shell(args);
+    ShellExitCode exit_code = shell.run();
+    cleanup_shell_args(args);
+    return exit_code;
 }
 
 int main(int argc, const char **argv) {
-    psh::psh_arguments_t args;
+    psh::PshArguments args;
     int res = psh::parse_shell_args(&args, argc, argv);
     if (res != 0) return res;
-    if (args.show_usage){
+    if (args.show_usage) {
         return psh::shell_show_usage(&args);
     }
-    if (args.show_version){
+    if (args.show_version) {
         return psh::shell_show_version(&args);
     }
     return psh::shell_main(&args);

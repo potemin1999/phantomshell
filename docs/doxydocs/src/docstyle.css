@@ -1,0 +1,29 @@
+
+a.hover{
+  background-color: #dddddd;
+  background-blend-mode: overlay;
+}
+
+.memproto{
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.15);
+}
+
+.memdoc{
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.15);
+  background-color : #ffffff;
+  background-blend-mode: overlay;
+}
+
+#projectname{
+  font: 220% Sans;
+}
+
+#projectbrief{
+  font: 100% Roboto;
+  color: #666666;
+}
+
+#main-menu{
+  background-blend-mode: overlay;
+  background-color: #eeeeee;
+}

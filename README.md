@@ -11,3 +11,6 @@ Google Document with progress report:
 
 Parent project (Phantom OS) on GitHub: 
 [link](https://github.com/dzavalishin/phantomuserland)
+
+Few words about this project's codestyle:
+[link](https://github.com/potemin1999/phantomshell/tree/master/docs/markdown/CodeStyle.md)

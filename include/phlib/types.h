@@ -2,7 +2,6 @@
  * @headerfile
  * @author Ilya Potemin
  * @date 11/14/18.
- * @section LICENSE
  * This file is part of Phantom Shell project,
  * which is child project of Phantom OS.
  * GNU Lesser General Public License v3.0
@@ -44,12 +43,15 @@ typedef u_int64_t uint64; /** [63:0] value */
  */
 typedef signed char char8; /** [7] sign, [6:0] value */
 typedef unsigned char uchar8; /** [7:0] value */
-typedef signed short char16; /** type with 2 byte width for UTF-16 encoding */
-typedef signed short char32; /** type with 4 byte width for UTF-32 encoding */
+typedef uint16 char16; /** type with 2 byte width for UTF-16 encoding */
+typedef uint32 char32; /** type with 4 byte width for UTF-32 encoding */
 
 /**
  * other types
  */
-typedef void *ptr_t;
+typedef void *Ptr;
+typedef const void* ConstPtr;
+typedef size_t Size;
+typedef ssize_t SSize;
 
 #endif //PHANTOMSHELL_TYPES_H

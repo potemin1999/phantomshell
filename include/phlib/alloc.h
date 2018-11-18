@@ -2,7 +2,6 @@
  * @headerfile
  * @author Ilya Potemin
  * @date 11/7/18.
- * @section LICENSE
  * This file is part of Phantom Shell project,
  * which is child project of Phantom OS.
  * GNU Lesser General Public License v3.0
@@ -20,6 +19,7 @@
 
 #endif //__simbuild__
 
+/** @brief Default namespace for Phantom Shell support library */
 namespace phlib {
 
 /**
@@ -27,13 +27,13 @@ namespace phlib {
  * @param size in bytes requested to allocate
  * @return pointer to allocated memory if succeed, 0 otherwise
  */
-ptr_t malloc(size_t size);
+Ptr malloc(Size size);
 
 /**
  * @brief OS independent wrap for free function
  * @param p pointer to allocated by phlib::malloc memory
  */
-void free(ptr_t p);
+void free(Ptr p);
 
 } //namespace phlib
 
@@ -41,9 +41,9 @@ void free(ptr_t p);
  * INLINE DEFINITIONS ARE BELOW
  */
 
-inline ptr_t phlib::malloc(size_t size) {
+inline Ptr phlib::malloc(Size size) {
 #ifdef __simbuild__
-    ptr_t pointer = ::malloc(size);
+    Ptr pointer = ::malloc(size);
 #ifdef __debug__
     DEBUG_LOG("alloc.h: allocated %lu bytes at address %p\n", size, pointer);
 #endif //__debug__
@@ -53,7 +53,7 @@ inline ptr_t phlib::malloc(size_t size) {
 #endif //__simbuild__
 }
 
-inline void phlib::free(ptr_t p) {
+inline void phlib::free(Ptr p) {
 #ifdef __simbuild__
     ::free(p);
 #ifdef __debug__
