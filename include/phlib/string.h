@@ -50,6 +50,15 @@ public:
     }
 
     /**
+     * @brief Creates string from char16* sequence with requested length
+     * @param str is a pointer to string beginning
+     * @param length is size of array to copy
+     */
+    String(const char16 *str,string_length length) {
+        setup_string(this, str,length);
+    }
+
+    /**
      * @brief Creates string from null terminated char array
      * @param str is array
      */
@@ -296,6 +305,13 @@ public:
         return 0;
     }
 
+    static String value_of(uint32 value){
+
+    }
+
+    static String value_of(uint8 value){
+
+    }
 
 private:
 
@@ -322,6 +338,11 @@ private:
     inline static void setup_string(String *dst, const char *src) {
         dst->str_length = 0;
         for (; src[dst->str_length] != '\0'; dst->str_length++);
+        setup_string(dst,src,dst->str_length);
+    }
+
+    inline static void setup_string(String *dst,const char* src,string_length length){
+        dst->str_length = length;
         dst->str_value = (char16 *) malloc((dst->str_length + STRING_VALUE_TERMINATOR) * 2);
         for (int i = 0; i < dst->str_length; i++) {
             dst->str_value[i] = src[i] & ((char16) 0x007f);

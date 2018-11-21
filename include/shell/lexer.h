@@ -26,15 +26,21 @@ namespace psh {
  */
 class Lexer {
 
+    /**
+     * @brief if we want to change or redefine symbol, we can do it here
+     */
+    typedef char16 Symbol;
+
 private:
 
     phlib::IStream *istream;
     uint8 *read_buffer;
     uint32 read_buffer_pointer;
     uint32 read_buffer_size;
-    uint8 *token_buffer;
+    Symbol *token_buffer;
     uint32 token_buffer_pointer;
     uint32 token_buffer_size;
+    uint32 stashed_symbol;
 
 public:
 
@@ -54,9 +60,11 @@ public:
 
 private:
 
-    char16 get_next_char();
+    Symbol get_next_symbol();
 
-    char16 read_next_char();
+    Symbol read_next_symbol();
+
+    void stash_symbol(Symbol symbol);
 
     SSize update_buffer();
 

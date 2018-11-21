@@ -104,7 +104,7 @@ uint32 psh::parse_shell_args(PshArguments *args, int argc, const char **argv) {
     args->show_usage = 0;
     args->output_stream = nullptr;
     args->input_stream = nullptr;
-    for (int i = 0; i < argc; i++) {
+    for (int i = 1; i < argc; i++) {
         String arg_str = argv[i];
         DEBUG_LOG("string %s\n", arg_str.char_value());
         if (arg_str.starts_with("--")) {
