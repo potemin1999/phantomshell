@@ -2,7 +2,6 @@
  * @headerfile
  * @author Ilya Potemin
  * @date 11/14/18.
- * @section LICENSE
  * This file is part of Phantom Shell project,
  * which is child project of Phantom OS.
  * GNU Lesser General Public License v3.0
@@ -20,7 +19,7 @@
 #endif //__simbuild__
 #endif //__debug__
 
-
+/** @brief Default namespace for Phantom Shell support library */
 namespace phlib {
 
 #ifdef __debug__

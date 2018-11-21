@@ -2,7 +2,6 @@
  * @headerfile
  * @author Ilya Potemin
  * @date 11/15/18.
- * @section LICENSE
  * This file is part of Phantom Shell project,
  * which is child project of Phantom OS.
  * GNU Lesser General Public License v3.0
@@ -16,53 +15,57 @@
 #include "types.h"
 #include "phio.h"
 
+/** @brief Default namespace for Phantom Shell support library */
 namespace phlib {
 
 /**
- * @class istream is Input Stream and it takes input from requested location
+ * @brief IStream is Input Stream and it takes input from requested location
  */
-class istream {
+class IStream {
 
     /**
      * @brief Function pointer to exact read implementation
      */
-    typedef ssize_t (istream::*read_func_t)(void *, size_t);
-
-    typedef int (istream::*close_func_t)();
+    typedef SSize (IStream::*ReadFunc)(Ptr, Size);
 
     /**
-     * @brief This union stores data for each type of istream
+     * @brief Function pointer to exact close function implementation
      */
-    typedef union istream_data_t {
+    typedef int (IStream::*CloseFunc)();
+
+    /**
+     * @brief This union stores data for each type of IStream
+     */
+    typedef union IStreamData {
 #ifdef __simbuild__
-        file_t *file; /**< Stores input file descriptor, when type==FILE_STREAM*/
+        File *file; /**< Stores input file descriptor, when type==FILE_STREAM*/
 #endif //__simbuild__
         struct {
-            void *object; /**< Stores pointer to source object, when type==OBJECT_STREAM*/
+            Ptr object; /**< Stores pointer to source object, when type==OBJECT_STREAM*/
             bool object_copy;
-            ssize_t current_pointer;
-            ssize_t object_size; /**< Stores source object size, when type==OBJECT_STREAM*/
+            SSize current_pointer;
+            SSize object_size; /**< Stores source object size, when type==OBJECT_STREAM*/
         };
         int stdin_fd; /**< Stores stdin descriptor, when type==STDIN_STREAM*/
-    } istream_data_t;
+    } IStream_data_t;
 
     /**
-     * @brief This enum describes istream types
+     * @brief This enum describes IStream types
      */
-    typedef enum istream_type_t {
+    typedef enum IStreamType {
 #ifdef __simbuild__
         FILE_STREAM = 0,
 #endif //__simbuild__
         STDIN_STREAM = 1,
         OBJECT_STREAM = 2
-    } istream_type_t;
+    } IStream_type_t;
 
 protected:
 
-    read_func_t read_func;
-    close_func_t close_func;
-    istream_data_t data;
-    istream_type_t type;
+    ReadFunc read_func;
+    CloseFunc close_func;
+    IStreamData data;
+    IStreamType type;
     bool isClosed = false;
 
 public:
@@ -73,11 +76,11 @@ public:
      * @brief Creates input stream from file
      * @param file_path
      */
-    istream(string &file_path) {
-        type = istream_type_t::FILE_STREAM;
-        read_func = &istream::read_from_file;
-        close_func = &istream::close_file;
-        data.file = phlib::fopen(file_path.value(), "r");
+    IStream(String &file_path) {
+        type = IStreamType::FILE_STREAM;
+        read_func = &IStream::read_from_file;
+        close_func = &IStream::close_file;
+        data.file = phlib::fopen(file_path, "r");
     }
 
 #endif //__simbuild__
@@ -85,12 +88,13 @@ public:
     /**
      * @brief Creates input stream from object
      * @param byte_buffer to use as source
+     * @param size size of buffer
      * @param do_copy determines whether it should be copied
      */
-    istream(void *byte_buffer, size_t size, bool do_copy) {
-        type = istream_type_t::OBJECT_STREAM;
-        read_func = &istream::read_from_object;
-        close_func = &istream::close_object;
+    IStream(Ptr byte_buffer, Size size, bool do_copy) {
+        type = IStreamType::OBJECT_STREAM;
+        read_func = &IStream::read_from_object;
+        close_func = &IStream::close_object;
         if (do_copy) {
             data.object = phlib::malloc(size);
             for (int i = 0; i < size; ((char *) data.object)[i] = ((char *) byte_buffer)[i], i++);
@@ -105,28 +109,39 @@ public:
     /**
      * @brief Creates input stream from stdin
      */
-    istream() {
-        type = istream_type_t::STDIN_STREAM;
-        read_func = &istream::read_from_stdin;
-        close_func = &istream::close_stdin;
-        data.stdin_fd = phlib::open("/dev/stdin", o_flags::RDONLY);
+    IStream() {
+        type = IStreamType::STDIN_STREAM;
+        read_func = &IStream::read_from_stdin;
+        close_func = &IStream::close_stdin;
+        data.stdin_fd = phlib::open("/dev/stdin", OFlags::RDONLY);
         DEBUG_LOG("created input stream from stdin with stdin_fd = %d\n", data.stdin_fd);
     }
 
     /**
      * @brief unique destructor
+     *
+     * Also closes resources if they we not released earlier
      */
-    ~istream() {
+    ~IStream() {
         if (!isClosed) {
             close();
         }
     }
 
-    void *operator new(size_t size) {
+    /**
+     * @brief Allocates memory for new IStream
+     * @param size of IStream object
+     * @return memory pointer to allocated memory
+     */
+    Ptr operator new(Size size) {
         return phlib::malloc(size);
     }
 
-    void operator delete(void *pointer) {
+    /**
+     * @brief Frees memory from IStream
+     * @param pointer to IStream object
+     */
+    void operator delete(Ptr pointer) {
         phlib::free(pointer);
     }
 
@@ -135,10 +150,10 @@ public:
      * @param buffer place for write to
      * @param buffer_size is @p buffer size in bytes
      * @return -1 if @p buffer_size is negative
-     * @return -2 if @p buffer is <tt>null<tt/> and @p buffer_size if positive
+     * @return -2 if @p buffer is null and @p buffer_size if positive
      * @return  value of read implementation otherwise
      */
-    ssize_t read(void *buffer, size_t buffer_size) {
+    SSize read(Ptr buffer, Size buffer_size) {
         if (buffer_size < 0) return -1;
         if (buffer == nullptr && buffer_size > 0) return -2;
         return (this->*read_func)(buffer, buffer_size);
@@ -157,17 +172,17 @@ private:
 
 #ifdef __simbuild__
 
-    ssize_t read_from_file(void *buffer, size_t buffer_size) {
+    SSize read_from_file(Ptr buffer, Size buffer_size) {
         return phlib::fread(data.file, buffer, buffer_size);
     }
 
 #endif //__simbuild__
 
-    ssize_t read_from_stdin(void *buffer, size_t buffer_size) {
+    SSize read_from_stdin(Ptr buffer, Size buffer_size) {
         return phlib::read(data.stdin_fd, buffer, buffer_size);
     }
 
-    ssize_t read_from_object(void *buffer, size_t buffer_size) {
+    SSize read_from_object(Ptr buffer, Size buffer_size) {
         ssize_t read_size = buffer_size < (data.object_size - data.current_pointer - 1) ?
                             buffer_size : data.object_size - data.current_pointer - 1;
         for (int i = 0; i < read_size; ((char *) buffer)[i++] = ((char *) data.object)[data.current_pointer++]);

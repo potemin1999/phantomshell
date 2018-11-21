@@ -2,7 +2,6 @@
  * @headerfile
  * @author Ilya Potemin <potemin1999@bk.ru>
  * @date 11/15/18
- * @section LICENSE
  * This file is part of Phantom Shell project,
  * which is child project of Phantom OS.
  * GNU Lesser General Public License v3.0
@@ -16,48 +15,55 @@
 #include "types.h"
 #include "phio.h"
 
+/** @brief Default namespace for Phantom Shell support library */
 namespace phlib {
 
 /**
- * @class ostream represents Output Stream to some location
+ * @brief OStream represents Output Stream to some location
  */
-class ostream {
+class OStream {
 
-    typedef ssize_t (ostream::*write_func_t)(const void *, size_t);
+    /**
+     * @brief Function pointer to exact write function implementation
+     */
+    typedef SSize (OStream::*WriteFunc)(ConstPtr, Size);
 
-    typedef int (ostream::*close_func_t)();
+    /**
+     * @brief Function pointer to exact close function implementation
+     */
+    typedef int (OStream::*CloseFunc)();
 
     /**
     * @brief This union stores data for each type of istream
     */
-    typedef union ostream_data_t {
+    typedef union OStreamData {
 #ifdef __simbuild__
-        file_t *file; /**< Stores output file descriptor, when type==FILE_STREAM*/
+        File *file; /**< Stores output file descriptor, when type==FILE_STREAM*/
 #endif //__simbuild__
         struct {
-            void *object; /**< Stores pointer to destination object, when type==OBJECT_STREAM*/
+            Ptr object; /**< Stores pointer to destination object, when type==OBJECT_STREAM*/
             bool object_copy;
-            ssize_t current_pointer;
-            ssize_t object_size; /**< Stores destination object size, when type==OBJECT_STREAM*/
+            SSize current_pointer;
+            SSize object_size; /**< Stores destination object size, when type==OBJECT_STREAM*/
         };
         int stdout_fd; /**< Stores stdout descriptor, when type==STDOUT_STREAM*/
-    } ostream_data_t;
+    } OStreamData;
 
     /**
     * @brief This enum describes istream types
     */
-    typedef enum ostream_type_t {
+    typedef enum OStreamType {
         FILE_STREAM = 0,
         STDOUT_STREAM = 1,
         OBJECT_STREAM = 2
-    } ostream_type_t;
+    } OStreamType;
 
 protected:
 
-    write_func_t write_func;
-    close_func_t close_func;
-    ostream_type_t type;
-    ostream_data_t data;
+    WriteFunc write_func;
+    CloseFunc close_func;
+    OStreamType type;
+    OStreamData data;
     bool isClosed = false;
 
 public:
@@ -68,11 +74,11 @@ public:
      * @brief Creates stream, writing to the file
      * @param file_path
      */
-    ostream(string &file_path) {
-        type = ostream_type_t::FILE_STREAM;
-        write_func = &ostream::write_to_file;
-        close_func = &ostream::close_file;
-        data.file = fopen(file_path.value(), "w+");
+    OStream(String &file_path) {
+        type = OStreamType::FILE_STREAM;
+        write_func = &OStream::write_to_file;
+        close_func = &OStream::close_file;
+        data.file = fopen(file_path, "w+");
     }
 
 #endif //__simbuild__
@@ -81,39 +87,64 @@ public:
      * @brief Creates stream, writing to pointed buffer
      * @param buffer
      */
-    ostream(void *buffer) {
+    OStream(Ptr buffer) {
         //TODO: implement later
     }
 
     /**
      * @brief Creates stream, writing to stdout
      */
-    ostream() {
-        type = ostream_type_t::STDOUT_STREAM;
-        write_func = &ostream::write_to_stdout;
-        close_func = &ostream::close_stdout;
-        data.stdout_fd = open("/dev/stdout", o_flags::WRONLY);
+    OStream() {
+        type = OStreamType::STDOUT_STREAM;
+        write_func = &OStream::write_to_stdout;
+        close_func = &OStream::close_stdout;
+        data.stdout_fd = open("/dev/stdout", OFlags::WRONLY);
         DEBUG_LOG("created new stdout output stream with stdout_fd = %d\n", data.stdout_fd);
     }
 
-    ~ostream() {
+    /**
+     * @brief Only destructor of OStream
+     *
+     * Also closes resources if they we not released earlier
+     */
+    ~OStream() {
         if (!isClosed) {
             close();
         }
     }
 
-    void *operator new(size_t size) {
+    /**
+     * @brief Allocates memory for new OStream
+     * @param size of OStream object
+     * @return memory pointer
+     */
+    Ptr operator new(Size size) {
         return phlib::malloc(size);
     }
 
-    void operator delete(void *pointer) {
+    /**
+     * @brief Frees memory from OStream
+     * @param pointer to OStream object
+     */
+    void operator delete(Ptr pointer) {
         phlib::free(pointer);
     }
 
-    ssize_t write(const void *buffer, size_t buffer_size) {
+    /**
+     * @brief Writes data to location, described at creation
+     * @param buffer to get data from
+     * @param buffer_size is size of @p buffer in bytes
+     * @return actually written bytes count
+     */
+    SSize write(ConstPtr buffer, Size buffer_size) {
         return (this->*write_func)(buffer, buffer_size);
     }
 
+    /**
+     * @brief Closes resources in use
+     * @return -1 if it was already closed
+     * @return value of close function implementation
+     */
     int close() {
         if (isClosed) return -1;
         return (this->*close_func)();
@@ -121,13 +152,13 @@ public:
 
 private:
 
-    ssize_t write_to_stdout(const void *buffer, size_t buffer_size) {
+    SSize write_to_stdout(ConstPtr buffer, Size buffer_size) {
         return phlib::write(data.stdout_fd, buffer, buffer_size);
     }
 
 #ifdef __simbuild__
 
-    ssize_t write_to_file(const void *buffer, size_t buffer_size) {
+    SSize write_to_file(ConstPtr buffer, Size buffer_size) {
         return phlib::fwrite(data.file, buffer, buffer_size);
     }
 
