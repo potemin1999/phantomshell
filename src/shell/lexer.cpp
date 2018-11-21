@@ -131,4 +131,23 @@ Token *Lexer::get_next_token() {
                          Separator::PARENTHESIS_OPEN :
                          Separator::PARENTHESIS_CLOSE);
     }
+    if (char_1 == '{' | char_1 == '}'){
+        return new Token(char_1 == '{' ?
+                        Separator::BRACE_OPEN :
+                        Separator::BRACE_CLOSE);
+    }
+    if (char_1 == '[' | char_1 == ']'){
+        return new Token(char_1 == '[' ?
+                        Separator::BRACKET_OPEN :
+                        Separator::BRACE_CLOSE);
+    }
+    if (char_1 == '.'){
+        return new Token(Separator::DOT);
+    }
+    if (char_1 == ';'){
+        return new Token(Separator::SEMICOLON);
+    }
+    if (char_1 == ','){
+        return new Token(Separator::COMMA);
+    }
 }

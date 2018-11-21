@@ -90,6 +90,14 @@ public:
         delete string_value;
     }
 
+    Ptr operator new(Size size){
+        return phlib::malloc(size);
+    }
+
+    void operator delete(Ptr token_ptr){
+        phlib::free(token_ptr);
+    }
+
     /**
      * @brief token used always and shows how to interpret other data
      *
