@@ -36,6 +36,9 @@ ShellExitCode PhantomShell::run() {
     while (lexer != nullptr) {
         Token *token = lexer->get_next_token();
         if (token == nullptr) break;
+#ifdef __debug__
+        DEBUG_LOG("%s\n",token->token_to_string());
+#endif
     }
     return ShellExitCode::EXIT_NORMAL;
 }
@@ -127,6 +130,9 @@ uint32 psh::parse_shell_args(PshArguments *args, int argc, const char **argv) {
             }
 #endif //__simbuild__
         }
+    }
+    if (args->input_stream == nullptr) {
+        args->input_stream = new IStream();
     }
     if (args->output_stream == nullptr) {
         args->output_stream = new OStream();

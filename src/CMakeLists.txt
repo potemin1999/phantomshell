@@ -10,3 +10,8 @@ add_compile_definitions(__debug__)
 include_directories("../include")
 add_executable(${PROJECT_NAME} ${SHELL_SOURCE_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+
+if (BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif ()

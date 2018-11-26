@@ -91,7 +91,7 @@ public:
      * @param size size of buffer
      * @param do_copy determines whether it should be copied
      */
-    IStream(Ptr byte_buffer, Size size, bool do_copy) {
+    IStream(ConstPtr byte_buffer, Size size, bool do_copy) {
         type = IStreamType::OBJECT_STREAM;
         read_func = &IStream::read_from_object;
         close_func = &IStream::close_object;
@@ -99,7 +99,7 @@ public:
             data.object = phlib::malloc(size);
             for (int i = 0; i < size; ((char *) data.object)[i] = ((char *) byte_buffer)[i], i++);
         } else {
-            data.object = byte_buffer;
+            data.object = (Ptr) byte_buffer;
         }
         data.object_copy = do_copy;
         data.object_size = size;
@@ -184,7 +184,7 @@ private:
 
     SSize read_from_object(Ptr buffer, Size buffer_size) {
         ssize_t read_size = buffer_size < (data.object_size - data.current_pointer - 1) ?
-                            buffer_size : data.object_size - data.current_pointer - 1;
+                            buffer_size : data.object_size - data.current_pointer -1;
         for (int i = 0; i < read_size; ((char *) buffer)[i++] = ((char *) data.object)[data.current_pointer++]);
         return read_size;
     }

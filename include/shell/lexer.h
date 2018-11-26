@@ -16,7 +16,7 @@
 #include <shell/token.h>
 
 #define LEXER_READ_BUFFER_SIZE 8192
-#define LEXER_TOKEN_BUFFER_SIZE 256
+#define LEXER_STASH_BUFFER_SIZE 256
 
 /** @brief Default Shell namespace */
 namespace psh {
@@ -37,10 +37,9 @@ private:
     uint8 *read_buffer;
     uint32 read_buffer_pointer;
     uint32 read_buffer_size;
-    Symbol *token_buffer;
-    uint32 token_buffer_pointer;
-    uint32 token_buffer_size;
-    uint32 stashed_symbol;
+    Symbol *stash_buffer;
+    uint32 stash_buffer_pointer; /**< stores token_buffer offset where the next symbol is stored*/
+    uint32 stash_buffer_size;
 
 public:
 
@@ -67,6 +66,8 @@ private:
     void stash_symbol(Symbol symbol);
 
     SSize update_buffer();
+
+    phlib::String *create_from_stash_buffer();
 
 };
 

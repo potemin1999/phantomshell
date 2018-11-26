@@ -209,6 +209,13 @@ bool is_comparison_operator(Operator oper);
  */
 bool is_logical_operator(Operator oper);
 
+/**
+ * @brief Converts operator code to string
+ * @param oper to convert
+ * @return char* name of operator
+ */
+const char* operator_to_string(Operator oper);
+
 } //namespace psh
 
 /*
@@ -266,6 +273,37 @@ inline bool psh::is_comparison_operator(psh::Operator oper) {
 
 inline bool psh::is_logical_operator(psh::Operator oper) {
     return (oper & OP_TYPE_MASK) == OP_TYPE_LOGIC;
+}
+
+inline const char *psh::operator_to_string(psh::Operator oper) {
+    switch (oper) {
+        case EQUAL_TO: return "EQUAL_TO";
+        case ADDITION: return "ADDITION";
+        case DIVISION: return "DIVISION";
+        case LESS_THAN: return "LESS_THAN";
+        case ASSIGNMENT: return "ASSIGNMENT";
+        case PAREN_OPEN: return "PAREN_OPEN";
+        case BITWISE_OR: return "BITWISE_OR";
+        case LOGICAL_OR: return "LOGICAL_OR";
+        case SUBTRACTION: return "SUBTRACTION";
+        case BITWISE_NOT: return "BITWISE_NOT";
+        case LOGICAL_NOT: return "LOGICAL_NOT";
+        case BITWISE_AND: return "BITWISE_AND";
+        case BITWISE_XOR: return "BITWISE_XOR";
+        case PAREN_CLOSE: return "PAREN_CLOSE";
+        case LOGICAL_AND: return "LOGICAL_AND";
+        case LOGICAL_XOR: return "LOGICAL_XOR";
+        case NOT_EQUAL_TO: return "NOT_EQUAL_TO";
+        case GREATER_THAN: return "GREATER_THAN";
+        case NOT_LESS_THAN: return "NOT_LESS_THAN";
+        case MULTIPLICATION: return "MULTIPLICATION";
+        case POST_INCREMENT: return "POST_INCREMENT";
+        case POST_DECREMENT: return "POST_DECREMENT";
+        case NOT_GREATER_THAN: return "NOT_GREATER_THAN";
+        case BITWISE_SHIFT_LEFT: return "BITWISE_SHIFT_LEFT";
+        case BITWISE_SHIFT_RIGHT: return "BITWISE_SHIFT_RIGHT";
+        case LOGICAL_IMPLICATION: return "LOGICAL_IMPLICATION";
+    }
 }
 
 #endif //PHANTOMSHELL_OPERATOR_H
