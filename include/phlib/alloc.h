@@ -35,6 +35,20 @@ Ptr malloc(Size size);
  */
 void free(Ptr p);
 
+class Allocator{
+private:
+public:
+
+    static Ptr allocate(size_t size){
+
+    }
+
+    static void deallocate(Ptr ptr){
+
+    }
+
+};
+
 } //namespace phlib
 
 /*

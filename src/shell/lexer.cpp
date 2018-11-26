@@ -17,19 +17,18 @@ Lexer::Lexer(IStream *input_stream) {
     read_buffer_pointer = LEXER_READ_BUFFER_SIZE;
     read_buffer_size = LEXER_READ_BUFFER_SIZE;
     read_buffer = (uint8 *) phlib::malloc(LEXER_READ_BUFFER_SIZE);
-    token_buffer_pointer = 0;
-    token_buffer_size = LEXER_TOKEN_BUFFER_SIZE;
-    token_buffer = (Symbol *) phlib::malloc(LEXER_TOKEN_BUFFER_SIZE);
-    stashed_symbol = 0;
+    stash_buffer_pointer = 0;
+    stash_buffer_size = LEXER_STASH_BUFFER_SIZE;
+    stash_buffer = (Symbol *) phlib::malloc(LEXER_STASH_BUFFER_SIZE);
 }
 
 Lexer::~Lexer() {
     phlib::free(read_buffer);
-    phlib::free(token_buffer);
+    phlib::free(stash_buffer);
 }
 
 psh::Lexer::Symbol Lexer::read_next_symbol() {
-    if (read_buffer_pointer == read_buffer_size) {
+    if (read_buffer_pointer >= read_buffer_size) {
         read_buffer_size = (uint32) update_buffer();
         if (read_buffer_size == 0) return '\0';
         read_buffer_pointer = 0;
@@ -41,25 +40,29 @@ psh::Lexer::Symbol Lexer::read_next_symbol() {
 }
 
 psh::Lexer::Symbol Lexer::get_next_symbol() {
-    if (stashed_symbol!= 0){
-        --stashed_symbol;
-        token_buffer_pointer = (token_buffer_pointer + 1) % token_buffer_size;
-        return token_buffer[(token_buffer_pointer-1) % token_buffer_size];
+    if (stash_buffer_pointer != 0) {
+        stash_buffer_pointer -= 1;
+        Symbol ret_value = stash_buffer[stash_buffer_pointer];
+        return ret_value;
     }
     Symbol symbol = read_next_symbol();
-    token_buffer[token_buffer_pointer] = symbol;
-    token_buffer_pointer = (token_buffer_pointer + 1) % token_buffer_size;
     return symbol;
 }
 
 void Lexer::stash_symbol(Symbol symbol) {
-    token_buffer_pointer = (token_buffer_pointer+token_buffer_size-1) % token_buffer_size;
-    token_buffer[token_buffer_pointer] = symbol;
-    ++stashed_symbol;
+    stash_buffer[stash_buffer_pointer] = symbol;
+    stash_buffer_pointer += 1;
 }
 
 SSize Lexer::update_buffer() {
     return istream->read(read_buffer, read_buffer_size);
+}
+
+phlib::String *Lexer::create_from_stash_buffer() {
+    if (stash_buffer_pointer == 0) return new String();
+    auto ret_str = new String(stash_buffer, (string_length) stash_buffer_pointer);
+    stash_buffer_pointer = 0;
+    return ret_str;
 }
 
 Token *Lexer::get_next_token() {
@@ -68,19 +71,19 @@ Token *Lexer::get_next_token() {
         char_1 = get_next_symbol();
     } while (char_1 == ' ');
     if (char_1 == '\0') return nullptr;
-    DEBUG_LOG("%c\n", (char) char_1);
     if (Character::is_letter(char_1)) {
-        uint32 start_index = token_buffer_pointer - 1;
+        stash_symbol(char_1);
         Symbol last_read;
         bool may_be_keyword = true;
         bool last_read_is_letter;
         bool last_read_is_digit;
         bool last_read_is_underscore;
         do {
-            last_read = get_next_symbol();
+            last_read = read_next_symbol();
             last_read_is_digit = Character::is_digit(last_read);
             last_read_is_letter = Character::is_letter(last_read);
             last_read_is_underscore = last_read == '_';
+            stash_symbol(last_read);
             if (!last_read_is_letter &
                 (last_read_is_digit || last_read_is_underscore)) {
                 may_be_keyword = false;
@@ -88,47 +91,90 @@ Token *Lexer::get_next_token() {
         } while (last_read_is_letter |
                  last_read_is_digit |
                  last_read_is_underscore);
-        uint32 end_index = token_buffer_pointer - 1;
+        stash_buffer_pointer -= 1;
+        String *string_value = create_from_stash_buffer();
         stash_symbol(last_read);
-        String string_value = String(token_buffer+start_index,end_index-start_index);
-        DEBUG_LOG("string lexed : %s\n",string_value.char_value());
-        DEBUG_LOG("may be keyword ? %s\n",may_be_keyword ? "true" : "false");
+        int keyword_value = -1;
         if (may_be_keyword) {
-            return new Token(TokenType::KEYWORD);
-        }else{
-            return new Token(string_value.value());
+            keyword_value = is_keyword(*string_value);
+        }
+        DEBUG_LOG("is keyword ? %s\n", keyword_value != -1 ? "true" : "false");
+        if (keyword_value != -1) {
+            delete string_value;
+            return new Token((Keyword) keyword_value);
+        } else {
+            return new Token(string_value);
         }
     }
     //if we are starting from digits
-    if (Character::is_digit(char_1)){
-        uint32 start_index = token_buffer_pointer - 1;
+    if (Character::is_digit(char_1)) {
+        stash_symbol(char_1);
         Symbol last_read;
         bool has_dot = false;
         bool last_read_is_dot;
         bool last_read_is_digit;
-        do{
-            last_read = get_next_symbol();
+        do {
+            last_read = read_next_symbol();
             last_read_is_digit = Character::is_digit(last_read);
             last_read_is_dot = last_read == '.';
             has_dot = has_dot | last_read_is_dot;
-        }while (last_read_is_digit |
-                last_read_is_dot);
-        uint32 end_index = token_buffer_pointer - 1;
-        stash_symbol(last_read);
-        if (last_read_is_dot){
+            stash_symbol(last_read);
+        } while (last_read_is_digit |
+                 last_read_is_dot);
+        stash_buffer_pointer -= 1;
+        if (last_read_is_dot) {
             //last symbol is dot. what should we do
         }
-        String literal_value = String(token_buffer+start_index,end_index-start_index);
-        if (has_dot){
-            return new Token(Literal::FLOAT_LITERAL,literal_value);
-        }else{
-            return new Token(Literal::INTEGER_LITERAL,literal_value);
+        auto literal_value = create_from_stash_buffer();
+        stash_symbol(last_read);
+        if (has_dot) {
+            return new Token(Literal::FLOAT_LITERAL, literal_value);
+        } else {
+            return new Token(Literal::INTEGER_LITERAL, literal_value);
         }
     }
+    if (char_1 == '"') {
+        Symbol last_read;
+        bool last_read_escape;
+        bool last_read_double_quotes;
+        do {
+            last_read = read_next_symbol();
+            last_read_escape = last_read == '\\';
+            last_read_double_quotes = last_read == '"';
+            stash_symbol(last_read);
+        } while (!last_read_double_quotes |
+                 last_read_escape);
+        stash_buffer_pointer -= 1;
+        auto string_literal_value = create_from_stash_buffer();
+        return new Token(Literal::STRING_LITERAL, string_literal_value);
+    }
     // only non-digits and non-letters left
-    if (char_1 == '(' | char_1 == ')'){
+    if (char_1 == '(' | char_1 == ')') {
         return new Token(char_1 == '(' ?
                          Separator::PARENTHESIS_OPEN :
                          Separator::PARENTHESIS_CLOSE);
     }
+    if (char_1 == '{' | char_1 == '}') {
+        return new Token(char_1 == '{' ?
+                         Separator::BRACE_OPEN :
+                         Separator::BRACE_CLOSE);
+    }
+    if (char_1 == '[' | char_1 == ']') {
+        return new Token(char_1 == '[' ?
+                         Separator::BRACKET_OPEN :
+                         Separator::BRACE_CLOSE);
+    }
+    if (char_1 == '.') {
+        return new Token(Separator::DOT);
+    }
+    if (char_1 == ';') {
+        return new Token(Separator::SEMICOLON);
+    }
+    if (char_1 == '\n') {
+        return new Token(Separator::SEMICOLON);
+    }
+    if (char_1 == ',') {
+        return new Token(Separator::COMMA);
+    }
 }
+

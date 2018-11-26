@@ -60,7 +60,7 @@ public:
     }
 
     static inline bool is_digit(char16 symbol){
-        return symbol > 0x2f & symbol < 0x3f;
+        return symbol >= '0' & symbol <= '9';
     }
 
     static inline bool is_letter(char16 symbol){

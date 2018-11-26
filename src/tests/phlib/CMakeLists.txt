@@ -1,0 +1,9 @@
+set(PHLIB_ISTREAM_TEST phlib_istream_tests)
+set(PHLIB_ISTREAM_TEST_SRC istream_tests.cpp)
+add_executable(${PHLIB_ISTREAM_TEST} ${PHLIB_ISTREAM_TEST_SRC})
+add_test(NAME ${PHLIB_ISTREAM_TEST} COMMAND ${PHLIB_ISTREAM_TEST})
+
+set(PHLIB_STRING_TEST phlib_string_tests)
+set(PHLIB_STRING_TEST_SRC string_tests.cpp)
+add_executable(${PHLIB_STRING_TEST} ${PHLIB_STRING_TEST_SRC})
+add_test(NAME ${PHLIB_STRING_TEST} COMMAND ${PHLIB_STRING_TEST})
