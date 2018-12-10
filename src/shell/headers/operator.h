@@ -10,7 +10,7 @@
 #ifndef PHANTOMSHELL_OPERATOR_H
 #define PHANTOMSHELL_OPERATOR_H
 
-#include <phlib/types.h>
+#include "types.h"
 
 #define OP_UNARY   0x00000000 /**< 00 */
 #define OP_BINARY  0x40000000 /**< 01 */

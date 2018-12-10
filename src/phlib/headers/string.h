@@ -223,6 +223,8 @@ public:
 
     }
 
+    static int strcmp(const char* str1,const char* str2);
+
 private:
 
     String &plus_equal_operator(const char16 *str, Size str_length);

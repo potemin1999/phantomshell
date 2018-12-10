@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <phlib/istream.h>
+#include "istream.h"
 
 
 union phlib::IStream::IStreamData {

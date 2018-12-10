@@ -7,8 +7,8 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <shell/token.h>
-#include <phlib/alloc.h>
+#include "token.h"
+#include "alloc.h"
 
 using namespace phlib;
 

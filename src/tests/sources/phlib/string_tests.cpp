@@ -1,4 +1,4 @@
-#include <phlib/string.h>
+//#include "string.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +12,7 @@ int test1() {
     auto str = new String();
     *str += "hello";
     *str += " world";
-    return strcmp(str->char_value(), "hello world");
+    return String::strcmp(str->char_value(), "hello world");
 }
 
 

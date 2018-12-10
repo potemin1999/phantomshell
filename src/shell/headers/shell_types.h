@@ -10,8 +10,8 @@
 #ifndef PHANTOMSHELL_SHELL_TYPES_H
 #define PHANTOMSHELL_SHELL_TYPES_H
 
-#include <phlib/istream.h>
-#include <phlib/ostream.h>
+#include "istream.h"
+#include "ostream.h"
 
 /** @brief Default Shell namespace */
 namespace psh {

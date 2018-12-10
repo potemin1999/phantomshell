@@ -10,7 +10,7 @@
 #ifndef PHANTOMSHELL_TOKEN_H
 #define PHANTOMSHELL_TOKEN_H
 
-#include <phlib/string.h>
+#include "string.h"
 #include "keyword.h"
 #include "operator.h"
 

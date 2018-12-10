@@ -1,7 +1,7 @@
 #undef __debug__
 
-#include <phlib/istream.h>
-#include <shell/lexer.h>
+#include "istream.h"
+#include "../../../shell/headers/lexer.h"
 #include <chrono>
 #include <stdio.h>
 

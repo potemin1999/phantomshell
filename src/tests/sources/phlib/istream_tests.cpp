@@ -1,4 +1,4 @@
-#include <phlib/istream.h>
+#include "istream.h"
 #include <stdio.h>
 
 using namespace phlib;

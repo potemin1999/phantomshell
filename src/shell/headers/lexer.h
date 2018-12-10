@@ -10,10 +10,10 @@
 #ifndef PHANTOMSHELL_LEXER_H
 #define PHANTOMSHELL_LEXER_H
 
-#include <phlib/alloc.h>
-#include <phlib/character.h>
-#include <phlib/istream.h>
-#include <shell/token.h>
+#include "alloc.h"
+#include "character.h"
+#include "istream.h"
+#include "token.h"
 
 #define LEXER_READ_BUFFER_SIZE 8192
 #define LEXER_STASH_BUFFER_SIZE 256

@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <phlib/ostream.h>
+#include "ostream.h"
 
 
 union phlib::OStream::OStreamData {

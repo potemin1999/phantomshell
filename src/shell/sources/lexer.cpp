@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <shell/lexer.h>
+#include "lexer.h"
 
 using namespace psh;
 using namespace phlib;

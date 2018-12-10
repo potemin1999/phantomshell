@@ -7,12 +7,12 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <shell/lexer.h>
-#include <shell/parser.h>
-#include <shell/phantom_shell.h>
-#include <phlib/alloc.h>
-#include <phlib/string.h>
-#include <phlib/log.h>
+#include "lexer.h"
+#include "parser.h"
+#include "phantom_shell.h"
+#include "alloc.h"
+#include "string.h"
+#include "log.h"
 
 /**
  * Workaround for linking without -lstdc++ flag

@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <phlib/string.h>
+#include "string.h"
 
 
 phlib::Allocator *string_allocator = phlib::Allocator::get_default_allocator();
@@ -239,4 +239,15 @@ void phlib::String::setup_string(phlib::String *dst, const char16 *src, Size len
     dst->str_value = (char16 *) malloc((dst->str_length + 1) * 2);
     copy_str(dst->str_value, src, dst->str_length);
     dst->str_value[dst->str_length] = '\0';
+}
+
+int phlib::String::strcmp(const char *str1, const char *str2) {
+    for (int i = 0; ; i++) {
+        if (str1[i] != str2[i]) {
+            return str1[i] < str2[i] ? -1 : 1;
+        }
+        if (str1[i] == '\0') {
+            return 0;
+        }
+    }
 }

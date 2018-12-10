@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <phlib/alloc.h>
+#include "alloc.h"
 
 
 Ptr phlib::malloc(Size size) {
