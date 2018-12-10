@@ -69,6 +69,8 @@ private:
 
     Symbol read_next_symbol();
 
+    Token *make_operator_token(Symbol char1);
+
     void stash_symbol(Symbol symbol);
 
     SSize update_buffer();

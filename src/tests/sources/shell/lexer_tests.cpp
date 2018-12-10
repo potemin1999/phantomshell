@@ -23,6 +23,11 @@ int test1_2() {
     return tokenizing_test(src_buffer, 32);
 }
 
+int test1_3() {
+    const char *src_buffer = "hello1*hello2+hello3\\'/ku";
+    return tokenizing_test(src_buffer,27);
+}
+
 
 int tokenizing_test(const char *src_buffer, Size size) {
     auto input_stream = new IStream(src_buffer, size, false);
@@ -71,6 +76,7 @@ int main(int argc, const char **argv) {
     int ret = 0;
     if ((ret = test1()) != 0) return ret;
     if ((ret = test1_2()) != 0) return ret;
+    if ((ret = test1_3()) != 0) return ret;
     if ((ret = test2()) != 0) return ret;
     return ret;
 }
