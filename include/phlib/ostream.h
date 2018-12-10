@@ -36,34 +36,23 @@ class OStream {
     /**
     * @brief This union stores data for each type of istream
     */
-    typedef union OStreamData {
-#ifdef __simbuild__
-        File *file; /**< Stores output file descriptor, when type==FILE_STREAM*/
-#endif //__simbuild__
-        struct {
-            Ptr object; /**< Stores pointer to destination object, when type==OBJECT_STREAM*/
-            bool object_copy;
-            SSize current_pointer;
-            SSize object_size; /**< Stores destination object size, when type==OBJECT_STREAM*/
-        };
-        int stdout_fd; /**< Stores stdout descriptor, when type==STDOUT_STREAM*/
-    } OStreamData;
+    union OStreamData;
 
     /**
     * @brief This enum describes istream types
     */
-    typedef enum OStreamType {
+    enum OStreamType {
         FILE_STREAM = 0,
         STDOUT_STREAM = 1,
         OBJECT_STREAM = 2
-    } OStreamType;
+    };
 
 protected:
 
     WriteFunc write_func;
     CloseFunc close_func;
     OStreamType type;
-    OStreamData data;
+    OStreamData* data;
     bool isClosed = false;
 
 public:
@@ -74,12 +63,7 @@ public:
      * @brief Creates stream, writing to the file
      * @param file_path
      */
-    OStream(String &file_path) {
-        type = OStreamType::FILE_STREAM;
-        write_func = &OStream::write_to_file;
-        close_func = &OStream::close_file;
-        data.file = fopen(file_path, "w+");
-    }
+    OStream(String &file_path);
 
 #endif //__simbuild__
 
@@ -87,48 +71,32 @@ public:
      * @brief Creates stream, writing to pointed buffer
      * @param buffer
      */
-    OStream(Ptr buffer) {
-        //TODO: implement later
-    }
+    OStream(Ptr buffer);
 
     /**
      * @brief Creates stream, writing to stdout
      */
-    OStream() {
-        type = OStreamType::STDOUT_STREAM;
-        write_func = &OStream::write_to_stdout;
-        close_func = &OStream::close_stdout;
-        data.stdout_fd = open("/dev/stdout", OFlags::WRONLY);
-        DEBUG_LOG("created new stdout output stream with stdout_fd = %d\n", data.stdout_fd);
-    }
+    OStream();
 
     /**
      * @brief Only destructor of OStream
      *
      * Also closes resources if they we not released earlier
      */
-    ~OStream() {
-        if (!isClosed) {
-            close();
-        }
-    }
+    ~OStream();
 
     /**
      * @brief Allocates memory for new OStream
      * @param size of OStream object
      * @return memory pointer
      */
-    Ptr operator new(Size size) {
-        return phlib::malloc(size);
-    }
+    Ptr operator new(Size size);
 
     /**
      * @brief Frees memory from OStream
      * @param pointer to OStream object
      */
-    void operator delete(Ptr pointer) {
-        phlib::free(pointer);
-    }
+    void operator delete(Ptr pointer);
 
     /**
      * @brief Writes data to location, described at creation
@@ -136,44 +104,27 @@ public:
      * @param buffer_size is size of @p buffer in bytes
      * @return actually written bytes count
      */
-    SSize write(ConstPtr buffer, Size buffer_size) {
-        return (this->*write_func)(buffer, buffer_size);
-    }
+    SSize write(ConstPtr buffer, Size buffer_size);
 
     /**
      * @brief Closes resources in use
      * @return -1 if it was already closed
      * @return value of close function implementation
      */
-    int close() {
-        if (isClosed) return -1;
-        return (this->*close_func)();
-    }
+    int close();
 
 private:
 
-    SSize write_to_stdout(ConstPtr buffer, Size buffer_size) {
-        return phlib::write(data.stdout_fd, buffer, buffer_size);
-    }
+    SSize write_to_stdout(ConstPtr buffer, Size buffer_size);
 
 #ifdef __simbuild__
-
-    SSize write_to_file(ConstPtr buffer, Size buffer_size) {
-        return phlib::fwrite(data.file, buffer, buffer_size);
-    }
-
+    SSize write_to_file(ConstPtr buffer, Size buffer_size);
 #endif //__simbuild__
 
-    int close_stdout() {
-        phlib::close(data.stdout_fd);
-    }
+    int close_stdout();
 
 #ifdef __simbuild__
-
-    int close_file() {
-        phlib::fclose(data.file);
-    }
-
+    int close_file();
 #endif //__simbuild__
 
 };

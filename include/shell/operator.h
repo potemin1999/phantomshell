@@ -83,36 +83,37 @@ namespace psh {
  *   15 - lowest precedence, @n
  *
  *  Id: from 0x00 up to 0x7f including @n
+ *   id can be used to execute these operators in O(1) time
  *
  */
 typedef enum Operator {
 
-    POST_INCREMENT      = OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x00,  /**< <div>  ++ </div> */
-    POST_DECREMENT      = OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x01,  /**< <div> -- </div> */
-    BITWISE_NOT         = OP_UNARY  | OP_TYPE_BIT    | OP_PRECED_3  | OP_ASSOC_RTL | 0x30,  /**< <div> ~ </div> */
-    LOGICAL_NOT         = OP_UNARY  | OP_TYPE_LOGIC  | OP_PRECED_10 | OP_ASSOC_RTL | 0x50,  /**< <div> ! / not </div> */
-    MULTIPLICATION      = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_6  | OP_ASSOC_LTR | 0x22,  /**< <div> * </div> */
-    DIVISION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_6  | OP_ASSOC_LTR | 0x23,  /**< <div> / </div>*/
-    ADDITION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_7  | OP_ASSOC_LTR | 0x20,  /**< <div> + </div> */
-    SUBTRACTION         = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_7  | OP_ASSOC_LTR | 0x21,  /**< <div> - </div> */
-    ASSIGNMENT          = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_15 | OP_ASSOC_RTL | 0x10,  /**< <div> = </div>*/
-    BITWISE_SHIFT_LEFT  = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_LTR | 0x34,  /**< <div> << </div>*/
-    BITWISE_SHIFT_RIGHT = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_LTR | 0x35,  /**< <div> >> </div>*/
-    BITWISE_AND         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_4  | OP_ASSOC_LTR | 0x31,  /**< <div> /\ </div>*/
-    BITWISE_OR          = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x32,  /**< <div> \/ </div>*/
-    BITWISE_XOR         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x33,  /**< <div> \'/ </div>*/
-    PAREN_OPEN          = OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x60,  /**< <div> ( </div>*/
-    PAREN_CLOSE         = OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x61,  /**< <div> ) </div>*/
-    EQUAL_TO            = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x40,  /**< <div> == </div>*/
-    NOT_EQUAL_TO        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x41,  /**< <div> != </div>*/
-    GREATER_THAN        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x42,  /**< <div> > </div>*/
-    LESS_THAN           = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x43,  /**< <div> < </div>*/
-    NOT_GREATER_THAN    = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x44,  /**< <div> <= </div>*/
-    NOT_LESS_THAN       = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x45,  /**< <div> >= </div>*/
-    LOGICAL_AND         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_11 | OP_ASSOC_LTR | 0x51,  /**< <div> and </div>*/
-    LOGICAL_OR          = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x52,  /**< <div> or </div>*/
-    LOGICAL_XOR         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x53,  /**< <div> xor </div>*/
-    LOGICAL_IMPLICATION = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_13 | OP_ASSOC_LTR | 0x54   /**< <div> -> </div>*/
+    POST_INCREMENT      = OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x01,  /**< <div> ++  </div> */
+    POST_DECREMENT      = OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x02,  /**< <div> --  </div> */
+    BITWISE_NOT         = OP_UNARY  | OP_TYPE_BIT    | OP_PRECED_3  | OP_ASSOC_RTL | 0x03,  /**< <div>  ~  </div> */
+    LOGICAL_NOT         = OP_UNARY  | OP_TYPE_LOGIC  | OP_PRECED_10 | OP_ASSOC_RTL | 0x04,  /**< <div> ! / not </div> */
+    MULTIPLICATION      = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_6  | OP_ASSOC_LTR | 0x05,  /**< <div>  *  </div> */
+    DIVISION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_6  | OP_ASSOC_LTR | 0x06,  /**< <div>  /  </div>*/
+    ADDITION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_7  | OP_ASSOC_LTR | 0x07,  /**< <div>  +  </div> */
+    SUBTRACTION         = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_7  | OP_ASSOC_LTR | 0x08,  /**< <div>  -  </div> */
+    ASSIGNMENT          = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_15 | OP_ASSOC_RTL | 0x09,  /**< <div>  =  </div>*/
+    BITWISE_SHIFT_LEFT  = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_LTR | 0x0a,  /**< <div> <<  </div>*/
+    BITWISE_SHIFT_RIGHT = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_LTR | 0x0b,  /**< <div> >>  </div>*/
+    BITWISE_AND         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_4  | OP_ASSOC_LTR | 0x0c,  /**< <div> /\  </div>*/
+    BITWISE_OR          = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0d,  /**< <div> \/  </div>*/
+    BITWISE_XOR         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0e,  /**< <div> \'/ </div>*/
+    PAREN_OPEN          = OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x0f,  /**< <div>  (  </div>*/
+    PAREN_CLOSE         = OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x10,  /**< <div>  )  </div>*/
+    EQUAL_TO            = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x11,  /**< <div> ==  </div>*/
+    NOT_EQUAL_TO        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x12,  /**< <div> !=  </div>*/
+    GREATER_THAN        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x13,  /**< <div>  >  </div>*/
+    LESS_THAN           = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x14,  /**< <div>  <  </div>*/
+    NOT_GREATER_THAN    = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x15,  /**< <div> <=  </div>*/
+    NOT_LESS_THAN       = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x16,  /**< <div> >=  </div>*/
+    LOGICAL_AND         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_11 | OP_ASSOC_LTR | 0x17,  /**< <div> and </div>*/
+    LOGICAL_OR          = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x18,  /**< <div> or  </div>*/
+    LOGICAL_XOR         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x19,  /**< <div> xor </div>*/
+    LOGICAL_IMPLICATION = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_13 | OP_ASSOC_LTR | 0x1a   /**< <div> ->  </div>*/
 
 } Operator;
 
@@ -303,6 +304,7 @@ inline const char *psh::operator_to_string(psh::Operator oper) {
         case BITWISE_SHIFT_LEFT: return "BITWISE_SHIFT_LEFT";
         case BITWISE_SHIFT_RIGHT: return "BITWISE_SHIFT_RIGHT";
         case LOGICAL_IMPLICATION: return "LOGICAL_IMPLICATION";
+        default: return "NOT AN OPERATOR";
     }
 }
 

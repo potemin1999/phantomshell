@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 using namespace phlib;
+
 
 int test1() {
     auto str = new String();
@@ -12,6 +14,7 @@ int test1() {
     *str += " world";
     return strcmp(str->char_value(), "hello world");
 }
+
 
 int main(int argc, const char **argv) {
     int ret = 0;

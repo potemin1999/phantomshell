@@ -9,11 +9,24 @@ using namespace phlib;
 using namespace psh;
 using namespace std::chrono;
 
+int tokenizing_test(const char *src_buffer, Size size);
+
+
 int test1() {
     const char *src_buffer = "ident(\"1.22\");if{};";
-    auto input_stream = new IStream(src_buffer, 20, false);
+    return tokenizing_test(src_buffer, 20);
+}
+
+
+int test1_2() {
+    const char *src_buffer = "hello1 and}hello2;or;xor not()";
+    return tokenizing_test(src_buffer, 32);
+}
+
+
+int tokenizing_test(const char *src_buffer, Size size) {
+    auto input_stream = new IStream(src_buffer, size, false);
     auto lexer = new Lexer(input_stream);
-    int counter = 0;
     while (true) {
         Token *token = lexer->get_next_token();
         if (token == nullptr) break;
@@ -25,8 +38,9 @@ int test1() {
     return 0;
 }
 
+
 int test2() {
-    const int size = 10000;
+    const int size = 10000000;
     char *src_buffer = (char *) phlib::malloc(size);
     for (int i = 0; i < size; i++) {
         src_buffer[i] = 'a' + (char) (i % ('z' - 'a'));
@@ -52,9 +66,11 @@ int test2() {
     return 0;
 }
 
+
 int main(int argc, const char **argv) {
     int ret = 0;
     if ((ret = test1()) != 0) return ret;
+    if ((ret = test1_2()) != 0) return ret;
     if ((ret = test2()) != 0) return ret;
     return ret;
 }
