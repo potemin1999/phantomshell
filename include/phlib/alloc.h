@@ -19,6 +19,12 @@
 
 #endif //__simbuild__
 
+#ifdef __debug_memory__
+#define DEBUG_LOG_MEM(...) DEBUG_LOG(__VA_ARGS__)
+#else
+#define DEBUG_LOG_MEM(...)
+#endif
+
 /** @brief Default namespace for Phantom Shell support library */
 namespace phlib {
 
@@ -35,47 +41,44 @@ Ptr malloc(Size size);
  */
 void free(Ptr p);
 
-class Allocator{
-private:
+
+/**
+ * @brief parent class for all allocators
+ */
+class Allocator {
 public:
 
-    static Ptr allocate(size_t size){
+    Allocator() = default;
 
-    }
+    ~Allocator() = default;
 
-    static void deallocate(Ptr ptr){
+    /**
+     * @brief allocates memory of required size
+     *
+     * Only implementation can declare how to allocate memory
+     * @param size in bytes to allocate
+     * @return nullptr if allocation was failed
+     */
+    virtual Ptr allocate(Size size) = 0;
 
-    }
+    /**
+     * @brief deallocate memory
+     *
+     * Like the phlib::Allocate::allocate, this one does not declare
+     * how to deallocate and release memory to the system
+     * @param ptr is and pointer to previously allocated memory
+     */
+    virtual void deallocate(Ptr ptr) = 0;
+
+    virtual void release() {}
+
+    static Allocator* get_default_allocator() noexcept;
 
 };
 
+
+
+
 } //namespace phlib
-
-/*
- * INLINE DEFINITIONS ARE BELOW
- */
-
-inline Ptr phlib::malloc(Size size) {
-#ifdef __simbuild__
-    Ptr pointer = ::malloc(size);
-#ifdef __debug__
-    DEBUG_LOG("alloc.h: allocated %lu bytes at address %p\n", size, pointer);
-#endif //__debug__
-    return pointer;
-#else //__simbuild__
-    //TODO: create custom malloc wrap, using phantom api
-#endif //__simbuild__
-}
-
-inline void phlib::free(Ptr p) {
-#ifdef __simbuild__
-    ::free(p);
-#ifdef __debug__
-    DEBUG_LOG("alloc.h: released address %p\n", p);
-#endif //__debug__
-#else //__simbuild__
-    //TODO: create free wrap for phantom api
-#endif //__simbuild__
-}
 
 #endif //PHANTOMSHELL_ALLOC_H

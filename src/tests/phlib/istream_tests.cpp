@@ -3,6 +3,7 @@
 
 using namespace phlib;
 
+
 int test1() {
     const int size = 500;
     char *src_buffer = (char *) phlib::malloc(size);
@@ -19,6 +20,7 @@ int test1() {
     }
     return 0;
 }
+
 
 int main(int argc, const char **argv) {
     int ret = 0;

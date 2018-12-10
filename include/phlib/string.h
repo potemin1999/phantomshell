@@ -16,8 +16,6 @@
 /** @brief Default namespace for Phantom Shell support library */
 namespace phlib {
 
-typedef uint32 string_length;
-
 /**
  * @brief String is wrap class for char16*
  */
@@ -27,7 +25,7 @@ private:
 
     char *str_char_value = nullptr;
     char16 *str_value = nullptr; /**< null terminated char16 sequence */
-    string_length str_length = 0;
+    Size str_length = 0;
 
 public:
 
@@ -35,66 +33,37 @@ public:
      * @brief Creates string by copying other string value
      * @param other
      */
-    String(const String &other) {
-        str_value = (char16 *) phlib::malloc((other.str_length + 1) * sizeof(char16));
-        str_length = other.str_length;
-        copy_str(str_value, other.str_value, other.str_length + 1);
-    }
+    String(const String &other);
 
     /**
      * @brief Creates string from null terminated char16 array
      * @param str is array
      */
-    String(const char16 *str) : String(str,get_length(str)){
-    }
+    String(const char16 *str) : String(str,get_length(str))
+    {}
 
     /**
      * @brief Creates string from char16* sequence with requested length
      * @param str is a pointer to string beginning
      * @param length is size of array to copy
      */
-    String(const char16 *str, string_length length) {
-        str_length = length;
-        str_value = (char16 *) phlib::malloc((str_length + 1) * sizeof(char16));
-        copy_str(str_value,str,str_length);
-        str_value[str_length] = '\0';
-    }
+    String(const char16 *str, Size length);
 
     /**
      * @brief Creates string from null terminated char array
      * @param str is array
      */
-    String(const char *str) {
-        str_length = get_length(str);
-        str_value = (char16 *) malloc((str_length + 1) * 2);
-        for (int i = 0; i < str_length; i++) {
-            str_value[i] = str[i] & ((char16) 0x007f);
-        }
-        str_value[str_length] = '\0';
-    }
+    String(const char *str);
 
     /**
      * @brief Creates empty string
      */
-    String(){
-        str_length = 0;
-        str_value = (char16*) malloc(1* sizeof(char16));
-        str_value[0] = '\0';
-    }
+    String();
 
     /**
      * @brief Destroys string and its resources
      */
-    ~String() {
-        if (str_value != nullptr) {
-            phlib::free(str_value);
-            str_value = nullptr;
-        }
-        if (str_char_value != nullptr) {
-            phlib::free(str_char_value);
-            str_char_value = nullptr;
-        }
-    }
+    ~String();
 
     /**
      * @brief returns character at required index
@@ -110,65 +79,47 @@ public:
      * @param other second operand
      * @return this with data of other
      */
-    String &operator=(const String &other) {
-        this->str_value = (char16*) malloc((other.str_length+1)*2);
-        copy_str(str_value,other.str_value,other.str_length+1);
-        this->str_length = other.str_length;
-    };
+    String &operator=(const String &other);
 
     /**
      * @brief assignment operator
      * @param str second operand
      * @return this with str value
      */
-    String &operator=(const char16 *&str) {
-        setup_string(this, str);
-        return *this;
-    }
+    String &operator=(const char16 *&str);
 
     /**
      * @brief += operator
      * @param other string
      * @return this string with appended @p other
      */
-    String &operator+=(const String &other) {
-        return plus_equal_operator(other.str_value, other.str_length);
-    }
+    String &operator+=(const String &other);
 
     /**
      * @brief += operator
      * @param str value to append
      * @return this string with appended @p str
      */
-    String &operator+=(const char16 *str) {
-        string_length length = 0;
-        while (str[length++] != '\0');
-        return plus_equal_operator(str, length);
-    }
+    String &operator+=(const char16 *str);
 
     /**
      * @brief allocates memory for new string
      * @param size of string
      * @return pointer to allocated memory
      */
-    void *operator new(unsigned long size) {
-        void *pointer = phlib::malloc(sizeof(String));
-        return pointer;
-    }
+    void *operator new(unsigned long size);
 
     /**
      * @brief releases memory allocated for string at @p pointer
      * @param pointer to string
      */
-    void operator delete(void *pointer) {
-        phlib::free(pointer);
-    }
+    void operator delete(void *pointer);
 
     /**
      * @brief converts string to const char16 array
      * @return pointer to value;
      */
-    operator const char16 *() {
+    inline operator const char16 *() {
         return value();
     }
 
@@ -176,7 +127,7 @@ public:
      * @brief converts string to const char array
      * @return pointer to char value
      */
-    operator const char *() {
+    inline operator const char *() {
         return char_value();
     }
 
@@ -184,7 +135,7 @@ public:
      * @brief Length of the string value
      * @return length of the string without null terminator
      */
-    inline string_length length() {
+    inline Size length() {
         return str_length;
     }
 
@@ -200,58 +151,35 @@ public:
      * @brief default char value of string
      * @return null terminated const char array
      */
-    inline const char *char_value() {
-        if (this->str_char_value == nullptr) {
-            this->str_char_value = (char *) phlib::malloc(this->str_length + 1);
-            for (int i = 0; i < this->str_length; i++) {
-                this->str_char_value[i] = (char) (0x7f & this->str_value[i]);
-            }
-            this->str_char_value[this->str_length] = '\0';
-        }
-        return this->str_char_value;
-    }
+    const char *char_value();
 
     /**
      * @brief Compares beginning of the string with other string value
      * @param str other string
      * @return true, if this string starts with @p str
      */
-    inline bool starts_with(const String &str) {
-        return starts_with(str.str_value);
-    }
+    bool starts_with(const String &str);
 
     /**
      * @brief Compares beginning of the string with other char* value
      * @param prefix char* to compare beginning with
      * @return true, if string starts with prefix
      */
-    inline bool starts_with(const char16 *prefix) {
-        for (int i = 0; prefix[i] != '\0'; i++) {
-            if (i >= this->str_length) return false;
-            if (prefix[i] != this->str_value[i]) return false;
-        }
-        return true;
-    }
+    bool starts_with(const char16 *prefix);
 
     /**
      * @brief Checks, whether this string ends by other string
      * @param suffix string to check
      * @return true if ends, false if does not
      */
-    inline bool ends_with(const String &suffix) {
-        return ends_with(suffix.str_value, suffix.str_length);
-    }
+    bool ends_with(const String &suffix);
 
     /**
      * @brief Checks, whether string ends with suffix
      * @param suffix to check
      * @return true if ends, false if does not
      */
-    inline bool ends_with(const char16 *suffix) {
-        string_length length = 0;
-        while (suffix[++length] != '\0');
-        return ends_with(suffix, length);
-    }
+    bool ends_with(const char16 *suffix);
 
     /**
      * @brief Checks, whether string ends with suffix
@@ -261,64 +189,31 @@ public:
      * @param suffix_length suffix length without null terminator
      * @return true if ends, false if does not
      */
-    inline bool ends_with(const char16 *suffix, string_length suffix_length) {
-        if (suffix_length > this->str_length) return false;
-        for (int i = 0; i <= suffix_length; i++) {
-            if (this->str_value[i + this->str_length - suffix_length] != suffix[i]) return false;
-        }
-        return true;
-    }
+    bool ends_with(const char16 *suffix, Size suffix_length);
 
     /**
      * @brief Computes hash code of string by Java-like method
      * @return hash code of the string
      */
-    uint32 hash_code() {
-        uint32 hash = 0;
-        if (str_length > 0) {
-            for (int i = 0; i < str_length; i++) {
-                hash = (hash << 5) - hash + str_value[i];
-            }
-        }
-        return hash;
-    }
+    uint32 hash_code();
 
     /**
      * @brief Compares two strings
      * @param other second string
      * @return true, if they have the same value
      */
-    inline bool equals(const String &other) {
-        return equals(other.str_value);
-    }
+    bool equals(const String &other);
 
     /**
      * @brief Compares string and char* values
      * @param str second operand
      * @return true, if value of string equals to str
      */
-    inline bool equals(const char16 *str) {
-        int i = 0;
-        for (; str[i] != '\0'; i++) {
-            if (str[i] != this->str_value[i]) return false;
-        }
-        return i == this->str_length;
-    }
+    bool equals(const char16 *str);
 
-    inline int compare(const String &str1, const String &str2) {
-        if (str1.str_length != str2.str_length)
-            return str1.str_length > str2.str_length ? 1 : -1;
-        return compare(str1.str_value, str2.str_value);
-    }
+    int compare(const String &str1, const String &str2);
 
-    inline int compare(const char16 *str1, const char16 *str2) {
-        if (str1 == nullptr || str2 == nullptr) return -2;
-        for (int i = 0;; i++) {
-            if (str1[i] == '\0' & str2[i] == '\0') break;
-            if (str1[i] != str2[i]) return str1[i] > str2[i] ? 1 : -1;
-        }
-        return 0;
-    }
+    int compare(const char16 *str1, const char16 *str2);
 
     static String value_of(uint32 value) {
 
@@ -330,67 +225,27 @@ public:
 
 private:
 
-    inline String &plus_equal_operator(const char16 *str, string_length str_length) {
-        string_length length = str_length + this->str_length;
-        string_length old_length = this->str_length;
-        char16 *last_value = this->str_value;
-        this->str_value = (char16 *) phlib::malloc((length + 1) * sizeof(char16));
-        add_str(str_value, last_value, old_length, str, str_length);
-        this->str_value[length] = '\0';
-        if (last_value != nullptr) {
-            phlib::free((void *) last_value);
-        }
-        this->str_length = length;
-        return *this;
-    }
+    String &plus_equal_operator(const char16 *str, Size str_length);
 
-    inline static string_length get_length(const char *str) {
-        string_length i = 0;
-        for (; str[i] != '\0'; ++i);
-        return i;
-    }
+    static Size get_length(const char *str);
 
-    inline static string_length get_length(const char16 *str) {
-        string_length i = 0;
-        for (; str[i] != '\0'; ++i);
-        return i;
-    }
+    static Size get_length(const char16 *str);
 
-    inline static void setup_string(String *dst, const char16 *src) {
-        dst->str_length = 0;
-        for (; src[dst->str_length] != '\0'; dst->str_length++);
-        setup_string(dst, src, dst->str_length);
-    }
+    static void setup_string(String *dst, const char16 *src);
 
-    inline static void setup_string(String *dst, const char *src) {
-        dst->str_length = 0;
-        for (; src[dst->str_length] != '\0'; dst->str_length++);
-        setup_string(dst, src, dst->str_length);
-    }
+    static void setup_string(String *dst, const char *src);
 
-    inline static void setup_string(String *dst, const char *src, string_length length) {
-        dst->str_length = length;
-        dst->str_value = (char16 *) malloc((dst->str_length + 1) * 2);
-        for (int i = 0; i < dst->str_length; i++) {
-            dst->str_value[i] = src[i] & ((char16) 0x007f);
-        }
-        dst->str_value[dst->str_length] = '\0';
-    }
+    static void setup_string(String *dst, const char *src, Size length);
 
-    inline static void setup_string(String *dst, const char16 *src, string_length length) {
-        dst->str_length = length;
-        dst->str_value = (char16 *) malloc((dst->str_length + 1) * 2);
-        copy_str(dst->str_value, src, dst->str_length);
-        dst->str_value[dst->str_length] = '\0';
-    }
+    static void setup_string(String *dst, const char16 *src, Size length);
 
-    inline static void copy_str(char16 *dst, const char16 *src, uint32 length) {
+    inline static void copy_str(char16 *dst, const char16 *src, Size length) {
         for (int i = 0; i < length; dst[i] = src[i], i++);
     }
 
     inline static void add_str(char16 *dst,
-                               const char16 *src1, uint32 src1_length,
-                               const char16 *src2, uint32 src2_length) {
+                               const char16 *src1, Size src1_length,
+                               const char16 *src2, Size src2_length) {
         copy_str(dst, src1, src1_length);
         copy_str(dst + src1_length, src2, src2_length);
     }

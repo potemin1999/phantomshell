@@ -28,20 +28,23 @@ PhantomShell::PhantomShell(PshArguments *args) {
     lexer = new Lexer(args->input_stream);
 }
 
+
 PhantomShell::~PhantomShell() {
     delete lexer;
 }
+
 
 ShellExitCode PhantomShell::run() {
     while (lexer != nullptr) {
         Token *token = lexer->get_next_token();
         if (token == nullptr) break;
 #ifdef __debug__
-        DEBUG_LOG("%s\n",token->token_to_string());
+        DEBUG_LOG("%s\n", token->token_to_string());
 #endif
     }
     return ShellExitCode::EXIT_NORMAL;
 }
+
 
 uint32 psh::parse_shell_short_options(psh::PshArguments *args, const char *option) {
     if (option[0] != '-') return 1;
@@ -90,10 +93,12 @@ uint32 psh::parse_shell_short_options(psh::PshArguments *args, const char *optio
     return 0;
 }
 
+
 uint32 psh::parse_shell_long_options(psh::PshArguments *args, const char *option) {
     //TODO: implement
     return 0;
 }
+
 
 uint32 psh::parse_shell_args(PshArguments *args, int argc, const char **argv) {
 #ifndef __debug__
@@ -140,10 +145,12 @@ uint32 psh::parse_shell_args(PshArguments *args, int argc, const char **argv) {
     return 0;
 }
 
+
 uint32 psh::cleanup_shell_args(psh::PshArguments *args) {
     delete args->input_stream;
     delete args->output_stream;
 }
+
 
 psh::ShellExitCode psh::shell_show_usage(PshArguments *args) {
     psh::shell_show_version(args);
@@ -160,11 +167,13 @@ psh::ShellExitCode psh::shell_show_usage(PshArguments *args) {
     return ShellExitCode::EXIT_NORMAL;
 }
 
+
 psh::ShellExitCode psh::shell_show_version(PshArguments *args) {
     String version_str = PHANTOM_SHELL_VERSION "\n";
     args->output_stream->write(version_str.value(), version_str.length());
     return ShellExitCode::EXIT_NORMAL;
 }
+
 
 psh::ShellExitCode psh::shell_main(PshArguments *args) {
     PhantomShell shell(args);
@@ -172,6 +181,7 @@ psh::ShellExitCode psh::shell_main(PshArguments *args) {
     cleanup_shell_args(args);
     return exit_code;
 }
+
 
 int main(int argc, const char **argv) {
     psh::PshArguments args;

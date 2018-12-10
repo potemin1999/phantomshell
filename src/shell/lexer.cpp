@@ -12,6 +12,7 @@
 using namespace psh;
 using namespace phlib;
 
+
 Lexer::Lexer(IStream *input_stream) {
     istream = input_stream;
     read_buffer_pointer = LEXER_READ_BUFFER_SIZE;
@@ -22,10 +23,12 @@ Lexer::Lexer(IStream *input_stream) {
     stash_buffer = (Symbol *) phlib::malloc(LEXER_STASH_BUFFER_SIZE);
 }
 
+
 Lexer::~Lexer() {
     phlib::free(read_buffer);
     phlib::free(stash_buffer);
 }
+
 
 psh::Lexer::Symbol Lexer::read_next_symbol() {
     if (read_buffer_pointer >= read_buffer_size) {
@@ -39,6 +42,7 @@ psh::Lexer::Symbol Lexer::read_next_symbol() {
     return ((hi << 8) & lo);
 }
 
+
 psh::Lexer::Symbol Lexer::get_next_symbol() {
     if (stash_buffer_pointer != 0) {
         stash_buffer_pointer -= 1;
@@ -49,21 +53,81 @@ psh::Lexer::Symbol Lexer::get_next_symbol() {
     return symbol;
 }
 
+
 void Lexer::stash_symbol(Symbol symbol) {
     stash_buffer[stash_buffer_pointer] = symbol;
     stash_buffer_pointer += 1;
 }
 
+
 SSize Lexer::update_buffer() {
     return istream->read(read_buffer, read_buffer_size);
 }
 
+
 phlib::String *Lexer::create_from_stash_buffer() {
     if (stash_buffer_pointer == 0) return new String();
-    auto ret_str = new String(stash_buffer, (string_length) stash_buffer_pointer);
+    auto ret_str = new String(stash_buffer, (Size) stash_buffer_pointer);
     stash_buffer_pointer = 0;
     return ret_str;
 }
+
+
+uint32 Lexer::check_if_identifier_is_operator() {
+    if (stash_buffer_pointer != 2 &
+        stash_buffer_pointer != 3) {
+        return 0;
+    }
+    switch (stash_buffer[0]) {
+        case 'a': {
+            if (stash_buffer_pointer != 3)
+                return 0;
+            if (stash_buffer[1] == 'n' &
+                stash_buffer[2] == 'd') {
+                stash_buffer_pointer -= 3;
+                return Operator::LOGICAL_AND;
+            } else {
+                return 0;
+            }
+        }
+        case 'n': {
+            if (stash_buffer_pointer != 3)
+                return 0;
+            if (stash_buffer[1] == 'o' &
+                stash_buffer[2] == 't') {
+                stash_buffer_pointer -= 3;
+                return Operator::LOGICAL_NOT;
+            } else {
+                return 0;
+            }
+        }
+        case 'o': {
+            if (stash_buffer_pointer != 2)
+                return 0;
+            if (stash_buffer[1] == 'r') {
+                stash_buffer_pointer -= 2;
+                return Operator::LOGICAL_OR;
+            } else {
+                return 0;
+            }
+        }
+        case 'x': {
+            if (stash_buffer_pointer != 3)
+                return 0;
+            if (stash_buffer[1] == 'o' &
+                stash_buffer[2] == 'r') {
+                stash_buffer_pointer -= 3;
+                return Operator::LOGICAL_XOR;
+            } else {
+                return 0;
+            }
+        }
+        default: {
+            return 0;
+        }
+    }
+}
+
 
 Token *Lexer::get_next_token() {
     Symbol char_1;
@@ -92,13 +156,19 @@ Token *Lexer::get_next_token() {
                  last_read_is_digit |
                  last_read_is_underscore);
         stash_buffer_pointer -= 1;
+        uint32 oper = check_if_identifier_is_operator();
+        if (oper != 0) {
+            auto ret_token = new Token((Operator) oper);
+            stash_symbol(last_read);
+            return ret_token;
+        }
         String *string_value = create_from_stash_buffer();
         stash_symbol(last_read);
         int keyword_value = -1;
         if (may_be_keyword) {
             keyword_value = is_keyword(*string_value);
         }
-        DEBUG_LOG("is keyword ? %s\n", keyword_value != -1 ? "true" : "false");
+        DEBUG_LOG_LEX("is keyword ? %s\n", keyword_value != -1 ? "true" : "false");
         if (keyword_value != -1) {
             delete string_value;
             return new Token((Keyword) keyword_value);

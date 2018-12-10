@@ -18,6 +18,12 @@
 #define LEXER_READ_BUFFER_SIZE 8192
 #define LEXER_STASH_BUFFER_SIZE 256
 
+#ifdef __debug_lexer__
+#define DEBUG_LOG_LEX(...) DEBUG_LOG(__VA_ARGS__)
+#else
+#define DEBUG_LOG_LEX(...)
+#endif
+
 /** @brief Default Shell namespace */
 namespace psh {
 
@@ -66,6 +72,8 @@ private:
     void stash_symbol(Symbol symbol);
 
     SSize update_buffer();
+
+    uint32 check_if_identifier_is_operator();
 
     phlib::String *create_from_stash_buffer();
 
