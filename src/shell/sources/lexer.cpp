@@ -239,7 +239,7 @@ Token *Lexer::get_next_token() {
         } else if (char2 == '*') {
             Symbol last_read;
             bool last_read_asterisk = false;
-            while (!(last_read_asterisk & (last_read = read_next_symbol()) == '/')) {
+            while (!(last_read_asterisk & ((last_read = read_next_symbol()) == '/'))) {
                 last_read_asterisk = last_read == '*';
             }
             comment_skipped = true;

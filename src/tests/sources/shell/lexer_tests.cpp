@@ -1,7 +1,7 @@
 #undef __debug__
 
 #include "istream.h"
-#include "../../../shell/headers/lexer.h"
+#include "lexer.h"
 #include <chrono>
 #include <stdio.h>
 
