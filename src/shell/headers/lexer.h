@@ -39,18 +39,25 @@ class Lexer {
 
 private:
 
-    phlib::IStream *istream;
-    uint8 *read_buffer;
-    uint32 read_buffer_pointer;
-    uint32 read_buffer_size;
-    Symbol *stash_buffer;
-    uint32 stash_buffer_pointer; /**< stores token_buffer offset where the next symbol is stored*/
-    uint32 stash_buffer_size;
+    phlib::IStream *istream;     /**< data source */
+    uint8 *read_buffer;          /**< buffer as read source */
+    uint32 read_buffer_pointer;  /**< current position in read_buffer*/
+    uint32 read_buffer_size;     /**< read buffer size in bytes */
+    Symbol *stash_buffer;        /**< stash stack for symbols */
+    uint32 stash_buffer_pointer; /**< stores token_buffer offset where the next symbol is stored */
+    uint32 stash_buffer_size;    /**< max stash size */
 
 public:
 
+    /**
+     * @brief Main constructor
+     * @param istream stream from which lexer should lex
+     */
     Lexer(phlib::IStream *istream);
 
+    /**
+     * @brief Just destructor
+     */
     ~Lexer();
 
     void *operator new(Size size) {
@@ -61,6 +68,10 @@ public:
         phlib::free(ptr);
     }
 
+    /**
+     * @brief Returns next lexed token
+     * @return token from input stream, nullptr if stream have ended
+     */
     Token *get_next_token();
 
 private:
@@ -68,6 +79,8 @@ private:
     Symbol get_next_symbol();
 
     Symbol read_next_symbol();
+
+    Token *make_operator_token(Symbol char1);
 
     void stash_symbol(Symbol symbol);
 

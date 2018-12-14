@@ -58,7 +58,7 @@ public:
 
     Token(TokenType type);
 
-    Token(Separator separator) ;
+    Token(Separator separator);
 
     Token(Literal literal, phlib::String *literal_value);
 
@@ -68,11 +68,11 @@ public:
 
     Token(phlib::String *identifier);
 
-    ~Token() ;
+    ~Token();
 
-    Ptr operator new(Size size) ;
+    Ptr operator new(Size size);
 
-    void operator delete(Ptr token_ptr) ;
+    void operator delete(Ptr token_ptr);
 
     /**
      * @brief token used always and shows how to interpret other data

@@ -129,12 +129,131 @@ uint32 Lexer::check_if_identifier_is_operator() {
 }
 
 
+inline Token *Lexer::make_operator_token(Symbol char1) {
+    if (char1 == '+') {
+        Symbol char2 = get_next_symbol();
+        if (char2 == '+') {
+            return new Token(Operator::POST_INCREMENT);
+        } else {
+            stash_symbol(char2);
+            return new Token(Operator::ADDITION);
+        }
+    }
+    if (char1 == '-') {
+        Symbol char2 = get_next_symbol();
+        if (char2 == '-') {
+            return new Token(Operator::POST_DECREMENT);
+        } else if (char2 == '>') {
+            return new Token(Operator::LOGICAL_IMPLICATION);
+        } else {
+            stash_symbol(char2);
+            return new Token(Operator::SUBTRACTION);
+        }
+    }
+    if (char1 == '=') {
+        Symbol char2 = get_next_symbol();
+        if (char2 == '=') {
+            return new Token(Operator::EQUAL_TO);
+        } else {
+            stash_symbol(char2);
+            return new Token(Operator::ASSIGNMENT);
+        }
+    }
+    if (char1 == '~') {
+        return new Token(Operator::BITWISE_NOT);
+    }
+    if (char1 == '!') {
+        Symbol char2 = get_next_symbol();
+        if (char2 == '=') {
+            return new Token(Operator::NOT_EQUAL_TO);
+        } else {
+            stash_symbol(char2);
+            return new Token(Operator::LOGICAL_NOT);
+        }
+    }
+    if (char1 == '*') {
+        return new Token(Operator::MULTIPLICATION);
+    }
+    if (char1 == '/') {
+        Symbol char2 = get_next_symbol();
+        if (char2 == '\\') {
+            return new Token(Operator::BITWISE_AND);
+        } else {
+            stash_symbol(char2);
+            return new Token(Operator::DIVISION);
+        }
+    }
+    if (char1 == '<') {
+        Symbol char2 = get_next_symbol();
+        if (char2 == '<') {
+            return new Token(Operator::BITWISE_SHIFT_LEFT);
+        } else if (char2 == '=') {
+            return new Token(Operator::NOT_GREATER_THAN);
+        } else {
+            stash_symbol(char2);
+            return new Token(Operator::LESS_THAN);
+        }
+    }
+    if (char1 == '>') {
+        Symbol char2 = get_next_symbol();
+        if (char2 == '>') {
+            return new Token(Operator::BITWISE_SHIFT_RIGHT);
+        } else if (char2 == '=') {
+            return new Token(Operator::NOT_LESS_THAN);
+        } else {
+            stash_symbol(char2);
+            return new Token(Operator::GREATER_THAN);
+        }
+    }
+    if (char1 == '\\') {
+        Symbol char2 = get_next_symbol();
+        if (char2 == '\'') {
+            Symbol char3 = get_next_symbol();
+            if (char3 == '/') {
+                return new Token(Operator::BITWISE_XOR);
+            } else {
+                stash_symbol(char3);
+            }
+        } else if (char2 == '/') {
+            return new Token(Operator::BITWISE_OR);
+        } else {
+            stash_symbol(char2);
+        }
+    }
+    return nullptr;
+}
+
+
 Token *Lexer::get_next_token() {
     Symbol char_1;
     do {
         char_1 = get_next_symbol();
     } while (char_1 == ' ');
     if (char_1 == '\0') return nullptr;
+    bool comment_skipped = false;
+    if (char_1 == '/') {
+        Symbol char2 = get_next_symbol();
+        if (char2 == '/') {
+            while (read_next_symbol() != '\n') {}
+            comment_skipped = true;
+        } else if (char2 == '*') {
+            Symbol last_read;
+            bool last_read_asterisk = false;
+            while (!(last_read_asterisk & ((last_read = read_next_symbol()) == '/'))) {
+                last_read_asterisk = last_read == '*';
+            }
+            comment_skipped = true;
+        } else {
+            stash_symbol(char2);
+        }
+    }
+    if (comment_skipped) {
+        char_1 = get_next_symbol();
+        if (char_1 == '\0') return nullptr;
+        while (char_1 == ' ') {
+            char_1 = get_next_symbol();
+        }
+    }
     if (Character::is_letter(char_1)) {
         stash_symbol(char_1);
         Symbol last_read;
@@ -187,6 +306,7 @@ Token *Lexer::get_next_token() {
             last_read = read_next_symbol();
             last_read_is_digit = Character::is_digit(last_read);
             last_read_is_dot = last_read == '.';
+            //TODO: has_dot & last_read_is_dot should be invalid
             has_dot = has_dot | last_read_is_dot;
             stash_symbol(last_read);
         } while (last_read_is_digit |
@@ -217,6 +337,10 @@ Token *Lexer::get_next_token() {
         stash_buffer_pointer -= 1;
         auto string_literal_value = create_from_stash_buffer();
         return new Token(Literal::STRING_LITERAL, string_literal_value);
+    }
+    Token *operator_token = make_operator_token(char_1);
+    if (operator_token != nullptr) {
+        return operator_token;
     }
     // only non-digits and non-letters left
     if (char_1 == '(' | char_1 == ')') {

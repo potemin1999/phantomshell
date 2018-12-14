@@ -242,7 +242,7 @@ void phlib::String::setup_string(phlib::String *dst, const char16 *src, Size len
 }
 
 int phlib::String::strcmp(const char *str1, const char *str2) {
-    for (int i = 0; ; i++) {
+    for (int i = 0;; i++) {
         if (str1[i] != str2[i]) {
             return str1[i] < str2[i] ? -1 : 1;
         }
