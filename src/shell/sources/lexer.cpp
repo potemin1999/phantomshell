@@ -7,6 +7,8 @@
  * GNU Lesser General Public License v3.0
  */
 
+#include <lexer.h>
+
 #include "lexer.h"
 
 using namespace psh;
@@ -21,6 +23,7 @@ Lexer::Lexer(IStream *input_stream) {
     stash_buffer_pointer = 0;
     stash_buffer_size = LEXER_STASH_BUFFER_SIZE;
     stash_buffer = (Symbol *) phlib::malloc(LEXER_STASH_BUFFER_SIZE);
+    current_line = 1;
 }
 
 
@@ -130,79 +133,89 @@ uint32 Lexer::check_if_identifier_is_operator() {
 
 
 inline Token *Lexer::make_operator_token(Symbol char1) {
+    Operator oper = make_operator(char1);
+    if (oper != 0) {
+        return new Token(oper, current_line);
+    } else {
+        return nullptr;
+    }
+}
+
+
+Operator Lexer::make_operator(Lexer::Symbol char1) {
     if (char1 == '+') {
         Symbol char2 = get_next_symbol();
         if (char2 == '+') {
-            return new Token(Operator::POST_INCREMENT);
+            return Operator::POST_INCREMENT;
         } else {
             stash_symbol(char2);
-            return new Token(Operator::ADDITION);
+            return Operator::ADDITION;
         }
     }
     if (char1 == '-') {
         Symbol char2 = get_next_symbol();
         if (char2 == '-') {
-            return new Token(Operator::POST_DECREMENT);
+            return Operator::POST_DECREMENT;
         } else if (char2 == '>') {
-            return new Token(Operator::LOGICAL_IMPLICATION);
+            return Operator::LOGICAL_IMPLICATION;
         } else {
             stash_symbol(char2);
-            return new Token(Operator::SUBTRACTION);
+            return Operator::SUBTRACTION;
         }
     }
     if (char1 == '=') {
         Symbol char2 = get_next_symbol();
         if (char2 == '=') {
-            return new Token(Operator::EQUAL_TO);
+            return Operator::EQUAL_TO;
         } else {
             stash_symbol(char2);
-            return new Token(Operator::ASSIGNMENT);
+            return Operator::ASSIGNMENT;
         }
     }
     if (char1 == '~') {
-        return new Token(Operator::BITWISE_NOT);
+        return Operator::BITWISE_NOT;
     }
     if (char1 == '!') {
         Symbol char2 = get_next_symbol();
         if (char2 == '=') {
-            return new Token(Operator::NOT_EQUAL_TO);
+            return Operator::NOT_EQUAL_TO;
         } else {
             stash_symbol(char2);
-            return new Token(Operator::LOGICAL_NOT);
+            return Operator::LOGICAL_NOT;
         }
     }
     if (char1 == '*') {
-        return new Token(Operator::MULTIPLICATION);
+        return Operator::MULTIPLICATION;
     }
     if (char1 == '/') {
         Symbol char2 = get_next_symbol();
         if (char2 == '\\') {
-            return new Token(Operator::BITWISE_AND);
+            return Operator::BITWISE_AND;
         } else {
             stash_symbol(char2);
-            return new Token(Operator::DIVISION);
+            return Operator::DIVISION;
         }
     }
     if (char1 == '<') {
         Symbol char2 = get_next_symbol();
         if (char2 == '<') {
-            return new Token(Operator::BITWISE_SHIFT_LEFT);
+            return Operator::BITWISE_SHIFT_LEFT;
         } else if (char2 == '=') {
-            return new Token(Operator::NOT_GREATER_THAN);
+            return Operator::NOT_GREATER_THAN;
         } else {
             stash_symbol(char2);
-            return new Token(Operator::LESS_THAN);
+            return Operator::LESS_THAN;
         }
     }
     if (char1 == '>') {
         Symbol char2 = get_next_symbol();
         if (char2 == '>') {
-            return new Token(Operator::BITWISE_SHIFT_RIGHT);
+            return Operator::BITWISE_SHIFT_RIGHT;
         } else if (char2 == '=') {
-            return new Token(Operator::NOT_LESS_THAN);
+            return Operator::NOT_LESS_THAN;
         } else {
             stash_symbol(char2);
-            return new Token(Operator::GREATER_THAN);
+            return Operator::GREATER_THAN;
         }
     }
     if (char1 == '\\') {
@@ -210,17 +223,49 @@ inline Token *Lexer::make_operator_token(Symbol char1) {
         if (char2 == '\'') {
             Symbol char3 = get_next_symbol();
             if (char3 == '/') {
-                return new Token(Operator::BITWISE_XOR);
+                return Operator::BITWISE_XOR;
             } else {
                 stash_symbol(char3);
             }
         } else if (char2 == '/') {
-            return new Token(Operator::BITWISE_OR);
+            return Operator::BITWISE_OR;
         } else {
             stash_symbol(char2);
         }
     }
-    return nullptr;
+    return (Operator) 0;
+}
+
+
+Separator Lexer::make_separator(Lexer::Symbol symbol) {
+    if (symbol == '(' | symbol == ')') {
+        return symbol == '(' ?
+               Separator::PARENTHESIS_OPEN :
+               Separator::PARENTHESIS_CLOSE;
+    }
+    if (symbol == '{' | symbol == '}') {
+        return symbol == '{' ?
+               Separator::BRACE_OPEN :
+               Separator::BRACE_CLOSE;
+    }
+    if (symbol == '[' | symbol == ']') {
+        return symbol == '[' ?
+               Separator::BRACKET_OPEN :
+               Separator::BRACE_CLOSE;
+    }
+    if (symbol == '.') {
+        return Separator::DOT;
+    }
+    if (symbol == ';') {
+        return Separator::SEMICOLON;
+    }
+    if (symbol == '\n') {
+        return Separator::NEW_LINE;
+    }
+    if (symbol == ',') {
+        return Separator::COMMA;
+    }
+    return (Separator) 0;
 }
 
 
@@ -277,7 +322,7 @@ Token *Lexer::get_next_token() {
         stash_buffer_pointer -= 1;
         uint32 oper = check_if_identifier_is_operator();
         if (oper != 0) {
-            auto ret_token = new Token((Operator) oper);
+            auto ret_token = new Token((Operator) oper, current_line);
             stash_symbol(last_read);
             return ret_token;
         }
@@ -290,9 +335,9 @@ Token *Lexer::get_next_token() {
         DEBUG_LOG_LEX("is keyword ? %s\n", keyword_value != -1 ? "true" : "false");
         if (keyword_value != -1) {
             delete string_value;
-            return new Token((Keyword) keyword_value);
+            return new Token((Keyword) keyword_value, current_line);
         } else {
-            return new Token(string_value);
+            return new Token(string_value, current_line);
         }
     }
     //if we are starting from digits
@@ -317,11 +362,8 @@ Token *Lexer::get_next_token() {
         }
         auto literal_value = create_from_stash_buffer();
         stash_symbol(last_read);
-        if (has_dot) {
-            return new Token(Literal::FLOAT_LITERAL, literal_value);
-        } else {
-            return new Token(Literal::INTEGER_LITERAL, literal_value);
-        }
+        return new Token(has_dot ? Literal::FLOAT_LITERAL : Literal::INTEGER_LITERAL,
+                         literal_value, current_line);
     }
     if (char_1 == '"') {
         Symbol last_read;
@@ -336,39 +378,21 @@ Token *Lexer::get_next_token() {
                  last_read_escape);
         stash_buffer_pointer -= 1;
         auto string_literal_value = create_from_stash_buffer();
-        return new Token(Literal::STRING_LITERAL, string_literal_value);
+        return new Token(Literal::STRING_LITERAL, string_literal_value, current_line);
     }
     Token *operator_token = make_operator_token(char_1);
     if (operator_token != nullptr) {
         return operator_token;
     }
     // only non-digits and non-letters left
-    if (char_1 == '(' | char_1 == ')') {
-        return new Token(char_1 == '(' ?
-                         Separator::PARENTHESIS_OPEN :
-                         Separator::PARENTHESIS_CLOSE);
-    }
-    if (char_1 == '{' | char_1 == '}') {
-        return new Token(char_1 == '{' ?
-                         Separator::BRACE_OPEN :
-                         Separator::BRACE_CLOSE);
-    }
-    if (char_1 == '[' | char_1 == ']') {
-        return new Token(char_1 == '[' ?
-                         Separator::BRACKET_OPEN :
-                         Separator::BRACE_CLOSE);
-    }
-    if (char_1 == '.') {
-        return new Token(Separator::DOT);
-    }
-    if (char_1 == ';') {
-        return new Token(Separator::SEMICOLON);
-    }
-    if (char_1 == '\n') {
-        return new Token(Separator::NEW_LINE);
-    }
-    if (char_1 == ',') {
-        return new Token(Separator::COMMA);
+    Separator separator = make_separator(char_1);
+    if (separator != 0) {
+        auto token = new Token(separator, current_line);
+        if (token->separator == Separator::NEW_LINE)
+            current_line++;
+        return token;
+    } else {
+        return nullptr;
     }
 }
 

@@ -7,11 +7,20 @@
  * GNU Lesser General Public License v3.0
  */
 
+#include <string.h>
+#include <character.h>
+
 #include "string.h"
 
 
 phlib::Allocator *string_allocator = phlib::Allocator::get_default_allocator();
 
+char16 phlib::String::digits[] = {'0', '1', '2', '3', '4',
+                                  '5', '6', '7', '8', '9'};
+
+int phlib::String::int_size_table[] = {9, 99, 999, 9999, 99999,
+                                       999999, 9999999,
+                                       99999999, 999999999};
 
 phlib::String::String(const String &other) {
     str_value = (char16 *) phlib::malloc((other.str_length + 1) * sizeof(char16));
@@ -250,4 +259,29 @@ int phlib::String::strcmp(const char *str1, const char *str2) {
             return 0;
         }
     }
+}
+
+int phlib::String::string_size_of_integer(int32 integer) {
+    for (int i = 0;; i++)
+        if (integer <= String::int_size_table[i])
+            return i + 1;
+}
+
+phlib::String phlib::String::value_of(int32 value) {
+    bool negative = value < 0;
+    int size = string_size_of_integer(value);
+    if (negative)
+        size += 1;
+    char16 chars[size];
+    int index = size;
+    int q = 0, r = 0;
+    while (value != 0) {
+        q = value / 10;
+        r = value - (q * 10);
+        value = q;
+        chars[--index] = String::digits[r];
+    }
+    if (negative)
+        chars[0] = '-';
+    return String(chars, size);
 }

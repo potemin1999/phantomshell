@@ -26,7 +26,7 @@ typedef enum Literal{
 } Literal;
 
 typedef enum Separator{
-    DOT               = 0x00,
+    DOT               = 0x04,
     COMMA             = 0x01,
     SEMICOLON         = 0x02,
     NEW_LINE          = 0x03,
@@ -57,17 +57,17 @@ private:
 
 public:
 
-    Token(TokenType type);
+    Token(TokenType type,int32 line);
 
-    Token(Separator separator);
+    Token(Separator separator,int32 line);
 
-    Token(Literal literal, phlib::String *literal_value);
+    Token(Literal literal, phlib::String *literal_value,int32 line);
 
-    Token(Keyword keyword);
+    Token(Keyword keyword,int32 line);
 
-    Token(Operator oper);
+    Token(Operator oper,int32 line);
 
-    Token(phlib::String *identifier);
+    Token(phlib::String *identifier,int32 line);
 
     ~Token();
 
@@ -81,6 +81,7 @@ public:
      * It determines which data accessed from union will be valid
      */
     TokenType type;
+    int32 line;
     union {
         /**
          * if psh::Token::type equal to psh::TokenType::LITERAL,
@@ -107,7 +108,7 @@ public:
     const char *literal_to_string(Literal literal);
 
     const char *separator_to_string(Separator separator);
-    
+
     bool operator==(const Token& other);
 
 };

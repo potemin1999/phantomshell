@@ -46,6 +46,7 @@ private:
     Symbol *stash_buffer;        /**< stash stack for symbols */
     uint32 stash_buffer_pointer; /**< stores token_buffer offset where the next symbol is stored */
     uint32 stash_buffer_size;    /**< max stash size */
+    int32 current_line;
 
 public:
 
@@ -81,6 +82,10 @@ private:
     Symbol read_next_symbol();
 
     Token *make_operator_token(Symbol char1);
+
+    Operator make_operator(Symbol symbol);
+
+    Separator make_separator(Symbol symbol);
 
     void stash_symbol(Symbol symbol);
 

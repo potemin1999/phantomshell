@@ -15,39 +15,45 @@ using namespace psh;
 
 Allocator *token_allocator = Allocator::get_default_allocator();
 
-Token::Token(TokenType type) {
+Token::Token(TokenType type, int32 line) {
     this->type = type;
+    this->line = line;
 }
 
 
-Token::Token(Separator separator) {
+Token::Token(Separator separator, int32 line) {
     this->type = TokenType::SEPARATOR;
     this->separator = separator;
+    this->line = line;
 }
 
 
-Token::Token(Literal literal, String *literal_value) {
+Token::Token(Literal literal, String *literal_value, int32 line) {
     this->type = TokenType::LITERAL;
     this->literal = literal;
     this->literal_value = literal_value;
+    this->line = line;
 }
 
 
-Token::Token(Keyword keyword) {
+Token::Token(Keyword keyword, int32 line) {
     this->type = TokenType::KEYWORD;
     this->keyword = keyword;
+    this->line = line;
 }
 
 
-Token::Token(Operator oper) {
+Token::Token(Operator oper, int32 line) {
     this->type = TokenType::OPERATOR;
     this->oper = oper;
+    this->line = line;
 }
 
 
-Token::Token(String *identifier) {
+Token::Token(String *identifier, int32 line) {
     this->type = TokenType::IDENTIFIER;
     this->identifier = identifier;
+    this->line = line;
 }
 
 
@@ -104,6 +110,8 @@ const char *Token::token_to_string() {
             break;
         }
     }
+    string_value += ",line=";
+    string_value += String::value_of((int32) line);
     string_value += ")";
     return string_value.char_value();
 }
