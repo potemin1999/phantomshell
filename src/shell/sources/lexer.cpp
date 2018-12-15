@@ -30,7 +30,7 @@ Lexer::~Lexer() {
 }
 
 
-psh::Lexer::Symbol Lexer::read_next_symbol() {
+Lexer::Symbol Lexer::read_next_symbol() {
     if (read_buffer_pointer >= read_buffer_size) {
         read_buffer_size = (uint32) update_buffer();
         if (read_buffer_size == 0) return '\0';
@@ -43,7 +43,7 @@ psh::Lexer::Symbol Lexer::read_next_symbol() {
 }
 
 
-psh::Lexer::Symbol Lexer::get_next_symbol() {
+Lexer::Symbol Lexer::get_next_symbol() {
     if (stash_buffer_pointer != 0) {
         stash_buffer_pointer -= 1;
         Symbol ret_value = stash_buffer[stash_buffer_pointer];
@@ -65,7 +65,7 @@ SSize Lexer::update_buffer() {
 }
 
 
-phlib::String *Lexer::create_from_stash_buffer() {
+String *Lexer::create_from_stash_buffer() {
     if (stash_buffer_pointer == 0) return new String();
     auto ret_str = new String(stash_buffer, (Size) stash_buffer_pointer);
     stash_buffer_pointer = 0;
@@ -365,7 +365,7 @@ Token *Lexer::get_next_token() {
         return new Token(Separator::SEMICOLON);
     }
     if (char_1 == '\n') {
-        return new Token(Separator::SEMICOLON);
+        return new Token(Separator::NEW_LINE);
     }
     if (char_1 == ',') {
         return new Token(Separator::COMMA);

@@ -7,14 +7,12 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <parser.h>
-
 #include "parser.h"
 
 using namespace psh;
 
 Parser::Parser() {
-    token_buffer = (Token*) phlib::malloc(PARSER_TOKEN_BUFFER_CAPACITY*sizeof(Token));
+    token_buffer = (Token *) phlib::malloc(PARSER_TOKEN_BUFFER_CAPACITY * sizeof(Token *));
     push_functions[TokenType::IDENTIFIER] = &Parser::push_identifier_token;
     push_functions[TokenType::KEYWORD] = &Parser::push_keyword_token;
     push_functions[TokenType::LITERAL] = &Parser::push_literal_token;
@@ -27,8 +25,8 @@ Parser::~Parser() {
 }
 
 int Parser::push_token(Token *token) {
-    TokenType& type = token->type;
-    if (type<1 | type>5)
+    TokenType &type = token->type;
+    if (type < 1 | type > 5)
         return -1;
     return (this->*(push_functions[type]))(token);
 }
