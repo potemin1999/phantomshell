@@ -20,6 +20,16 @@ set_target_properties(${PHLIB_ISTREAM_TEST} PROPERTIES LINK_FLAGS -lstdc++)
 target_link_libraries(${PHLIB_ISTREAM_TEST} phlib)
 add_test(NAME ${PHLIB_ISTREAM_TEST} COMMAND ${PHLIB_ISTREAM_TEST})
 
+#phlib tests
+set(PHLIB_PHLIB_TEST phlib_phlib_tests)
+set(PHLIB_PHLIB_TEST_SRC
+        sources/phlib/phlib_tests.cpp
+        )
+add_executable(${PHLIB_PHLIB_TEST} ${PHLIB_PHLIB_TEST_SRC})
+set_target_properties(${PHLIB_PHLIB_TEST} PROPERTIES LINK_FLAGS -lstdc++)
+target_link_libraries(${PHLIB_PHLIB_TEST} phlib)
+add_test(NAME ${PHLIB_PHLIB_TEST} COMMAND ${PHLIB_PHLIB_TEST})
+
 #strings tests
 set(PHLIB_STRING_TEST phlib_string_tests)
 set(PHLIB_STRING_TEST_SRC

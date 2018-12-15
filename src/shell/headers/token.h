@@ -29,6 +29,7 @@ typedef enum Separator{
     DOT               = 0x00,
     COMMA             = 0x01,
     SEMICOLON         = 0x02,
+    NEW_LINE          = 0x03,
     PARENTHESIS_OPEN  = 0x08,
     PARENTHESIS_CLOSE = 0x09,
     BRACKET_OPEN      = 0x0a,
@@ -106,6 +107,8 @@ public:
     const char *literal_to_string(Literal literal);
 
     const char *separator_to_string(Separator separator);
+    
+    bool operator==(const Token& other);
 
 };
 
