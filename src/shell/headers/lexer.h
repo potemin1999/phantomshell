@@ -39,14 +39,14 @@ class Lexer {
 
 private:
 
-    phlib::IStream *istream;     /**< data source */
-    uint8 *read_buffer;          /**< buffer as read source */
-    uint32 read_buffer_pointer;  /**< current position in read_buffer*/
-    uint32 read_buffer_size;     /**< read buffer size in bytes */
-    Symbol *stash_buffer;        /**< stash stack for symbols */
-    uint32 stash_buffer_pointer; /**< stores token_buffer offset where the next symbol is stored */
-    uint32 stash_buffer_size;    /**< max stash size */
-    int32 current_line;
+    phlib::IStream *istream;             /**< data source */
+    uint8          *read_buffer;         /**< buffer as read source */
+    uint32         read_buffer_pointer;  /**< current position in read_buffer*/
+    uint32         read_buffer_size;     /**< read buffer size in bytes */
+    Symbol         *stash_buffer;        /**< stash stack for symbols */
+    uint32         stash_buffer_pointer; /**< stores token_buffer offset where the next symbol is stored */
+    uint32         stash_buffer_size;    /**< max stash size */
+    int32          current_line;
 
 public:
 
@@ -91,7 +91,7 @@ private:
 
     SSize update_buffer();
 
-    uint32 check_if_identifier_is_operator();
+    Operator check_if_identifier_is_operator();
 
     phlib::String *create_from_stash_buffer();
 
