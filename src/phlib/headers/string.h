@@ -23,11 +23,11 @@ class String {
 
 private:
 
-    char *str_char_value = nullptr;
-    char16 *str_value = nullptr; /**< null terminated char16 sequence */
-    Size str_length = 0;
+    char          *str_char_value = nullptr;
+    char16        *str_value      = nullptr; /**< null terminated char16 sequence */
+    Size          str_length      = 0;
     static char16 digits[10];
-    static int int_size_table[9];
+    static int    int_size_table[9];
 
 public:
 
@@ -41,8 +41,7 @@ public:
      * @brief Creates string from null terminated char16 array
      * @param str is array
      */
-    String(const char16 *str) : String(str,get_length(str))
-    {}
+    String(const char16 *str) : String(str, get_length(str)) {}
 
     /**
      * @brief Creates string from char16* sequence with requested length
@@ -227,7 +226,7 @@ public:
 
     }
 
-    static int strcmp(const char* str1,const char* str2);
+    static int strcmp(const char *str1, const char *str2);
 
 private:
 

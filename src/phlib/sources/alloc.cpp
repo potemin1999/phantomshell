@@ -9,6 +9,28 @@
 
 #include "alloc.h"
 
+/**
+ * Workaround for linking without -lstdc++ flag
+ * It will work until first exception, I'm afraid
+ */
+void *__gxx_personality_v0;
+/**
+ * This two classes allow us to use virtual tables
+ */
+namespace __cxxabiv1 {
+class __class_type_info {
+    virtual void dummy();
+};
+
+class __si_class_type_info {
+    virtual void dummy();
+};
+};
+
+void __cxxabiv1::__class_type_info::dummy() {}
+
+void __cxxabiv1::__si_class_type_info::dummy() {}
+
 
 Ptr phlib::malloc(Size size) {
 #ifdef __simbuild__

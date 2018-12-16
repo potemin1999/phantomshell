@@ -30,7 +30,7 @@ namespace phlib {
 typedef enum OFlags {
     RDONLY = O_RDONLY,
     WRONLY = O_WRONLY,
-    RDWR = O_RDWR
+    RDWR   = O_RDWR
 } OFlags;
 #else //__simbuild__
 typedef enum OFlags {
@@ -66,8 +66,8 @@ int fclose(File *file);
  */
 #ifdef __simbuild__
 
-inline int phlib::print(String str){
-    return ::printf("%s",str.char_value());
+inline int phlib::print(String str) {
+    return ::printf("%s", str.char_value());
 }
 
 inline int phlib::open(String file, phlib::OFlags flag) {

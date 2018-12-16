@@ -20,18 +20,18 @@ namespace psh {
  * @brief Describes keywords of Phantom Shell
  */
 typedef enum Keyword {
-    DEF      = 0x00, /**< def */
-    RETURN   = 0x01, /**< return */
-    IF       = 0x10, /**< if */
-    ELIF     = 0x11, /**< elif */
-    ELSE     = 0x12, /**< else */
-    FOR      = 0x13, /**< for */
-    WHILE    = 0x14, /**< while */
-    DO       = 0x15, /**< do */
-    SWITCH   = 0x16, /**< switch */
-    CASE     = 0x17, /**< case */
-    OTHER    = 0x18, /**< other */
-    CLASS    = 0x20 /**< class */
+    DEF    = 0x00, /**< def */
+    RETURN = 0x01, /**< return */
+    IF     = 0x10, /**< if */
+    ELIF   = 0x11, /**< elif */
+    ELSE   = 0x12, /**< else */
+    FOR    = 0x13, /**< for */
+    WHILE  = 0x14, /**< while */
+    DO     = 0x15, /**< do */
+    SWITCH = 0x16, /**< switch */
+    CASE   = 0x17, /**< case */
+    OTHER  = 0x18, /**< other */
+    CLASS  = 0x20 /**< class */
 } Keyword;
 
 } //namespace psh
@@ -82,13 +82,12 @@ public:
                 if (str.equals("while")) return psh::Keyword::WHILE;
                 return -1;
             }
-            default:
-                return -1;
+            default:return -1;
         }
     }
 
-    static const char* keyword_to_string(psh::Keyword keyword){
-        switch (keyword){
+    static const char *keyword_to_string(psh::Keyword keyword) {
+        switch (keyword) {
             case psh::Keyword::CASE: return "CASE";
             case psh::Keyword::CLASS: return "CLASS";
             case psh::Keyword::DEF: return "DEF";

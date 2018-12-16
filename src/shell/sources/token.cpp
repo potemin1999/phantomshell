@@ -15,45 +15,52 @@ using namespace psh;
 
 Allocator *token_allocator = Allocator::get_default_allocator();
 
-Token::Token(TokenType type, int32 line) {
+Token::Token(TokenType type,
+             int32 line) {
     this->type = type;
     this->line = line;
 }
 
 
-Token::Token(Separator separator, int32 line) {
-    this->type = TokenType::SEPARATOR;
+Token::Token(Separator separator,
+             int32 line) {
+    this->type      = TokenType::SEPARATOR;
     this->separator = separator;
-    this->line = line;
+    this->line      = line;
 }
 
 
-Token::Token(Literal literal, String *literal_value, int32 line) {
-    this->type = TokenType::LITERAL;
-    this->literal = literal;
+Token::Token(Literal literal,
+             String *literal_value,
+             int32 line) {
+    this->type          = TokenType::LITERAL;
+    this->literal       = literal;
     this->literal_value = literal_value;
-    this->line = line;
+    this->line          = line;
 }
 
 
-Token::Token(Keyword keyword, int32 line) {
-    this->type = TokenType::KEYWORD;
+Token::Token(Keyword keyword,
+             int32 line) {
+    this->type    = TokenType::KEYWORD;
     this->keyword = keyword;
-    this->line = line;
+    this->line    = line;
 }
 
 
-Token::Token(Operator oper, int32 line) {
+Token::Token(Operator oper,
+             int32 line) {
     this->type = TokenType::OPERATOR;
     this->oper = oper;
     this->line = line;
 }
 
 
-Token::Token(String *identifier, int32 line) {
-    this->type = TokenType::IDENTIFIER;
+Token::Token(String *identifier,
+             int32 line) {
+    this->type       = TokenType::IDENTIFIER;
     this->identifier = identifier;
-    this->line = line;
+    this->line       = line;
 }
 
 
@@ -119,58 +126,38 @@ const char *Token::token_to_string() {
 
 const char *Token::token_type_to_string(TokenType type) {
     switch (type) {
-        case TokenType::OPERATOR:
-            return "OPERATOR";
-        case TokenType::KEYWORD:
-            return "KEYWORD";
-        case TokenType::SEPARATOR:
-            return "SEPARATOR";
-        case TokenType::LITERAL:
-            return "LITERAL";
-        default:
-            return "IDENTIFIER";
+        case TokenType::LITERAL: return "LITERAL";
+        case TokenType::KEYWORD: return "KEYWORD";
+        case TokenType::OPERATOR: return "OPERATOR";
+        case TokenType::SEPARATOR: return "SEPARATOR";
+        default:return "IDENTIFIER";
     }
 }
 
 
 const char *Token::literal_to_string(Literal literal) {
     switch (literal) {
-        case Literal::FLOAT_LITERAL:
-            return "FLOAT_LITERAL";
-        case Literal::STRING_LITERAL:
-            return "STRING_LITERAL";
-        case Literal::LOGICAL_LITERAL:
-            return "LOGICAL_LITERAL";
-        case Literal::INTEGER_LITERAL:
-            return "INTEGER_LITERAL";
-        case Literal::CHARACTER_LITERAL:
-            return "CHARACTER_LITERAL";
+        case Literal::FLOAT_LITERAL: return "FLOAT_LITERAL";
+        case Literal::STRING_LITERAL: return "STRING_LITERAL";
+        case Literal::LOGICAL_LITERAL: return "LOGICAL_LITERAL";
+        case Literal::INTEGER_LITERAL: return "INTEGER_LITERAL";
+        case Literal::CHARACTER_LITERAL: return "CHARACTER_LITERAL";
     }
 }
 
 
 const char *Token::separator_to_string(Separator separator) {
     switch (separator) {
-        case Separator::DOT:
-            return "DOT";
-        case Separator::COMMA:
-            return "COMMA";
-        case Separator::NEW_LINE:
-            return "NEW_LINE";
-        case Separator::SEMICOLON:
-            return "SEMICOLON";
-        case Separator::BRACE_OPEN:
-            return "BRACE_OPEN";
-        case Separator::BRACE_CLOSE:
-            return "BRACE_CLOSE";
-        case Separator::BRACKET_OPEN:
-            return "BRACKET_OPEN";
-        case Separator::BRACKET_CLOSE:
-            return "BRACKET_CLOSE";
-        case Separator::PARENTHESIS_OPEN:
-            return "PARENTHESIS_OPEN";
-        case Separator::PARENTHESIS_CLOSE:
-            return "PARENTHESIS_CLOSE";
+        case Separator::DOT: return "DOT";
+        case Separator::COMMA: return "COMMA";
+        case Separator::NEW_LINE: return "NEW_LINE";
+        case Separator::SEMICOLON: return "SEMICOLON";
+        case Separator::BRACE_OPEN: return "BRACE_OPEN";
+        case Separator::BRACE_CLOSE: return "BRACE_CLOSE";
+        case Separator::BRACKET_OPEN: return "BRACKET_OPEN";
+        case Separator::BRACKET_CLOSE: return "BRACKET_CLOSE";
+        case Separator::PARENTHESIS_OPEN: return "PARENTHESIS_OPEN";
+        case Separator::PARENTHESIS_CLOSE: return "PARENTHESIS_CLOSE";
     }
 }
 

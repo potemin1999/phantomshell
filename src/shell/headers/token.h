@@ -17,7 +17,7 @@
 /** @brief Default Shell namespace */
 namespace psh {
 
-typedef enum Literal{
+typedef enum Literal {
     LOGICAL_LITERAL   = 0x01,
     INTEGER_LITERAL   = 0x02,
     FLOAT_LITERAL     = 0x03,
@@ -25,7 +25,7 @@ typedef enum Literal{
     STRING_LITERAL    = 0x05
 } Literal;
 
-typedef enum Separator{
+typedef enum Separator {
     DOT               = 0x04,
     COMMA             = 0x01,
     SEMICOLON         = 0x02,
@@ -39,11 +39,11 @@ typedef enum Separator{
 } Separator;
 
 typedef enum TokenType {
-    IDENTIFIER    = 0x01, /**< described by identifier field */
-    OPERATOR      = 0x02, /**< described by oper field */
-    KEYWORD       = 0x03, /**< described by keyword field */
-    SEPARATOR     = 0x04, /**< described by separator field */
-    LITERAL       = 0x05, /**< described by literal and literal_value fields */
+    IDENTIFIER = 0x01, /**< described by identifier field */
+    OPERATOR   = 0x02, /**< described by oper field */
+    KEYWORD    = 0x03, /**< described by keyword field */
+    SEPARATOR  = 0x04, /**< described by separator field */
+    LITERAL    = 0x05, /**< described by literal and literal_value fields */
 } TokenType;
 
 /**
@@ -57,17 +57,17 @@ private:
 
 public:
 
-    Token(TokenType type,int32 line);
+    Token(TokenType type, int32 line);
 
-    Token(Separator separator,int32 line);
+    Token(Separator separator, int32 line);
 
-    Token(Literal literal, phlib::String *literal_value,int32 line);
+    Token(Literal literal, phlib::String *literal_value, int32 line);
 
-    Token(Keyword keyword,int32 line);
+    Token(Keyword keyword, int32 line);
 
-    Token(Operator oper,int32 line);
+    Token(Operator oper, int32 line);
 
-    Token(phlib::String *identifier,int32 line);
+    Token(phlib::String *identifier, int32 line);
 
     ~Token();
 
@@ -81,20 +81,20 @@ public:
      * It determines which data accessed from union will be valid
      */
     TokenType type;
-    int32 line;
+    int32     line;
     union {
         /**
          * if psh::Token::type equal to psh::TokenType::LITERAL,
          * this struct will be used to describe literal, its type and value
          */
-        struct{
-            Literal literal;             /**< valid when psh::Token::type=psh::TokenType::LITERAL */
-            phlib::String* literal_value;/**< valid when psh::Token::type=psh::TokenType::LITERAL */
+        struct {
+            Literal literal;              /**< valid when psh::Token::type=psh::TokenType::LITERAL */
+            phlib::String *literal_value; /**< valid when psh::Token::type=psh::TokenType::LITERAL */
         };
-        Separator separator;             /**< valid when psh::Token::type=psh::TokenType::SEPARATOR */
-        Keyword keyword;                 /**< valid when psh::Token::type=psh::TokenType::KEYWORD */
-        Operator oper;                   /**< valid when psh::Token::type=psh::TokenType::OPERATOR */
-        phlib::String* identifier;       /**< valid when psh::Token::type=psh::TokenType::IDENTIFIER */
+        Separator separator;              /**< valid when psh::Token::type=psh::TokenType::SEPARATOR */
+        Keyword   keyword;                /**< valid when psh::Token::type=psh::TokenType::KEYWORD */
+        Operator  oper;                   /**< valid when psh::Token::type=psh::TokenType::OPERATOR */
+        phlib::String *identifier;        /**< valid when psh::Token::type=psh::TokenType::IDENTIFIER */
     };
 
     inline bool assert_type(TokenType type) {
@@ -109,7 +109,7 @@ public:
 
     const char *separator_to_string(Separator separator);
 
-    bool operator==(const Token& other);
+    bool operator==(const Token &other);
 
 };
 

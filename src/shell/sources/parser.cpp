@@ -14,10 +14,10 @@ using namespace psh;
 Parser::Parser() {
     token_buffer = (Token *) phlib::malloc(PARSER_TOKEN_BUFFER_CAPACITY * sizeof(Token *));
     push_functions[TokenType::IDENTIFIER] = &Parser::push_identifier_token;
-    push_functions[TokenType::KEYWORD] = &Parser::push_keyword_token;
-    push_functions[TokenType::LITERAL] = &Parser::push_literal_token;
-    push_functions[TokenType::OPERATOR] = &Parser::push_operator_token;
-    push_functions[TokenType::SEPARATOR] = &Parser::push_separator_token;
+    push_functions[TokenType::KEYWORD]    = &Parser::push_keyword_token;
+    push_functions[TokenType::LITERAL]    = &Parser::push_literal_token;
+    push_functions[TokenType::OPERATOR]   = &Parser::push_operator_token;
+    push_functions[TokenType::SEPARATOR]  = &Parser::push_separator_token;
 }
 
 Parser::~Parser() {

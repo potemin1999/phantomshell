@@ -17,14 +17,14 @@ union phlib::IStream::IStreamData {
 #endif //__simbuild__
     struct {
         /** Stores pointer to source object, when type==OBJECT_STREAM*/
-        Ptr object;
-        bool object_copy;
+        Ptr   object;
+        bool  object_copy;
         SSize current_pointer;
         /** Stores source object size, when type==OBJECT_STREAM*/
         SSize object_size;
     };
     /** Stores stdin descriptor, when type==STDIN_STREAM*/
-    int stdin_fd;
+    int  stdin_fd;
 
     Ptr operator new(Size size) {
         return Allocator::get_default_allocator()->allocate(sizeof(IStreamData));
@@ -38,35 +38,35 @@ union phlib::IStream::IStreamData {
 
 
 phlib::IStream::IStream(String &file_path) {
-    data = new IStreamData();
-    type = IStreamType::FILE_STREAM;
-    read_func = &IStream::read_from_file;
+    data       = new IStreamData();
+    type       = IStreamType::FILE_STREAM;
+    read_func  = &IStream::read_from_file;
     close_func = &IStream::close_file;
     data->file = phlib::fopen(file_path, "r");
 }
 
 
 phlib::IStream::IStream(ConstPtr byte_buffer, Size size, bool do_copy) {
-    data = new IStreamData();
-    type = IStreamType::OBJECT_STREAM;
-    read_func = &IStream::read_from_object;
-    close_func = &IStream::close_object;
+    data                  = new IStreamData();
+    type                  = IStreamType::OBJECT_STREAM;
+    read_func             = &IStream::read_from_object;
+    close_func            = &IStream::close_object;
     if (do_copy) {
         data->object = phlib::malloc(size);
         for (int i = 0; i < size; ((char *) data->object)[i] = ((char *) byte_buffer)[i], i++);
     } else {
         data->object = (Ptr) byte_buffer;
     }
-    data->object_copy = do_copy;
-    data->object_size = size;
+    data->object_copy     = do_copy;
+    data->object_size     = size;
     data->current_pointer = 0;
 }
 
 
 phlib::IStream::IStream() {
-    data = new IStreamData();
-    type = IStreamType::STDIN_STREAM;
-    read_func = &IStream::read_from_stdin;
+    data       = new IStreamData();
+    type       = IStreamType::STDIN_STREAM;
+    read_func  = &IStream::read_from_stdin;
     close_func = &IStream::close_stdin;
     data->stdin_fd = phlib::open("/dev/stdin", OFlags::RDONLY);
     DEBUG_LOG("created input stream from stdin with stdin_fd = %d\n", data->stdin_fd);
@@ -119,9 +119,9 @@ SSize phlib::IStream::read_from_stdin(Ptr buffer, Size buffer_size) {
 
 
 SSize phlib::IStream::read_from_object(Ptr buffer, Size buffer_size) {
-    ssize_t read_size = buffer_size < (data->object_size - data->current_pointer - 1) ?
-                        buffer_size : data->object_size - data->current_pointer - 1;
-    for (int i = 0; i < read_size; i++, data->current_pointer++) {
+    ssize_t  read_size = buffer_size < (data->object_size - data->current_pointer - 1) ?
+                         buffer_size : data->object_size - data->current_pointer - 1;
+    for (int i         = 0; i < read_size; i++, data->current_pointer++) {
         ((char *) buffer)[i] = ((char *) data->object)[data->current_pointer];
     }
     return read_size;

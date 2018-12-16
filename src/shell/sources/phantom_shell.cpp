@@ -14,18 +14,12 @@
 #include "string.h"
 #include "log.h"
 
-/**
- * Workaround for linking without -lstdc++ flag
- * It will work until first exception, I'm afraid
- */
-void *__gxx_personality_v0;
-
 using namespace psh;
 using namespace phlib;
 
 PhantomShell::PhantomShell(PshArguments *args) {
     psh_arguments = args;
-    lexer = new Lexer(args->input_stream);
+    lexer         = new Lexer(args->input_stream);
 }
 
 
@@ -68,7 +62,7 @@ uint32 psh::parse_shell_short_options(psh::PshArguments *args, const char *optio
         case 'l': {
             if (args->login_shell == 1)
                 return ShellExitCode::EXIT_DUPLICATED_ARGUMENT;
-            args->login_shell = 1;
+            args->login_shell       = 1;
             args->interactive_shell = 1;
             DEBUG_LOG("used as login shell\n");
             break;
@@ -107,11 +101,11 @@ uint32 psh::parse_shell_args(PshArguments *args, int argc, const char **argv) {
     args->debug_mode = 1;
 #endif //__debug__
     args->interactive_shell = 0;
-    args->login_shell = 0;
-    args->show_version = 0;
-    args->show_usage = 0;
-    args->output_stream = nullptr;
-    args->input_stream = nullptr;
+    args->login_shell       = 0;
+    args->show_version      = 0;
+    args->show_usage        = 0;
+    args->output_stream     = nullptr;
+    args->input_stream      = nullptr;
     for (int i = 1; i < argc; i++) {
         String arg_str = argv[i];
         DEBUG_LOG("string %s\n", arg_str.char_value());
@@ -162,7 +156,7 @@ psh::ShellExitCode psh::shell_show_usage(PshArguments *args) {
                         "   -i: start shell in interactive mode\n"\
                         "   -d: start shell in debug mode\n"\
                         "";
-    String usage_str(usage);
+    String     usage_str(usage);
     args->output_stream->write(usage_str.value(), usage_str.length());
     return ShellExitCode::EXIT_NORMAL;
 }
@@ -176,7 +170,7 @@ psh::ShellExitCode psh::shell_show_version(PshArguments *args) {
 
 
 psh::ShellExitCode psh::shell_main(PshArguments *args) {
-    PhantomShell shell(args);
+    PhantomShell  shell(args);
     ShellExitCode exit_code = shell.run();
     cleanup_shell_args(args);
     return exit_code;
@@ -185,7 +179,7 @@ psh::ShellExitCode psh::shell_main(PshArguments *args) {
 
 int main(int argc, const char **argv) {
     psh::PshArguments args;
-    int res = psh::parse_shell_args(&args, argc, argv);
+    int               res = psh::parse_shell_args(&args, argc, argv);
     if (res != 0) return res;
     if (args.show_usage) {
         return psh::shell_show_usage(&args);
