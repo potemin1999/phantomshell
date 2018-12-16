@@ -26,6 +26,8 @@ private:
     char *str_char_value = nullptr;
     char16 *str_value = nullptr; /**< null terminated char16 sequence */
     Size str_length = 0;
+    static char16 digits[10];
+    static int int_size_table[9];
 
 public:
 
@@ -219,6 +221,8 @@ public:
 
     }
 
+    static String value_of(int32 value);
+
     static String value_of(uint8 value) {
 
     }
@@ -226,6 +230,8 @@ public:
     static int strcmp(const char* str1,const char* str2);
 
 private:
+
+    static int string_size_of_integer(int32 integer);
 
     String &plus_equal_operator(const char16 *str, Size str_length);
 

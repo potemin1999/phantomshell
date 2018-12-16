@@ -217,6 +217,13 @@ bool is_logical_operator(Operator oper);
  */
 const char* operator_to_string(Operator oper);
 
+/**
+ * @brief Converts operator code to symbol, representing this operator
+ * @param oper to convert
+ * @return char* symbol of operator
+ */
+const char* operator_to_symbol(Operator oper);
+
 } //namespace psh
 
 /*
@@ -305,6 +312,38 @@ inline const char *psh::operator_to_string(psh::Operator oper) {
         case BITWISE_SHIFT_RIGHT: return "BITWISE_SHIFT_RIGHT";
         case LOGICAL_IMPLICATION: return "LOGICAL_IMPLICATION";
         default: return "NOT AN OPERATOR";
+    }
+}
+
+inline const char *psh::operator_to_symbol(psh::Operator oper) {
+    switch (oper) {
+        case EQUAL_TO: return "==";
+        case ADDITION: return "+";
+        case DIVISION: return "/";
+        case LESS_THAN: return "<";
+        case ASSIGNMENT: return "=";
+        case PAREN_OPEN: return "(";
+        case BITWISE_OR: return "\\/";
+        case LOGICAL_OR: return "or";
+        case SUBTRACTION: return "-";
+        case BITWISE_NOT: return "~";
+        case LOGICAL_NOT: return "!";
+        case BITWISE_AND: return "";
+        case BITWISE_XOR: return "\\'/";
+        case PAREN_CLOSE: return ")";
+        case LOGICAL_AND: return "and";
+        case LOGICAL_XOR: return "xor";
+        case NOT_EQUAL_TO: return "!=";
+        case GREATER_THAN: return ">";
+        case NOT_LESS_THAN: return ">=";
+        case MULTIPLICATION: return "*";
+        case POST_INCREMENT: return "++";
+        case POST_DECREMENT: return "--";
+        case NOT_GREATER_THAN: return "<=";
+        case BITWISE_SHIFT_LEFT: return "<<";
+        case BITWISE_SHIFT_RIGHT: return ">>";
+        case LOGICAL_IMPLICATION: return "->";
+        default: return " ";
     }
 }
 
