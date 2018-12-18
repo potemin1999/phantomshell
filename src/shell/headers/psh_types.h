@@ -10,34 +10,87 @@
 #ifndef PHANTOMSHELL_SHELL_TYPES_H
 #define PHANTOMSHELL_SHELL_TYPES_H
 
+#include "string.h"
+#include "types.h"
+
 /** @brief Default Shell namespace */
 namespace psh {
 
-class Type{
+class PshType {
+public:
 
 };
 
-class BooleanType : Type{
+class PshBoolean : PshType {
+public:
+
+    uint8 value;
+
+    PshBoolean(bool value) {
+        this->value = (uint8) (value ? 1 : 0);
+    }
+
+    PshBoolean(const PshBoolean &other) {
+        this->value = other.value;
+    }
 
 };
 
-class IntegerType : Type{
+class PshInteger : PshType {
+public:
+
+    int32 value;
+
+    PshInteger(int value) {
+        this->value = (int32) value;
+    }
+
+    PshInteger(const PshInteger &other) {
+        this->value = other.value;
+    }
 
 };
 
-class FloatType : Type{
+class PshFloat : PshType {
+public:
+
+    union {
+        float value;
+        struct {
+            uint8  sign: 1;
+            uint8  exponent: 8;
+            uint32 fraction: 23;
+        };
+    };
+
+    PshFloat(float value) {
+        this->value = value;
+    }
+};
+
+class PshCharacter : PshType {
+public:
+
+    uint16 value;
+
+    PshCharacter(char value) {
+        this->value = (uint16) (0x00ff & value);
+    }
 
 };
 
-class CharacterType : Type{
+class PshString : PshType {
+public:
+
+    const char16 *value = nullptr;
+
+    PshString(phlib::String &value) {
+        this->value = value.value();
+    }
 
 };
 
-class StringType : Type{
-
-};
-
-class ObjectType : Type{
+class PshObject : PshType {
 
 };
 

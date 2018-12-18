@@ -91,7 +91,7 @@ phlib::String &phlib::String::operator+=(const char16 *str) {
 }
 
 
-Ptr phlib::String::operator new(unsigned long size) {
+Ptr phlib::String::operator new(Size size) {
     return string_allocator->allocate(size);
 }
 

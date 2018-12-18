@@ -108,13 +108,13 @@ public:
      * @param size of string
      * @return pointer to allocated memory
      */
-    void *operator new(unsigned long size);
+    void *operator new(Size size);
 
     /**
      * @brief releases memory allocated for string at @p pointer
      * @param pointer to string
      */
-    void operator delete(void *pointer);
+    void operator delete(Ptr pointer);
 
     /**
      * @brief converts string to const char16 array

@@ -11,6 +11,9 @@
 
 namespace psh {
 
+/**
+ * @brief Basic AST node types
+ */
 typedef enum TreeNodeType {
     DECLARATION_NODE = 0x01,
     EXPRESSION_NODE  = 0x02,
@@ -18,6 +21,9 @@ typedef enum TreeNodeType {
     STATEMENT_NODE   = 0x04,
 } TreeNodeType;
 
+/**
+ * @brief Subtypes of literal nodes
+ */
 typedef enum LiteralNodeType {
     BOOLEAN_LITERAL_NODE   = 0x01,
     INTEGER_LITERAL_NODE   = 0x02,
@@ -26,6 +32,9 @@ typedef enum LiteralNodeType {
     STRING_LITERAL_NODE    = 0x05,
 } LiteralNodeType;
 
+/**
+ * @brief Subtypes of expression nodes
+ */
 typedef enum ExpressionNodeType {
     CONSTANT_EXPRESSION_NODE   = 0x01,
     UNARY_EXPRESSION_NODE      = 0x02,
@@ -34,6 +43,9 @@ typedef enum ExpressionNodeType {
     IDENTIFIER_EXPRESSION_NODE = 0x05
 } ExpressionNodeType;
 
+/**
+ * @brief Subtypes of statements nodes
+ */
 typedef enum StatementNodeType {
     DEF_VAR_STATEMENT_NODE    = 0x01,
     EXPRESSION_STATEMENT_NODE = 0x02,
@@ -45,17 +57,26 @@ typedef enum StatementNodeType {
     FOR_ITERATION_NODE        = 0x08
 } StatementNodeType;
 
+/**
+ * @brief subtypes of declaration nodes
+ */
 typedef enum DeclarationNodeType {
     FUNCTION_DECLARATION_NODE = 0x01,
     FUNC_ARG_DECLARATION_NODE = 0x02,
     CLASS_DECLARATION_NODE    = 0x03
 } DeclarationNodeType;
 
+/**
+ * @brief Basic class for all AST nodes
+ */
 class BaseTreeNode {
 public:
-    TreeNodeType node_type;
+    TreeNodeType node_type; /**< real node type*/
 };
 
+/**
+ * @brief This type of nodes can store user-printed literals
+ */
 class LiteralNode : BaseTreeNode {
 public:
     LiteralNodeType literal_node_type;
@@ -65,31 +86,53 @@ public:
 
 class BooleanLiteralNode : LiteralNode {
 public:
+    PshBoolean value;
+
     explicit BooleanLiteralNode(bool value);
+
+    explicit BooleanLiteralNode(PshBoolean &value);
 };
 
 class IntegerLiteralNode : LiteralNode {
 public:
+    PshInteger value;
+
     explicit IntegerLiteralNode(int value);
+
+    explicit IntegerLiteralNode(PshInteger &value);
 };
 
 class FloatLiteralNode : LiteralNode {
 public:
+    PshFloat value;
+
     explicit FloatLiteralNode(float value);
+
+    explicit FloatLiteralNode(PshFloat &value);
 };
 
 class CharacterLiteralNode : LiteralNode {
 public:
+    PshCharacter value;
+
     explicit CharacterLiteralNode(char value);
+
+    explicit CharacterLiteralNode(PshCharacter &value);
 };
 
 class StringLiteralNode : LiteralNode {
 public:
-    explicit StringLiteralNode(phlib::String *value);
+    PshString value;
+
+    explicit StringLiteralNode(phlib::String &value);
+
+    explicit StringLiteralNode(PshString &value);
 };
 
 
-
+/**
+ * @brief Expression nodes stores any kind of expressions
+ */
 class ExpressionNode : BaseTreeNode {
 public:
     ExpressionNodeType expression_node_type;
@@ -97,6 +140,9 @@ public:
     ExpressionNode();
 };
 
+/**
+ * @brief Wraps literal nodes as constant expression
+ */
 class ConstantExpressionNode : ExpressionNode {
 public:
     LiteralNode *literal;
@@ -104,6 +150,9 @@ public:
     explicit ConstantExpressionNode(LiteralNode *literal);
 };
 
+/**
+ * @brief Stores unary operator and its operand
+ */
 class UnaryExpressionNode : ExpressionNode {
 public:
     Operator       oper;
@@ -113,6 +162,9 @@ public:
                         ExpressionNode *operand);
 };
 
+/**
+ * @brief Stores binary operator and its operands
+ */
 class BinaryExpressionNode : ExpressionNode {
 public:
     Operator       oper;
@@ -124,6 +176,9 @@ public:
                          ExpressionNode *operand2);
 };
 
+/**
+ * @brief Stores ternary operator and its operands
+ */
 class TernaryExpressionNode : ExpressionNode {
 public:
     Operator       oper;
@@ -137,14 +192,13 @@ public:
                           ExpressionNode *operand3);
 };
 
+/**
+ * @brief Wraps value, represented as identifier
+ */
 class IdentifierExpressionNode : ExpressionNode {
 public:
     IdentifierExpressionNode();
 };
-
-
-
-
 
 
 class StatementNode : BaseTreeNode {
@@ -245,10 +299,10 @@ public:
 
 class FuncArgDeclarationNode : DeclarationNode {
 public:
-    Type          argument_type;
+    PshType       argument_type;
     phlib::String argument_name;
 
-    FuncArgDeclarationNode(Type argument_type,
+    FuncArgDeclarationNode(PshType argument_type,
                            phlib::String &argument_name);
 };
 
@@ -261,9 +315,11 @@ public:
 class ClassDeclarationNode : DeclarationNode {
 public:
     phlib::String class_name;
+
     ClassDeclarationNode(phlib::String &class_name);
 };
 
 
 }
+
 #endif //PHANTOMSHELL_TREE_H

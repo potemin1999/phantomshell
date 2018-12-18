@@ -9,6 +9,7 @@
 
 #include "tree.h"
 
+using namespace phlib;
 using namespace psh;
 
 DeclarationNode::DeclarationNode() : BaseTreeNode() {
@@ -16,19 +17,19 @@ DeclarationNode::DeclarationNode() : BaseTreeNode() {
     this->declaration_node_type = (DeclarationNodeType) 0;
 }
 
-FuncArgDeclarationNode::FuncArgDeclarationNode(Type argument_type, phlib::String &argument_name)
+FuncArgDeclarationNode::FuncArgDeclarationNode(PshType argument_type, String &argument_name)
         : DeclarationNode() {
     this->declaration_node_type = DeclarationNodeType::FUNC_ARG_DECLARATION_NODE;
     this->argument_type         = argument_type;
     this->argument_name         = argument_name;
 }
 
-FuncDeclarationNode::FuncDeclarationNode(phlib::String &function_name, FuncArgDeclarationNode *arguments)
+FuncDeclarationNode::FuncDeclarationNode(String &function_name, FuncArgDeclarationNode *arguments)
         : DeclarationNode() {
     this->declaration_node_type = DeclarationNodeType::FUNCTION_DECLARATION_NODE;
 }
 
-ClassDeclarationNode::ClassDeclarationNode(phlib::String &class_name)
+ClassDeclarationNode::ClassDeclarationNode(String &class_name)
         : DeclarationNode() {
     this->declaration_node_type = DeclarationNodeType::CLASS_DECLARATION_NODE;
 }
@@ -36,8 +37,8 @@ ClassDeclarationNode::ClassDeclarationNode(phlib::String &class_name)
 //Expressions
 
 ExpressionNode::ExpressionNode() : BaseTreeNode() {
-    node_type            = TreeNodeType::EXPRESSION_NODE;
-    expression_node_type = (ExpressionNodeType) 0;
+    this->node_type            = TreeNodeType::EXPRESSION_NODE;
+    this->expression_node_type = (ExpressionNodeType) 0;
 }
 
 ConstantExpressionNode::ConstantExpressionNode(LiteralNode *literal)
@@ -73,7 +74,7 @@ TernaryExpressionNode::TernaryExpressionNode(Operator oper, ExpressionNode *oper
 
 IdentifierExpressionNode::IdentifierExpressionNode()
         : ExpressionNode() {
-    expression_node_type = ExpressionNodeType::IDENTIFIER_EXPRESSION_NODE;
+    this->expression_node_type = ExpressionNodeType::IDENTIFIER_EXPRESSION_NODE;
 }
 
 //Literals
@@ -84,34 +85,60 @@ LiteralNode::LiteralNode() : BaseTreeNode() {
 }
 
 BooleanLiteralNode::BooleanLiteralNode(bool value)
-        : LiteralNode() {
+        : LiteralNode(), value(value) {
     this->literal_node_type = LiteralNodeType::BOOLEAN_LITERAL_NODE;
 }
 
 IntegerLiteralNode::IntegerLiteralNode(int value)
-        : LiteralNode() {
+        : LiteralNode(), value(value) {
     this->literal_node_type = LiteralNodeType::INTEGER_LITERAL_NODE;
 }
 
 FloatLiteralNode::FloatLiteralNode(float value)
-        : LiteralNode() {
+        : LiteralNode(), value(value) {
     this->literal_node_type = LiteralNodeType::FLOAT_LITERAL_NODE;
 }
 
 CharacterLiteralNode::CharacterLiteralNode(char value)
-        : LiteralNode() {
+        : LiteralNode(), value(value) {
     this->literal_node_type = LiteralNodeType::CHARACTER_LITERAL_NODE;
 }
 
-StringLiteralNode::StringLiteralNode(phlib::String *value)
-        : LiteralNode() {
+StringLiteralNode::StringLiteralNode(phlib::String &value)
+        : LiteralNode(), value(value) {
+    this->literal_node_type = LiteralNodeType::STRING_LITERAL_NODE;
+}
+
+
+BooleanLiteralNode::BooleanLiteralNode(PshBoolean &value)
+        : LiteralNode(), value(value) {
+    this->literal_node_type = LiteralNodeType::BOOLEAN_LITERAL_NODE;
+}
+
+IntegerLiteralNode::IntegerLiteralNode(PshInteger &value)
+        : LiteralNode(), value(value) {
+    this->literal_node_type = LiteralNodeType::INTEGER_LITERAL_NODE;
+}
+
+FloatLiteralNode::FloatLiteralNode(PshFloat &value)
+        : LiteralNode(), value(value) {
+    this->literal_node_type = LiteralNodeType::FLOAT_LITERAL_NODE;
+}
+
+CharacterLiteralNode::CharacterLiteralNode(PshCharacter &value)
+        : LiteralNode(), value(value) {
+    this->literal_node_type = LiteralNodeType::CHARACTER_LITERAL_NODE;
+}
+
+StringLiteralNode::StringLiteralNode(PshString &value)
+        : LiteralNode(), value(value) {
     this->literal_node_type = LiteralNodeType::STRING_LITERAL_NODE;
 }
 
 //Statements
 
 StatementNode::StatementNode() : BaseTreeNode() {
-    node_type = TreeNodeType::STATEMENT_NODE;
+    this->node_type           = TreeNodeType::STATEMENT_NODE;
     this->statement_node_type = (StatementNodeType) 0;
 }
 
@@ -138,7 +165,7 @@ IfStatementNode::IfStatementNode(ExpressionNode *expression, StatementNode *true
 }
 
 IfStatementNode::IfStatementNode(ExpressionNode *expression, StatementNode *true_statement)
-        : IfStatementNode(expression,true_statement,nullptr) {
+        : IfStatementNode(expression, true_statement, nullptr) {
 }
 
 CaseSelectionNode::CaseSelectionNode(ConstantExpressionNode *constant_expression, StatementNode *statement,
