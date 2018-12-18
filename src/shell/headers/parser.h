@@ -11,6 +11,7 @@
 #define PHANTOMSHELL_PARSER_H
 
 #include "token.h"
+#include "tree.h"
 
 #define PARSER_TOKEN_BUFFER_CAPACITY 64
 
@@ -19,13 +20,13 @@ namespace psh {
 
 /**
  */
-class Parser{
+class Parser {
 
-    typedef int (Parser::*PushTokenFunc)(Token*);
+    typedef int (Parser::*PushTokenFunc)(Token *);
 
 private:
 
-    Token* token_buffer = nullptr;
+    Token *token_buffer = nullptr;
     PushTokenFunc push_functions[6];
 
 public:
@@ -34,19 +35,19 @@ public:
 
     ~Parser();
 
-    int push_token(Token* token);
+    int push_token(Token *token);
 
 private:
 
-    int push_identifier_token(Token* token);
+    int push_identifier_token(Token *token);
 
-    int push_keyword_token(Token* token);
+    int push_keyword_token(Token *token);
 
-    int push_literal_token(Token* token);
+    int push_literal_token(Token *token);
 
-    int push_operator_token(Token* token);
+    int push_operator_token(Token *token);
 
-    int push_separator_token(Token* token);
+    int push_separator_token(Token *token);
 
 };
 

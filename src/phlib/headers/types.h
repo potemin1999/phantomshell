@@ -18,6 +18,15 @@
 #include <sys/types.h>
 
 #endif //__unix__
+#ifdef __WIN32
+
+#include <cstdint>
+
+typedef uint16_t u_int16_t;
+typedef uint32_t u_int32_t;
+typedef uint64_t u_int64_t;
+
+#endif //__WIN32
 #else //__simbuild__
 #include <phantom_types.h>
 #endif //__simbuild__

@@ -46,17 +46,17 @@ class IStream {
 #ifdef __simbuild__
         FILE_STREAM = 0,
 #endif //__simbuild__
-        STDIN_STREAM = 1,
+        STDIN_STREAM  = 1,
         OBJECT_STREAM = 2
     };
 
 protected:
 
-    ReadFunc read_func;
+    ReadFunc  read_func;
     CloseFunc close_func;
-    IStreamData* data;
+    IStreamData *data;
     IStreamType type;
-    bool isClosed = false;
+    bool        isClosed = false;
 
 public:
 
@@ -122,19 +122,23 @@ public:
 private:
 
 #ifdef __simbuild__
+
     SSize read_from_file(Ptr buffer, Size buffer_size);
+
 #endif //__simbuild__
 
     SSize read_from_stdin(Ptr buffer, Size buffer_size);
 
-    SSize read_from_object(Ptr buffer, Size buffer_size) ;
+    SSize read_from_object(Ptr buffer, Size buffer_size);
 
     int close_object();
 
-    int close_stdin() ;
+    int close_stdin();
 
 #ifdef __simbuild__
+
     int close_file();
+
 #endif //__simbuild__
 
 };
