@@ -17,14 +17,14 @@ union phlib::OStream::OStreamData {
 #endif //__simbuild__
     struct {
         /** Stores pointer to destination object, when type==OBJECT_STREAM*/
-        Ptr object;
-        bool object_copy;
+        Ptr   object;
+        bool  object_copy;
         SSize current_pointer;
         /** Stores destination object size, when type==OBJECT_STREAM*/
         SSize object_size;
     };
     /** Stores stdout descriptor, when type==STDOUT_STREAM*/
-    int stdout_fd;
+    int  stdout_fd;
 
     Ptr operator new(Size size) {
         return Allocator::get_default_allocator()->allocate(size);
@@ -37,8 +37,8 @@ union phlib::OStream::OStreamData {
 
 
 phlib::OStream::OStream(String &file_path) {
-    data = new OStreamData();
-    type = OStreamType::FILE_STREAM;
+    data       = new OStreamData();
+    type       = OStreamType::FILE_STREAM;
     write_func = &OStream::write_to_file;
     close_func = &OStream::close_file;
     data->file = fopen(file_path, "w+");
@@ -51,8 +51,8 @@ phlib::OStream::OStream(Ptr buffer) {
 
 
 phlib::OStream::OStream() {
-    data = new OStreamData();
-    type = OStreamType::STDOUT_STREAM;
+    data       = new OStreamData();
+    type       = OStreamType::STDOUT_STREAM;
     write_func = &OStream::write_to_stdout;
     close_func = &OStream::close_stdout;
     data->stdout_fd = open("/dev/stdout", OFlags::WRONLY);

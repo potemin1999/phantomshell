@@ -1,7 +1,7 @@
 #undef __debug__
 
 #include "istream.h"
-#include "../../../shell/headers/lexer.h"
+#include "lexer.h"
 #include <chrono>
 #include <stdio.h>
 
@@ -21,6 +21,11 @@ int test1() {
 int test1_2() {
     const char *src_buffer = "hello1 and}hello2;or;xor not()";
     return tokenizing_test(src_buffer, 32);
+}
+
+int test1_3() {
+    const char *src_buffer = "hello1*hello2+hello3\\'/ku";
+    return tokenizing_test(src_buffer,27);
 }
 
 
@@ -71,6 +76,7 @@ int main(int argc, const char **argv) {
     int ret = 0;
     if ((ret = test1()) != 0) return ret;
     if ((ret = test1_2()) != 0) return ret;
+    if ((ret = test1_3()) != 0) return ret;
     if ((ret = test2()) != 0) return ret;
     return ret;
 }

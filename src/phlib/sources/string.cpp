@@ -7,14 +7,23 @@
  * GNU Lesser General Public License v3.0
  */
 
+#include <string.h>
+#include <character.h>
+
 #include "string.h"
 
 
 phlib::Allocator *string_allocator = phlib::Allocator::get_default_allocator();
 
+char16 phlib::String::digits[] = {'0', '1', '2', '3', '4',
+                                  '5', '6', '7', '8', '9'};
+
+int phlib::String::int_size_table[] = {9, 99, 999, 9999, 99999,
+                                       999999, 9999999,
+                                       99999999, 999999999};
 
 phlib::String::String(const String &other) {
-    str_value = (char16 *) phlib::malloc((other.str_length + 1) * sizeof(char16));
+    str_value  = (char16 *) phlib::malloc((other.str_length + 1) * sizeof(char16));
     str_length = other.str_length;
     copy_str(str_value, other.str_value, other.str_length + 1);
 }
@@ -22,7 +31,7 @@ phlib::String::String(const String &other) {
 
 phlib::String::String(const char16 *str, Size length) {
     str_length = length;
-    str_value = (char16 *) phlib::malloc((str_length + 1) * sizeof(char16));
+    str_value  = (char16 *) phlib::malloc((str_length + 1) * sizeof(char16));
     copy_str(str_value, str, str_length);
     str_value[str_length] = '\0';
 }
@@ -30,8 +39,8 @@ phlib::String::String(const char16 *str, Size length) {
 
 phlib::String::String(const char *str) {
     str_length = get_length(str);
-    str_value = (char16 *) malloc((str_length + 1) * 2);
-    for (int i = 0; i < str_length; i++) {
+    str_value  = (char16 *) malloc((str_length + 1) * 2);
+    for (int i            = 0; i < str_length; i++) {
         str_value[i] = str[i] & ((char16) 0x007f);
     }
     str_value[str_length] = '\0';
@@ -40,7 +49,7 @@ phlib::String::String(const char *str) {
 
 phlib::String::String() {
     str_length = 0;
-    str_value = (char16 *) malloc(1 * sizeof(char16));
+    str_value  = (char16 *) malloc(1 * sizeof(char16));
     str_value[0] = '\0';
 }
 
@@ -82,7 +91,7 @@ phlib::String &phlib::String::operator+=(const char16 *str) {
 }
 
 
-Ptr phlib::String::operator new(unsigned long size) {
+Ptr phlib::String::operator new(Size size) {
     return string_allocator->allocate(size);
 }
 
@@ -95,7 +104,7 @@ void phlib::String::operator delete(Ptr pointer) {
 const char *phlib::String::char_value() {
     if (this->str_char_value == nullptr) {
         this->str_char_value = (char *) phlib::malloc(this->str_length + 1);
-        for (int i = 0; i < this->str_length; i++) {
+        for (int i                             = 0; i < this->str_length; i++) {
             this->str_char_value[i] = (char) (0x7f & this->str_value[i]);
         }
         this->str_char_value[this->str_length] = '\0';
@@ -182,8 +191,8 @@ uint32 phlib::String::hash_code() {
 
 
 phlib::String &phlib::String::plus_equal_operator(const char16 *str, Size str_length) {
-    Size length = str_length + this->str_length;
-    Size old_length = this->str_length;
+    Size   length      = str_length + this->str_length;
+    Size   old_length  = this->str_length;
     char16 *last_value = this->str_value;
     this->str_value = (char16 *) phlib::malloc((length + 1) * sizeof(char16));
     add_str(str_value, last_value, old_length, str, str_length);
@@ -226,8 +235,8 @@ void phlib::String::setup_string(phlib::String *dst, const char *src) {
 
 void phlib::String::setup_string(phlib::String *dst, const char *src, Size length) {
     dst->str_length = length;
-    dst->str_value = (char16 *) malloc((dst->str_length + 1) * 2);
-    for (int i = 0; i < dst->str_length; i++) {
+    dst->str_value  = (char16 *) malloc((dst->str_length + 1) * 2);
+    for (int i                      = 0; i < dst->str_length; i++) {
         dst->str_value[i] = src[i] & ((char16) 0x007f);
     }
     dst->str_value[dst->str_length] = '\0';
@@ -236,13 +245,13 @@ void phlib::String::setup_string(phlib::String *dst, const char *src, Size lengt
 
 void phlib::String::setup_string(phlib::String *dst, const char16 *src, Size length) {
     dst->str_length = length;
-    dst->str_value = (char16 *) malloc((dst->str_length + 1) * 2);
+    dst->str_value  = (char16 *) malloc((dst->str_length + 1) * 2);
     copy_str(dst->str_value, src, dst->str_length);
     dst->str_value[dst->str_length] = '\0';
 }
 
 int phlib::String::strcmp(const char *str1, const char *str2) {
-    for (int i = 0; ; i++) {
+    for (int i = 0;; i++) {
         if (str1[i] != str2[i]) {
             return str1[i] < str2[i] ? -1 : 1;
         }
@@ -250,4 +259,29 @@ int phlib::String::strcmp(const char *str1, const char *str2) {
             return 0;
         }
     }
+}
+
+int phlib::String::string_size_of_integer(int32 integer) {
+    for (int i = 0;; i++)
+        if (integer <= String::int_size_table[i])
+            return i + 1;
+}
+
+phlib::String phlib::String::value_of(int32 value) {
+    bool negative = value < 0;
+    int  size     = string_size_of_integer(value);
+    if (negative)
+        size += 1;
+    char16 chars[size];
+    int    index  = size;
+    int    q      = 0, r = 0;
+    while (value != 0) {
+        q     = value / 10;
+        r     = value - (q * 10);
+        value = q;
+        chars[--index] = String::digits[r];
+    }
+    if (negative)
+        chars[0]  = '-';
+    return String(chars, size);
 }

@@ -42,17 +42,17 @@ class OStream {
     * @brief This enum describes istream types
     */
     enum OStreamType {
-        FILE_STREAM = 0,
+        FILE_STREAM   = 0,
         STDOUT_STREAM = 1,
         OBJECT_STREAM = 2
     };
 
 protected:
 
-    WriteFunc write_func;
-    CloseFunc close_func;
+    WriteFunc   write_func;
+    CloseFunc   close_func;
     OStreamType type;
-    OStreamData* data;
+    OStreamData *data;
     bool isClosed = false;
 
 public:
@@ -118,13 +118,17 @@ private:
     SSize write_to_stdout(ConstPtr buffer, Size buffer_size);
 
 #ifdef __simbuild__
+
     SSize write_to_file(ConstPtr buffer, Size buffer_size);
+
 #endif //__simbuild__
 
     int close_stdout();
 
 #ifdef __simbuild__
+
     int close_file();
+
 #endif //__simbuild__
 
 };
