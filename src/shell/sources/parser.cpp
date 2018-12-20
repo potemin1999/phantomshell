@@ -9,6 +9,7 @@
 
 #include "parser.h"
 
+using namespace phlib;
 using namespace psh;
 
 Parser::Parser() {

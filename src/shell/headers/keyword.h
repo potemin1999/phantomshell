@@ -34,95 +34,73 @@ typedef enum Keyword {
     CLASS  = 0x20 /**< class */
 } Keyword;
 
-} //namespace psh
-namespace {
-
-class KeywordImpl {
-
-public:
-
-    static int32 is_keyword(phlib::String &str) {
-        switch (str[0]) {
-            case 'c' : {
-                if (str.equals("case")) return psh::Keyword::CASE;
-                if (str.equals("class")) return psh::Keyword::CLASS;
-                return -1;
-            }
-            case 'd' : {
-                if (str.equals("def")) return psh::Keyword::DEF;
-                if (str.equals("do")) return psh::Keyword::DO;
-                return -1;
-            }
-            case 'i' : {
-                if (str.equals("if")) return psh::Keyword::IF;
-                return -1;
-            }
-            case 'e' : {
-                if (str.equals("elif")) return psh::Keyword::ELIF;
-                if (str.equals("else")) return psh::Keyword::ELSE;
-                return -1;
-            }
-            case 'f' : {
-                if (str.equals("for")) return psh::Keyword::FOR;
-                return -1;
-            }
-            case 'o' : {
-                if (str.equals("other")) return psh::Keyword::OTHER;
-                return -1;
-            }
-            case 'r' : {
-                if (str.equals("return")) return psh::Keyword::RETURN;
-                return -1;
-            }
-            case 's' : {
-                if (str.equals("switch")) return psh::Keyword::SWITCH;
-                return -1;
-            }
-            case 'w' : {
-                if (str.equals("while")) return psh::Keyword::WHILE;
-                return -1;
-            }
-            default:return -1;
-        }
-    }
-
-    static const char *keyword_to_string(psh::Keyword keyword) {
-        switch (keyword) {
-            case psh::Keyword::CASE: return "CASE";
-            case psh::Keyword::CLASS: return "CLASS";
-            case psh::Keyword::DEF: return "DEF";
-            case psh::Keyword::DO: return "DO";
-            case psh::Keyword::IF: return "IF";
-            case psh::Keyword::ELIF: return "ELIF";
-            case psh::Keyword::FOR: return "FOR";
-            case psh::Keyword::OTHER: return "OTHER";
-            case psh::Keyword::RETURN: return "RETURN";
-            case psh::Keyword::SWITCH: return "SWITCH";
-            case psh::Keyword::WHILE: return "WHILE";
-            default: return "NOT A KEYWORD";
-        }
-    }
-
-};
-
-}
-
-namespace psh {
-
 /**
- * @
- * @param str 
+ * @brief checks, if word is a keyword
+ * @param str
  * @return psh::int32 if succeed
  *         -1 otherwise
  */
 inline int32 is_keyword(phlib::String &str) {
-    return KeywordImpl::is_keyword(str);
+    switch (str[0]) {
+        case 'c' : {
+            if (str.equals("case")) return psh::Keyword::CASE;
+            if (str.equals("class")) return psh::Keyword::CLASS;
+            return -1;
+        }
+        case 'd' : {
+            if (str.equals("def")) return psh::Keyword::DEF;
+            if (str.equals("do")) return psh::Keyword::DO;
+            return -1;
+        }
+        case 'i' : {
+            if (str.equals("if")) return psh::Keyword::IF;
+            return -1;
+        }
+        case 'e' : {
+            if (str.equals("elif")) return psh::Keyword::ELIF;
+            if (str.equals("else")) return psh::Keyword::ELSE;
+            return -1;
+        }
+        case 'f' : {
+            if (str.equals("for")) return psh::Keyword::FOR;
+            return -1;
+        }
+        case 'o' : {
+            if (str.equals("other")) return psh::Keyword::OTHER;
+            return -1;
+        }
+        case 'r' : {
+            if (str.equals("return")) return psh::Keyword::RETURN;
+            return -1;
+        }
+        case 's' : {
+            if (str.equals("switch")) return psh::Keyword::SWITCH;
+            return -1;
+        }
+        case 'w' : {
+            if (str.equals("while")) return psh::Keyword::WHILE;
+            return -1;
+        }
+        default:return -1;
+    }
 }
 
-inline const char *keyword_to_string(Keyword keyword) {
-    return KeywordImpl::keyword_to_string(keyword);
+inline const char *keyword_to_string(psh::Keyword keyword) {
+    switch (keyword) {
+        case psh::Keyword::CASE: return "CASE";
+        case psh::Keyword::CLASS: return "CLASS";
+        case psh::Keyword::DEF: return "DEF";
+        case psh::Keyword::DO: return "DO";
+        case psh::Keyword::IF: return "IF";
+        case psh::Keyword::ELIF: return "ELIF";
+        case psh::Keyword::FOR: return "FOR";
+        case psh::Keyword::OTHER: return "OTHER";
+        case psh::Keyword::RETURN: return "RETURN";
+        case psh::Keyword::SWITCH: return "SWITCH";
+        case psh::Keyword::WHILE: return "WHILE";
+        default: return "NOT A KEYWORD";
+    }
 }
-
 
 } //namespace psh
 #endif //PHANTOMSHELL_KEYWORD_H

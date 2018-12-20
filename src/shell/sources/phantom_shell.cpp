@@ -20,11 +20,13 @@ using namespace phlib;
 PhantomShell::PhantomShell(PshArguments *args) {
     psh_arguments = args;
     lexer         = new Lexer(args->input_stream);
+    parser = new Parser();
 }
 
 
 PhantomShell::~PhantomShell() {
     delete lexer;
+    delete parser;
 }
 
 
@@ -35,6 +37,7 @@ ShellExitCode PhantomShell::run() {
 #ifdef __debug__
         DEBUG_LOG("%s\n", token->token_to_string());
 #endif
+        parser->push_token(token);
     }
     return ShellExitCode::EXIT_NORMAL;
 }

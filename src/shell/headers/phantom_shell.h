@@ -52,6 +52,7 @@ private:
 
     PshArguments *psh_arguments;
     Lexer        *lexer;
+    Parser       *parser;
 
 public:
 
