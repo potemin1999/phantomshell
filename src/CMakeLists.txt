@@ -1,12 +1,18 @@
 project(SHELL C CXX)
 set(CMAKE_CXX_STANDARD 11)
-set(SHELL_SOURCE_FILES
-        shell/lexer.cpp
-        shell/parser.cpp
-        shell/phantom_shell.cpp
-        )
 add_compile_definitions(__simbuild__)
 add_compile_definitions(__debug__)
-include_directories("../include")
-add_executable(${PROJECT_NAME} ${SHELL_SOURCE_FILES})
-set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+set(MODULES_ROOT "${PROJECT_SOURCE_DIR}")
+
+#support library module for shell
+add_subdirectory(phlib)
+
+#shell module
+add_subdirectory(shell)
+
+#test modules, if needed
+if (BUILD_TESTING)
+    enable_testing()
+    set_target_properties(${SHELL} PROPERTIES LINKER_LANGUAGE CXX)
+    add_subdirectory(tests)
+endif ()
