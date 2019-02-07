@@ -7,29 +7,30 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <string.h>
-#include <character.h>
+#include <String.h>
+#include <Character.h>
 
-#include "string.h"
+#include "String.h"
 
+using namespace phlib;
 
-phlib::Allocator *string_allocator = phlib::Allocator::getDefaultAllocator();
+Allocator *string_allocator = Allocator::getDefaultAllocator();
 
-char16 phlib::String::digits[] = {'0', '1', '2', '3', '4',
+char16 String::digits[] = {'0', '1', '2', '3', '4',
                                   '5', '6', '7', '8', '9'};
 
-int phlib::String::intSizeTable[] = {9, 99, 999, 9999, 99999,
+int String::intSizeTable[] = {9, 99, 999, 9999, 99999,
                                      999999, 9999999,
                                      99999999, 999999999};
 
-phlib::String::String(const String &other) {
+String::String(const String &other) {
     strValue  = (char16 *) phlib::malloc((other.strLength + 1) * sizeof(char16));
     strLength = other.strLength;
     copyStr(strValue, other.strValue, other.strLength + 1);
 }
 
 
-phlib::String::String(const char16 *str, Size length) {
+String::String(const char16 *str, Size length) {
     strLength = length;
     strValue  = (char16 *) phlib::malloc((strLength + 1) * sizeof(char16));
     copyStr(strValue, str, strLength);
@@ -37,7 +38,7 @@ phlib::String::String(const char16 *str, Size length) {
 }
 
 
-phlib::String::String(const char *str) {
+String::String(const char *str) {
     strLength = getLength(str);
     strValue  = (char16 *) malloc((strLength + 1) * 2);
     for (int i          = 0; i < strLength; i++) {
@@ -47,14 +48,14 @@ phlib::String::String(const char *str) {
 }
 
 
-phlib::String::String() {
+String::String() {
     strLength = 0;
     strValue  = (char16 *) malloc(1 * sizeof(char16));
     strValue[0] = '\0';
 }
 
 
-phlib::String::~String() {
+String::~String() {
     if (strValue != nullptr) {
         phlib::free(strValue);
         strValue = nullptr;
@@ -66,42 +67,43 @@ phlib::String::~String() {
 }
 
 
-phlib::String &phlib::String::operator=(const phlib::String &other) {
+String &String::operator=(const String &other) {
     this->strValue = (char16 *) malloc((other.strLength + 1) * 2);
     copyStr(strValue, other.strValue, other.strLength + 1);
     this->strLength = other.strLength;
+    return *this;
 }
 
 
-phlib::String &phlib::String::operator=(const char16 *&str) {
+String &String::operator=(const char16 *&str) {
     setupString(this, str);
     return *this;
 }
 
 
-phlib::String &phlib::String::operator+=(const phlib::String &other) {
+String &String::operator+=(const String &other) {
     return plusEqualOperator(other.strValue, other.strLength);
 }
 
 
-phlib::String &phlib::String::operator+=(const char16 *str) {
+String &String::operator+=(const char16 *str) {
     Size length = 0;
     while (str[length++] != '\0');
     return plusEqualOperator(str, length);
 }
 
 
-Ptr phlib::String::operator new(Size size) {
+Ptr String::operator new(Size size) {
     return string_allocator->allocate(size);
 }
 
 
-void phlib::String::operator delete(Ptr pointer) {
+void String::operator delete(Ptr pointer) {
     string_allocator->deallocate(pointer);
 }
 
 
-const char *phlib::String::charValue() {
+const char *String::charValue() {
     if (this->strCharValue == nullptr) {
         this->strCharValue = (char *) phlib::malloc(this->strLength + 1);
         for (int i = 0; i < this->strLength; i++) {
@@ -114,12 +116,12 @@ const char *phlib::String::charValue() {
 }
 
 
-bool phlib::String::startsWith(const phlib::String &str) {
+bool String::startsWith(const String &str) {
     return startsWith(str.strValue);
 }
 
 
-bool phlib::String::startsWith(const char16 *prefix) {
+bool String::startsWith(const char16 *prefix) {
     for (int i = 0; prefix[i] != '\0'; i++) {
         if (i >= this->strLength) return false;
         if (prefix[i] != this->strValue[i]) return false;
@@ -128,19 +130,19 @@ bool phlib::String::startsWith(const char16 *prefix) {
 }
 
 
-bool phlib::String::endsWith(const String &suffix) {
+bool String::endsWith(const String &suffix) {
     return endsWith(suffix.strValue, suffix.strLength);
 }
 
 
-bool phlib::String::endsWith(const char16 *suffix) {
+bool String::endsWith(const char16 *suffix) {
     Size length = 0;
     while (suffix[++length] != '\0');
     return endsWith(suffix, length);
 }
 
 
-bool phlib::String::endsWith(const char16 *suffix, Size suffixLength) {
+bool String::endsWith(const char16 *suffix, Size suffixLength) {
     if (suffixLength > this->strLength) return false;
     for (int i = 0; i <= suffixLength; i++) {
         if (this->strValue[i + this->strLength - suffixLength] != suffix[i]) return false;
@@ -149,12 +151,12 @@ bool phlib::String::endsWith(const char16 *suffix, Size suffixLength) {
 }
 
 
-bool phlib::String::equals(const String &other) {
+bool String::equals(const String &other) {
     return equals(other.strValue);
 }
 
 
-bool phlib::String::equals(const char16 *str) {
+bool String::equals(const char16 *str) {
     int i = 0;
     for (; str[i] != '\0'; i++) {
         if (str[i] != this->strValue[i]) return false;
@@ -163,14 +165,14 @@ bool phlib::String::equals(const char16 *str) {
 }
 
 
-int phlib::String::compare(const String &str1, const String &str2) {
+int String::compare(const String &str1, const String &str2) {
     if (str1.strLength != str2.strLength)
         return str1.strLength > str2.strLength ? 1 : -1;
     return compare(str1.strValue, str2.strValue);
 }
 
 
-int phlib::String::compare(const char16 *str1, const char16 *str2) {
+int String::compare(const char16 *str1, const char16 *str2) {
     if (str1 == nullptr || str2 == nullptr) return -2;
     for (int i = 0;; i++) {
         if (str1[i] == '\0' & str2[i] == '\0') break;
@@ -180,7 +182,7 @@ int phlib::String::compare(const char16 *str1, const char16 *str2) {
 }
 
 
-uint32 phlib::String::hashCode() {
+uint32 String::hashCode() {
     uint32 hash = 0;
     if (strLength > 0) {
         for (int i = 0; i < strLength; i++) {
@@ -191,7 +193,7 @@ uint32 phlib::String::hashCode() {
 }
 
 
-phlib::String &phlib::String::plusEqualOperator(const char16 *str, Size strLength) {
+String &String::plusEqualOperator(const char16 *str, Size strLength) {
     auto length    = strLength + this->strLength;
     auto oldLength = this->strLength;
     auto lastValue = this->strValue;
@@ -206,35 +208,35 @@ phlib::String &phlib::String::plusEqualOperator(const char16 *str, Size strLengt
 }
 
 
-Size phlib::String::getLength(const char *str) {
+Size String::getLength(const char *str) {
     Size i = 0;
     for (; str[i] != '\0'; ++i);
     return i;
 }
 
 
-Size phlib::String::getLength(const char16 *str) {
+Size String::getLength(const char16 *str) {
     Size i = 0;
     for (; str[i] != '\0'; ++i);
     return i;
 }
 
 
-void phlib::String::setupString(phlib::String *dst, const char16 *src) {
+void String::setupString(String *dst, const char16 *src) {
     dst->strLength = 0;
     for (; src[dst->strLength] != '\0'; dst->strLength++);
     setupString(dst, src, dst->strLength);
 }
 
 
-void phlib::String::setupString(phlib::String *dst, const char *src) {
+void String::setupString(String *dst, const char *src) {
     dst->strLength = 0;
     for (; src[dst->strLength] != '\0'; dst->strLength++);
     setupString(dst, src, dst->strLength);
 }
 
 
-void phlib::String::setupString(phlib::String *dst, const char *src, Size length) {
+void String::setupString(String *dst, const char *src, Size length) {
     dst->strLength = length;
     dst->strValue  = (char16 *) malloc((dst->strLength + 1) * 2);
     for (int i = 0; i < dst->strLength; i++) {
@@ -245,14 +247,14 @@ void phlib::String::setupString(phlib::String *dst, const char *src, Size length
 }
 
 
-void phlib::String::setupString(phlib::String *dst, const char16 *src, Size length) {
+void String::setupString(String *dst, const char16 *src, Size length) {
     dst->strLength = length;
     dst->strValue  = (char16 *) malloc((dst->strLength + 1) * 2);
     copyStr(dst->strValue, src, dst->strLength);
     dst->strValue[dst->strLength] = '\0';
 }
 
-int phlib::String::strcmp(const char *str1, const char *str2) {
+int String::strcmp(const char *str1, const char *str2) {
     for (int i = 0;; i++) {
         if (str1[i] != str2[i]) {
             return str1[i] < str2[i] ? -1 : 1;
@@ -263,13 +265,13 @@ int phlib::String::strcmp(const char *str1, const char *str2) {
     }
 }
 
-int phlib::String::stringSizeOfInteger(int32 integer) {
-    for (int i = 0;; i++)
+Size String::stringSizeOfInteger(int32 integer) {
+    for (Size i = 0;; i++)
         if (integer <= String::intSizeTable[i])
             return i + 1;
 }
 
-phlib::String phlib::String::valueOf(int32 value) {
+String String::valueOf(int32 value) {
     bool negative = value < 0;
     auto size     = stringSizeOfInteger(value);
     if (negative)
@@ -287,4 +289,12 @@ phlib::String phlib::String::valueOf(int32 value) {
     if (negative)
         chars[0]  = '-';
     return String(chars, size);
+}
+
+String String::valueOf(uint8 value) {
+    return valueOf((int32) value);
+}
+
+String String::valueOf(uint32 value) {
+    return valueOf((int32) value);
 }

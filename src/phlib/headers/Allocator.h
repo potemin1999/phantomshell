@@ -10,8 +10,8 @@
 #ifndef PHANTOMSHELL_ALLOC_H
 #define PHANTOMSHELL_ALLOC_H
 
-#include "log.h"
-#include "types.h"
+#include "Log.h"
+#include "Types.h"
 
 #ifdef __simbuild__
 

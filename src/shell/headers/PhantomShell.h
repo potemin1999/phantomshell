@@ -12,10 +12,10 @@
 
 #define PHANTOM_SHELL_VERSION "PhantomShell version 0.001"
 
-#include "istream.h"
-#include "ostream.h"
-#include "lexer.h"
-#include "parser.h"
+#include "InputStream.h"
+#include "OutputStream.h"
+#include "Lexer.h"
+#include "Parser.h"
 
 /** @brief Default Shell namespace */
 namespace psh {

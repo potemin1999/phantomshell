@@ -3,7 +3,7 @@ set(PHLIB_ALLOCATORS_TEST phlib_allocators_tests)
 set(PHLIB_ALLOCATORS_TEST_SRC
         sources/phlib/allocators_tests.cpp
         ${MODULES_ROOT}/phlib/sources/allocator/pool_allocator.cpp
-        ${MODULES_ROOT}/phlib/sources/allocator/system_allocator.cpp
+        ${MODULES_ROOT}/phlib/sources/allocator/SystemAllocator.cpp
         )
 add_executable(${PHLIB_ALLOCATORS_TEST} ${PHLIB_ALLOCATORS_TEST_SRC})
 set_target_properties(${PHLIB_ALLOCATORS_TEST} PROPERTIES LINK_FLAGS -lstdc++)
@@ -44,8 +44,8 @@ add_test(NAME ${PHLIB_STRING_TEST} COMMAND ${PHLIB_STRING_TEST})
 set(SHELL_LEXER_TEST shell_lexer_tests)
 set(SHELL_LEXER_TEST_SRC
         sources/shell/lexer_tests.cpp
-        ${MODULES_ROOT}/shell/sources/lexer.cpp
-        ${MODULES_ROOT}/shell/sources/token.cpp
+        ${MODULES_ROOT}/shell/sources/Lexer.cpp
+        ${MODULES_ROOT}/shell/sources/Token.cpp
         ${MODULES_ROOT}/phlib/sources/allocator/pool_allocator.cpp
         )
 add_executable(${SHELL_LEXER_TEST} ${SHELL_LEXER_TEST_SRC})

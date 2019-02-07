@@ -10,8 +10,8 @@
 #ifndef PHANTOMSHELL_PHLIB_H
 #define PHANTOMSHELL_PHLIB_H
 
-#include "alloc.h"
-#include "types.h"
+#include "Allocator.h"
+#include "Types.h"
 
 /** @brief Default phlib namespace */
 namespace phlib {

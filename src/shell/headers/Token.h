@@ -10,9 +10,9 @@
 #ifndef PHANTOMSHELL_TOKEN_H
 #define PHANTOMSHELL_TOKEN_H
 
-#include "string.h"
-#include "keyword.h"
-#include "operator.h"
+#include "String.h"
+#include "Keyword.h"
+#include "Operator.h"
 
 /** @brief Default Shell namespace */
 namespace psh {

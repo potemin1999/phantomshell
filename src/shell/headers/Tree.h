@@ -5,9 +5,9 @@
 #ifndef PHANTOMSHELL_TREE_H
 #define PHANTOMSHELL_TREE_H
 
-#include "string.h"
-#include "operator.h"
-#include "psh_types.h"
+#include "String.h"
+#include "Operator.h"
+#include "PhantomShellTypes.h"
 
 namespace psh {
 

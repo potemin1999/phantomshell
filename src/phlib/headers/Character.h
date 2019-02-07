@@ -10,7 +10,7 @@
 #ifndef PHANTOMSHELL_CHARACTER_H
 #define PHANTOMSHELL_CHARACTER_H
 
-#include "types.h"
+#include "Types.h"
 
 /** @brief Default namespace for Phantom Shell support library */
 namespace phlib {

@@ -10,8 +10,8 @@
 #ifndef PHANTOMSHELL_SHELL_TYPES_H
 #define PHANTOMSHELL_SHELL_TYPES_H
 
-#include "string.h"
-#include "types.h"
+#include "String.h"
+#include "Types.h"
 
 /** @brief Default Shell namespace */
 namespace psh {

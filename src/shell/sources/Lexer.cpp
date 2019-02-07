@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include "lexer.h"
+#include "Lexer.h"
 
 using namespace psh;
 using namespace phlib;
@@ -380,9 +380,9 @@ Token *Lexer::getNextToken() {
         auto stringLiteralValue = createFromStashBuffer();
         return new Token(Literal::STRING_LITERAL, stringLiteralValue, currentLine);
     }
-    Token *operator_token  = makeOperatorToken(char1);
-    if (operator_token != nullptr) {
-        return operator_token;
+    Token *operatorToken   = makeOperatorToken(char1);
+    if (operatorToken != nullptr) {
+        return operatorToken;
     }
     // only non-digits and non-letters left
     Separator separator = makeSeparator(char1);

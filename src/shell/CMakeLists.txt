@@ -1,10 +1,10 @@
 set(SHELL "psh")
 set(SHELL_SOURCE_FILES
-        sources/lexer.cpp
-        sources/parser.cpp
-        sources/phantom_shell.cpp
-        sources/token.cpp
-        sources/tree.cpp)
+        sources/Lexer.cpp
+        sources/Parser.cpp
+        sources/PhantomShell.cpp
+        sources/Token.cpp
+        sources/Tree.cpp)
 add_executable(${SHELL} ${SHELL_SOURCE_FILES})
 target_include_directories(${SHELL} PUBLIC ${MODULES_ROOT}/phlib/headers)
 target_include_directories(${SHELL} PUBLIC headers)

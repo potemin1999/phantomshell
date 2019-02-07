@@ -7,12 +7,12 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include "lexer.h"
-#include "parser.h"
-#include "phantom_shell.h"
-#include "alloc.h"
-#include "string.h"
-#include "log.h"
+#include "Lexer.h"
+#include "Parser.h"
+#include "PhantomShell.h"
+#include "Allocator.h"
+#include "String.h"
+#include "Log.h"
 
 using namespace psh;
 using namespace phlib;
@@ -146,6 +146,7 @@ uint32 psh::parseShellArgs(PshArguments *args, int argc, const char **argv) {
 uint32 psh::cleanupShellArgs(psh::PshArguments *args) {
     delete args->inputStream;
     delete args->outputStream;
+    return 0;
 }
 
 

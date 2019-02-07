@@ -10,9 +10,9 @@
 #ifndef PHANTOMSHELL_PARSER_H
 #define PHANTOMSHELL_PARSER_H
 
-#include "keyword.h"
-#include "token.h"
-#include "tree.h"
+#include "Keyword.h"
+#include "Token.h"
+#include "Tree.h"
 
 #define PARSER_TOKEN_BUFFER_CAPACITY 64
 
@@ -41,6 +41,24 @@ public:
     explicit Parser();
 
     ~Parser();
+
+
+    /**
+     * @brief Allocates memory for new parser
+     * @param size Size of required memory in bytes
+     * @return Pointer to the memory
+     */
+    void *operator new(Size size) {
+        return phlib::malloc(size);
+    }
+
+    /**
+     * @brief Removes parser from memory
+     * @param ptr Pointer to lexer location
+     */
+    void operator delete(Ptr ptr) {
+        phlib::free(ptr);
+    }
 
     /**
      * @brief Input function of psh::Parser

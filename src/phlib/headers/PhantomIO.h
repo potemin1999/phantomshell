@@ -10,8 +10,8 @@
 #ifndef PHANTOMSHELL_PHIO_H
 #define PHANTOMSHELL_PHIO_H
 
-#include "types.h"
-#include "string.h"
+#include "Types.h"
+#include "String.h"
 
 #ifdef __simbuild__
 

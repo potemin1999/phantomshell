@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include "ostream.h"
+#include "OutputStream.h"
 
 
 union phlib::OStream::OStreamData {
@@ -37,8 +37,8 @@ union phlib::OStream::OStreamData {
 
 
 phlib::OStream::OStream(String &filePath) {
-    data       = new OStreamData();
-    type       = OStreamType::FILE_STREAM;
+    data      = new OStreamData();
+    type      = OStreamType::FILE_STREAM;
     writeFunc = &OStream::writeToFile;
     closeFunc = &OStream::closeFile;
     data->file = fopen(filePath, "w+");
@@ -51,8 +51,8 @@ phlib::OStream::OStream(Ptr buffer) {
 
 
 phlib::OStream::OStream() {
-    data       = new OStreamData();
-    type       = OStreamType::STDOUT_STREAM;
+    data      = new OStreamData();
+    type      = OStreamType::STDOUT_STREAM;
     writeFunc = &OStream::writeToStdout;
     closeFunc = &OStream::closeStdout;
     data->stdoutFd = open("/dev/stdout", OFlags::WRONLY);
@@ -101,6 +101,7 @@ SSize phlib::OStream::writeToFile(ConstPtr buffer, Size buffer_size) {
 
 int phlib::OStream::closeStdout() {
     phlib::close(data->stdoutFd);
+    return 0;
 }
 
 
@@ -108,6 +109,7 @@ int phlib::OStream::closeStdout() {
 
 int phlib::OStream::closeFile() {
     phlib::fclose(data->file);
+    return 0;
 }
 
 #endif //__simbuild__

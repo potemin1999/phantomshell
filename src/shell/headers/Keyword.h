@@ -10,8 +10,8 @@
 #ifndef PHANTOMSHELL_KEYWORD_H
 #define PHANTOMSHELL_KEYWORD_H
 
-#include "string.h"
-#include "types.h"
+#include "String.h"
+#include "Types.h"
 
 /** @brief Default Shell namespace */
 namespace psh {

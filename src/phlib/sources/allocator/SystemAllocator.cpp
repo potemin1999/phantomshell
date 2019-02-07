@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include "alloc.h"
+#include "Allocator.h"
 
 namespace phlib {
 

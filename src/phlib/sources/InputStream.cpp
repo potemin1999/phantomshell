@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include "istream.h"
+#include "InputStream.h"
 
 
 union phlib::IStream::IStreamData {
@@ -134,11 +134,13 @@ int phlib::IStream::closeObject() {
     if (data->objectCopy) {
         phlib::free(data->object);
     }
+    return 0;
 }
 
 
 int phlib::IStream::closeStdin() {
     phlib::close(data->stdinFd);
+    return 0;
 }
 
 
@@ -146,6 +148,7 @@ int phlib::IStream::closeStdin() {
 
 int phlib::IStream::closeFile() {
     phlib::fclose(data->file);
+    return 0;
 }
 
 #endif //__simbuild__

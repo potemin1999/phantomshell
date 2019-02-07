@@ -10,10 +10,10 @@
 #ifndef PHANTOMSHELL_OSTREAM_H
 #define PHANTOMSHELL_OSTREAM_H
 
-#include "log.h"
-#include "string.h"
-#include "types.h"
-#include "phio.h"
+#include "Log.h"
+#include "String.h"
+#include "Types.h"
+#include "PhantomIO.h"
 
 /** @brief Default namespace for Phantom Shell support library */
 namespace phlib {

@@ -7,13 +7,13 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include "token.h"
-#include "alloc.h"
+#include "Token.h"
+#include "Allocator.h"
 
 using namespace phlib;
 using namespace psh;
 
-Allocator *token_allocator = Allocator::getDefaultAllocator();
+Allocator *tokenAllocator = Allocator::getDefaultAllocator();
 
 Token::Token(TokenType type,
              int32 line) {
@@ -33,10 +33,10 @@ Token::Token(Separator separator,
 Token::Token(Literal literal,
              String *literalValue,
              int32 line) {
-    this->type          = TokenType::LITERAL;
-    this->literal       = literal;
+    this->type         = TokenType::LITERAL;
+    this->literal      = literal;
     this->literalValue = literalValue;
-    this->line          = line;
+    this->line         = line;
 }
 
 
@@ -74,53 +74,53 @@ Token::~Token() {
 
 
 Ptr Token::operator new(Size size) {
-    return token_allocator->allocate(size);
+    return tokenAllocator->allocate(size);
 }
 
 
 void Token::operator delete(Ptr tokenPtr) {
-    token_allocator->deallocate(tokenPtr);
+    tokenAllocator->deallocate(tokenPtr);
 }
 
 
 const char *Token::tokenToString() {
     delete stringValue;
     this->stringValue = new String("Token(type=");
-    String &string_value = *this->stringValue;
-    string_value += tokenTypeToString(this->type);
+    String &stringValue = *this->stringValue;
+    stringValue += tokenTypeToString(this->type);
     switch (type) {
         case TokenType::IDENTIFIER: {
-            string_value += ",identifier=";
-            string_value += *identifier;
+            stringValue += ",identifier=";
+            stringValue += *identifier;
             break;
         }
         case TokenType::KEYWORD: {
-            string_value += ",keyword=";
-            string_value += keywordToString(keyword);
+            stringValue += ",keyword=";
+            stringValue += keywordToString(keyword);
             break;
         }
         case TokenType::LITERAL: {
-            string_value += ",literal=";
-            string_value += literalToString(literal);
-            string_value += ",value=";
-            string_value += *literalValue;
+            stringValue += ",literal=";
+            stringValue += literalToString(literal);
+            stringValue += ",value=";
+            stringValue += *literalValue;
             break;
         }
         case TokenType::OPERATOR: {
-            string_value += ",operator=";
-            string_value += operatorToString(oper);
+            stringValue += ",operator=";
+            stringValue += operatorToString(oper);
             break;
         }
         case TokenType::SEPARATOR: {
-            string_value += ",separator=";
-            string_value += separatorToString(separator);
+            stringValue += ",separator=";
+            stringValue += separatorToString(separator);
             break;
         }
     }
-    string_value += ",line=";
-    string_value += String::valueOf((int32) line);
-    string_value += ")";
-    return string_value.charValue();
+    stringValue += ",line=";
+    stringValue += String::valueOf((int32) line);
+    stringValue += ")";
+    return stringValue.charValue();
 }
 
 
@@ -130,7 +130,7 @@ const char *Token::tokenTypeToString(TokenType type) {
         case TokenType::KEYWORD: return "KEYWORD";
         case TokenType::OPERATOR: return "OPERATOR";
         case TokenType::SEPARATOR: return "SEPARATOR";
-        default:return "IDENTIFIER";
+        default: return "IDENTIFIER";
     }
 }
 
@@ -143,6 +143,7 @@ const char *Token::literalToString(Literal literal) {
         case Literal::INTEGER_LITERAL: return "INTEGER_LITERAL";
         case Literal::CHARACTER_LITERAL: return "CHARACTER_LITERAL";
     }
+    return "UNKNOWN_LITERAL";
 }
 
 
@@ -159,6 +160,7 @@ const char *Token::separatorToString(Separator separator) {
         case Separator::PARENTHESIS_OPEN: return "PARENTHESIS_OPEN";
         case Separator::PARENTHESIS_CLOSE: return "PARENTHESIS_CLOSE";
     }
+    return "UNKNOWN_LITERAL";
 }
 
 bool Token::operator==(const Token &other) {

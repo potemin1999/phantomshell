@@ -10,8 +10,8 @@
 #ifndef PHANTOMSHELL_STRING_H
 #define PHANTOMSHELL_STRING_H
 
-#include "alloc.h"
-#include "types.h"
+#include "Allocator.h"
+#include "Types.h"
 
 /** @brief Default namespace for Phantom Shell support library */
 namespace phlib {
@@ -216,21 +216,17 @@ public:
 
     int compare(const char16 *str1, const char16 *str2);
 
-    static String value_of(uint32 value) {
-
-    }
+    static String valueOf(uint32 value);
 
     static String valueOf(int32 value);
 
-    static String valueOf(uint8 value) {
-
-    }
+    static String valueOf(uint8 value);
 
     static int strcmp(const char *str1, const char *str2);
 
 private:
 
-    static int stringSizeOfInteger(int32 integer);
+    static Size stringSizeOfInteger(int32 integer);
 
     String &plusEqualOperator(const char16 *str, Size strLength);
 

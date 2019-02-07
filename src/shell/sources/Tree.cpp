@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include "tree.h"
+#include "Tree.h"
 
 using namespace phlib;
 using namespace psh;
