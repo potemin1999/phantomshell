@@ -18,30 +18,30 @@ union phlib::OStream::OStreamData {
     struct {
         /** Stores pointer to destination object, when type==OBJECT_STREAM*/
         Ptr   object;
-        bool  object_copy;
-        SSize current_pointer;
+        bool  objectCopy;
+        SSize currentPointer;
         /** Stores destination object size, when type==OBJECT_STREAM*/
-        SSize object_size;
+        SSize objectSize;
     };
     /** Stores stdout descriptor, when type==STDOUT_STREAM*/
-    int  stdout_fd;
+    int  stdoutFd;
 
     Ptr operator new(Size size) {
-        return Allocator::get_default_allocator()->allocate(size);
+        return Allocator::getDefaultAllocator()->allocate(size);
     }
 
     void operator delete(Ptr ptr) {
-        Allocator::get_default_allocator()->deallocate(ptr);
+        Allocator::getDefaultAllocator()->deallocate(ptr);
     }
 };
 
 
-phlib::OStream::OStream(String &file_path) {
+phlib::OStream::OStream(String &filePath) {
     data       = new OStreamData();
     type       = OStreamType::FILE_STREAM;
-    write_func = &OStream::write_to_file;
-    close_func = &OStream::close_file;
-    data->file = fopen(file_path, "w+");
+    writeFunc = &OStream::writeToFile;
+    closeFunc = &OStream::closeFile;
+    data->file = fopen(filePath, "w+");
 }
 
 
@@ -53,10 +53,10 @@ phlib::OStream::OStream(Ptr buffer) {
 phlib::OStream::OStream() {
     data       = new OStreamData();
     type       = OStreamType::STDOUT_STREAM;
-    write_func = &OStream::write_to_stdout;
-    close_func = &OStream::close_stdout;
-    data->stdout_fd = open("/dev/stdout", OFlags::WRONLY);
-    DEBUG_LOG("created new stdout output stream with stdout_fd = %d\n", data->stdout_fd);
+    writeFunc = &OStream::writeToStdout;
+    closeFunc = &OStream::closeStdout;
+    data->stdoutFd = open("/dev/stdout", OFlags::WRONLY);
+    DEBUG_LOG("created new stdout output stream with stdoutFd = %d\n", data->stdoutFd);
 }
 
 
@@ -68,45 +68,45 @@ phlib::OStream::~OStream() {
 }
 
 Ptr phlib::OStream::operator new(Size size) {
-    return Allocator::get_default_allocator()->allocate(size);
+    return Allocator::getDefaultAllocator()->allocate(size);
 }
 
 void phlib::OStream::operator delete(Ptr pointer) {
-    Allocator::get_default_allocator()->deallocate(pointer);
+    Allocator::getDefaultAllocator()->deallocate(pointer);
 }
 
-SSize phlib::OStream::write(ConstPtr buffer, Size buffer_size) {
-    return (this->*write_func)(buffer, buffer_size);
+SSize phlib::OStream::write(ConstPtr buffer, Size bufferSize) {
+    return (this->*writeFunc)(buffer, bufferSize);
 }
 
 int phlib::OStream::close() {
     if (isClosed) return -1;
-    return (this->*close_func)();
+    return (this->*closeFunc)();
 }
 
 
-SSize phlib::OStream::write_to_stdout(ConstPtr buffer, Size buffer_size) {
-    return phlib::write(data->stdout_fd, buffer, buffer_size);
+SSize phlib::OStream::writeToStdout(ConstPtr buffer, Size bufferSize) {
+    return phlib::write(data->stdoutFd, buffer, bufferSize);
 }
 
 
 #ifdef __simbuild__
 
-SSize phlib::OStream::write_to_file(ConstPtr buffer, Size buffer_size) {
+SSize phlib::OStream::writeToFile(ConstPtr buffer, Size buffer_size) {
     return phlib::fwrite(data->file, buffer, buffer_size);
 }
 
 #endif //__simbuild__
 
 
-int phlib::OStream::close_stdout() {
-    phlib::close(data->stdout_fd);
+int phlib::OStream::closeStdout() {
+    phlib::close(data->stdoutFd);
 }
 
 
 #ifdef __simbuild__
 
-int phlib::OStream::close_file() {
+int phlib::OStream::closeFile() {
     phlib::fclose(data->file);
 }
 

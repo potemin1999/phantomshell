@@ -23,11 +23,11 @@ class String {
 
 private:
 
-    char          *str_char_value = nullptr;
-    char16        *str_value      = nullptr; /**< null terminated char16 sequence */
-    Size          str_length      = 0;
+    char          *strCharValue = nullptr;
+    char16        *strValue     = nullptr; /**< null terminated char16 sequence */
+    Size          strLength     = 0;
     static char16 digits[10];
-    static int    int_size_table[9];
+    static int    intSizeTable[9];
 
 public:
 
@@ -41,7 +41,7 @@ public:
      * @brief Creates string from null terminated char16 array
      * @param str is array
      */
-    String(const char16 *str) : String(str, get_length(str)) {}
+    String(const char16 *str) : String(str, getLength(str)) {}
 
     /**
      * @brief Creates string from char16* sequence with requested length
@@ -72,7 +72,7 @@ public:
      * @return char16 value
      */
     char16 &operator[](int i) {
-        return str_value[i];
+        return strValue[i];
     }
 
     /**
@@ -129,7 +129,7 @@ public:
      * @return pointer to char value
      */
     inline operator const char *() {
-        return char_value();
+        return charValue();
     }
 
     /**
@@ -137,7 +137,7 @@ public:
      * @return length of the string without null terminator
      */
     inline Size length() {
-        return str_length;
+        return strLength;
     }
 
     /**
@@ -145,58 +145,58 @@ public:
      * @return null terminated <tt>char*</tt>
      */
     inline const char16 *value() {
-        return str_value;
+        return strValue;
     }
 
     /**
      * @brief default char value of string
      * @return null terminated const char array
      */
-    const char *char_value();
+    const char *charValue();
 
     /**
      * @brief Compares beginning of the string with other string value
      * @param str other string
      * @return true, if this string starts with @p str
      */
-    bool starts_with(const String &str);
+    bool startsWith(const String &str);
 
     /**
      * @brief Compares beginning of the string with other char* value
      * @param prefix char* to compare beginning with
      * @return true, if string starts with prefix
      */
-    bool starts_with(const char16 *prefix);
+    bool startsWith(const char16 *prefix);
 
     /**
      * @brief Checks, whether this string ends by other string
      * @param suffix string to check
      * @return true if ends, false if does not
      */
-    bool ends_with(const String &suffix);
+    bool endsWith(const String &suffix);
 
     /**
      * @brief Checks, whether string ends with suffix
      * @param suffix to check
      * @return true if ends, false if does not
      */
-    bool ends_with(const char16 *suffix);
+    bool endsWith(const char16 *suffix);
 
     /**
      * @brief Checks, whether string ends with suffix
      *
      * If you know suffix length, this method is better than ends_with(const char*)
      * @param suffix - this is (probably) ending of this string
-     * @param suffix_length suffix length without null terminator
+     * @param suffixLength suffix length without null terminator
      * @return true if ends, false if does not
      */
-    bool ends_with(const char16 *suffix, Size suffix_length);
+    bool endsWith(const char16 *suffix, Size suffixLength);
 
     /**
      * @brief Computes hash code of string by Java-like method
      * @return hash code of the string
      */
-    uint32 hash_code();
+    uint32 hashCode();
 
     /**
      * @brief Compares two strings
@@ -220,9 +220,9 @@ public:
 
     }
 
-    static String value_of(int32 value);
+    static String valueOf(int32 value);
 
-    static String value_of(uint8 value) {
+    static String valueOf(uint8 value) {
 
     }
 
@@ -230,31 +230,31 @@ public:
 
 private:
 
-    static int string_size_of_integer(int32 integer);
+    static int stringSizeOfInteger(int32 integer);
 
-    String &plus_equal_operator(const char16 *str, Size str_length);
+    String &plusEqualOperator(const char16 *str, Size strLength);
 
-    static Size get_length(const char *str);
+    static Size getLength(const char *str);
 
-    static Size get_length(const char16 *str);
+    static Size getLength(const char16 *str);
 
-    static void setup_string(String *dst, const char16 *src);
+    static void setupString(String *dst, const char16 *src);
 
-    static void setup_string(String *dst, const char *src);
+    static void setupString(String *dst, const char *src);
 
-    static void setup_string(String *dst, const char *src, Size length);
+    static void setupString(String *dst, const char *src, Size length);
 
-    static void setup_string(String *dst, const char16 *src, Size length);
+    static void setupString(String *dst, const char16 *src, Size length);
 
-    inline static void copy_str(char16 *dst, const char16 *src, Size length) {
+    inline static void copyStr(char16 *dst, const char16 *src, Size length) {
         for (int i = 0; i < length; dst[i] = src[i], i++);
     }
 
-    inline static void add_str(char16 *dst,
-                               const char16 *src1, Size src1_length,
-                               const char16 *src2, Size src2_length) {
-        copy_str(dst, src1, src1_length);
-        copy_str(dst + src1_length, src2, src2_length);
+    inline static void addStr(char16 *dst,
+                              const char16 *src1, Size src1Length,
+                              const char16 *src2, Size src2Length) {
+        copyStr(dst, src1, src1Length);
+        copyStr(dst + src1Length, src2, src2Length);
     }
 
 };

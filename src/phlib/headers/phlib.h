@@ -41,18 +41,18 @@ Ptr memmove(Ptr dst, ConstPtr src, Size num);
 }
 
 inline Ptr phlib::memcpy(Ptr dst, ConstPtr src, Size num) {
-    Size i        = 0;
-    auto word_dst = (WordPtr) dst;
-    auto word_src = (ConstWordPtr) src;
+    Size i       = 0;
+    auto wordDst = (WordPtr) dst;
+    auto wordSrc = (ConstWordPtr) src;
     for (i = 0; i < num / WORDSIZE; i++) {
-        word_dst[i] = word_src[i];
+        wordDst[i] = wordSrc[i];
     }
     i *= 4;
     if (i - 1 == num) return dst;
-    auto byte_dst = (BytePtr) dst;
-    auto byte_src = (ConstBytePtr) src;
+    auto byteDst = (BytePtr) dst;
+    auto byteSrc = (ConstBytePtr) src;
     for (i -= WORDSIZE; i < num; i++) {
-        byte_dst[i] = byte_src[i];
+        byteDst[i] = byteSrc[i];
     }
     return dst;
 }
@@ -60,17 +60,15 @@ inline Ptr phlib::memcpy(Ptr dst, ConstPtr src, Size num) {
 inline Ptr phlib::memmove(Ptr dst, ConstPtr src, Size num) {
     if (dst == src)
         return dst;
-    auto byte_dst   = (BytePtr) dst;
-    auto byte_src   = (ConstBytePtr) src;
-    bool is_overlap = (byte_src + num > byte_dst) &
-                      (byte_src + num < byte_dst + num);
-    ConstPtr  buffer;
-    if (is_overlap) {
+    auto byteDst = (BytePtr) dst;
+    auto byteSrc = (ConstBytePtr) src;
+    bool overlap = (byteSrc + num > byteDst) &
+                   (byteSrc + num < byteDst + num);
+    auto buffer  = src;
+    if (overlap) {
         Ptr buffer1 = (Ptr) phlib::malloc(num);
         memcpy(buffer1, src, num);
         buffer = buffer1;
-    } else {
-        buffer = src;
     }
     memcpy(dst, buffer, num);
     return dst;

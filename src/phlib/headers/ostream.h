@@ -49,11 +49,11 @@ class OStream {
 
 protected:
 
-    WriteFunc   write_func;
-    CloseFunc   close_func;
+    WriteFunc   writeFunc;
+    CloseFunc   closeFunc;
     OStreamType type;
     OStreamData *data;
-    bool isClosed = false;
+    bool        isClosed = false;
 
 public:
 
@@ -61,9 +61,9 @@ public:
 
     /**
      * @brief Creates stream, writing to the file
-     * @param file_path
+     * @param filePath
      */
-    OStream(String &file_path);
+    OStream(String &filePath);
 
 #endif //__simbuild__
 
@@ -101,10 +101,10 @@ public:
     /**
      * @brief Writes data to location, described at creation
      * @param buffer to get data from
-     * @param buffer_size is size of @p buffer in bytes
+     * @param bufferSize is size of @p buffer in bytes
      * @return actually written bytes count
      */
-    SSize write(ConstPtr buffer, Size buffer_size);
+    SSize write(ConstPtr buffer, Size bufferSize);
 
     /**
      * @brief Closes resources in use
@@ -115,19 +115,19 @@ public:
 
 private:
 
-    SSize write_to_stdout(ConstPtr buffer, Size buffer_size);
+    SSize writeToStdout(ConstPtr buffer, Size bufferSize);
 
 #ifdef __simbuild__
 
-    SSize write_to_file(ConstPtr buffer, Size buffer_size);
+    SSize writeToFile(ConstPtr buffer, Size buffer_size);
 
 #endif //__simbuild__
 
-    int close_stdout();
+    int closeStdout();
 
 #ifdef __simbuild__
 
-    int close_file();
+    int closeFile();
 
 #endif //__simbuild__
 

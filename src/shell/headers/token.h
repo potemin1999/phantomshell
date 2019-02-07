@@ -53,7 +53,7 @@ class Token {
 
 private:
 
-    phlib::String *string_value = nullptr;
+    phlib::String *stringValue = nullptr;
 
 public:
 
@@ -61,7 +61,7 @@ public:
 
     Token(Separator separator, int32 line);
 
-    Token(Literal literal, phlib::String *literal_value, int32 line);
+    Token(Literal literal, phlib::String *literalValue, int32 line);
 
     Token(Keyword keyword, int32 line);
 
@@ -73,7 +73,7 @@ public:
 
     Ptr operator new(Size size);
 
-    void operator delete(Ptr token_ptr);
+    void operator delete(Ptr tokenPtr);
 
     /**
      * @brief token used always and shows how to interpret other data
@@ -88,26 +88,27 @@ public:
          * this struct will be used to describe literal, its type and value
          */
         struct {
-            Literal literal;              /**< valid when psh::Token::type=psh::TokenType::LITERAL */
-            phlib::String *literal_value; /**< valid when psh::Token::type=psh::TokenType::LITERAL */
+            Literal       literal;       /**< valid when psh::Token::type=psh::TokenType::LITERAL */
+            phlib::String *literalValue; /**< valid when psh::Token::type=psh::TokenType::LITERAL */
         };
         Separator separator;              /**< valid when psh::Token::type=psh::TokenType::SEPARATOR */
         Keyword   keyword;                /**< valid when psh::Token::type=psh::TokenType::KEYWORD */
         Operator  oper;                   /**< valid when psh::Token::type=psh::TokenType::OPERATOR */
+
         phlib::String *identifier;        /**< valid when psh::Token::type=psh::TokenType::IDENTIFIER */
     };
 
-    inline bool assert_type(TokenType type) {
+    inline bool assertType(TokenType type) {
         return !(this->type != type);
     }
 
-    const char *token_to_string();
+    const char *tokenToString();
 
-    const char *token_type_to_string(TokenType type);
+    const char *tokenTypeToString(TokenType type);
 
-    const char *literal_to_string(Literal literal);
+    const char *literalToString(Literal literal);
 
-    const char *separator_to_string(Separator separator);
+    const char *separatorToString(Separator separator);
 
     bool operator==(const Token &other);
 

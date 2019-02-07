@@ -51,19 +51,19 @@ public:
         return ((char) this->value) == c;
     }
 
-    inline bool is_digit() {
-        return is_digit(this->value);
+    inline bool isDigit() {
+        return isDigit(this->value);
     }
 
-    inline bool is_letter() {
-        return is_letter(this->value);
+    inline bool isLetter() {
+        return isLetter(this->value);
     }
 
-    static inline bool is_digit(char16 symbol) {
+    static inline bool isDigit(char16 symbol) {
         return symbol >= '0' & symbol <= '9';
     }
 
-    static inline bool is_letter(char16 symbol) {
+    static inline bool isLetter(char16 symbol) {
         return (symbol > 0x40 & symbol < 0x5b) || (symbol > 0x60 & symbol < 0x7b);
     }
 

@@ -41,7 +41,7 @@ int print(String str);
 
 int open(String file, OFlags flag);
 
-SSize read(int fd, Ptr buffer, Size buffer_size);
+SSize read(int fd, Ptr buffer, Size bufferSize);
 
 SSize write(int fd, ConstPtr buffer, Size nbytes);
 
@@ -51,7 +51,7 @@ int close(int fd);
 
 File *fopen(String file, const char *modes);
 
-SSize fread(File *file, Ptr buffer, Size buffer_size);
+SSize fread(File *file, Ptr buffer, Size bufferSize);
 
 SSize fwrite(File *file, ConstPtr buffer, Size nbytes);
 
@@ -67,15 +67,15 @@ int fclose(File *file);
 #ifdef __simbuild__
 
 inline int phlib::print(String str) {
-    return ::printf("%s", str.char_value());
+    return ::printf("%s", str.charValue());
 }
 
 inline int phlib::open(String file, phlib::OFlags flag) {
-    return ::open(file.char_value(), flag);
+    return ::open(file.charValue(), flag);
 }
 
-inline SSize phlib::read(int fd, Ptr buffer, Size buffer_size) {
-    return ::read(fd, buffer, buffer_size);
+inline SSize phlib::read(int fd, Ptr buffer, Size bufferSize) {
+    return ::read(fd, buffer, bufferSize);
 }
 
 inline SSize phlib::write(int fd, ConstPtr buffer, Size nbytes) {
@@ -87,11 +87,11 @@ inline int phlib::close(int fd) {
 }
 
 inline File *phlib::fopen(String file, const char *modes) {
-    return ::fopen(file.char_value(), modes);
+    return ::fopen(file.charValue(), modes);
 }
 
-inline SSize phlib::fread(File *file, Ptr buffer, Size buffer_size) {
-    return ::fread(buffer, 1, buffer_size, file);
+inline SSize phlib::fread(File *file, Ptr buffer, Size bufferSize) {
+    return ::fread(buffer, 1, bufferSize, file);
 }
 
 inline SSize phlib::fwrite(File *file, ConstPtr buffer, Size nbytes) {

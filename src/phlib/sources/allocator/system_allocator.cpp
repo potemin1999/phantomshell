@@ -36,10 +36,10 @@ void SystemAllocator::deallocate(Ptr ptr) {
 #endif //__debug__
 }
 
-SystemAllocator default_allocator;
+SystemAllocator defaultAllocator;
 
-Allocator *Allocator::get_default_allocator() noexcept {
-    return &default_allocator;
+Allocator *Allocator::getDefaultAllocator() noexcept {
+    return &defaultAllocator;
 }
 
 }

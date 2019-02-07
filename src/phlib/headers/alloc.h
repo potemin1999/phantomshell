@@ -72,7 +72,7 @@ public:
 
     virtual void release() {}
 
-    static Allocator *get_default_allocator() noexcept;
+    static Allocator *getDefaultAllocator() noexcept;
 
 };
 

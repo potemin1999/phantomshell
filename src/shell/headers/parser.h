@@ -33,8 +33,8 @@ class Parser {
 
 private:
 
-    Token         *token_buffer = nullptr;  /**< Stack of tokens*/
-    PushTokenFunc push_functions[6];        /**< Array of token push functions for each token type */
+    Token         *tokenBuffer = nullptr;  /**< Stack of tokens*/
+    PushTokenFunc pushFunctions[6];        /**< Array of token push functions for each token type */
 
 public:
 
@@ -47,19 +47,19 @@ public:
      * @param token to accept and push
      * @return push code
      */
-    int push_token(Token *token);
+    int pushToken(Token *token);
 
 private:
 
-    int push_identifier_token(Token *token);
+    int pushIdentifierToken(Token *token);
 
-    int push_keyword_token(Token *token);
+    int pushKeywordToken(Token *token);
 
-    int push_literal_token(Token *token);
+    int pushLiteralToken(Token *token);
 
-    int push_operator_token(Token *token);
+    int pushOperatorToken(Token *token);
 
-    int push_separator_token(Token *token);
+    int pushSeparatorToken(Token *token);
 
 };
 

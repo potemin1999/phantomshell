@@ -31,7 +31,7 @@ namespace phlib {
  * @param format string for arguments
  * @param ... format args
  */
-inline void debug_log_func(const char *file, unsigned line, const char *format, ...);
+inline void debugLogFunc(const char *file, unsigned line, const char *format, ...);
 
 #endif //__debug__
 
@@ -39,7 +39,7 @@ inline void debug_log_func(const char *file, unsigned line, const char *format, 
 
 #ifdef __debug__
 #ifdef __simbuild__
-#define DEBUG_LOG(...) phlib::debug_log_func(__FILE__,__LINE__,__VA_ARGS__)
+#define DEBUG_LOG(...) phlib::debugLogFunc(__FILE__,__LINE__,__VA_ARGS__)
 #else
 #define DEBUG_LOG(...)
 #endif //__simbuild__
@@ -53,7 +53,7 @@ inline void debug_log_func(const char *file, unsigned line, const char *format, 
 
 #ifdef __debug__
 
-void phlib::debug_log_func(const char *file, unsigned line, const char *format, ...) {
+void phlib::debugLogFunc(const char *file, unsigned line, const char *format, ...) {
 #ifdef __simbuild__
     printf("%s:%u\n", file, line);
     va_list list;

@@ -52,8 +52,8 @@ class IStream {
 
 protected:
 
-    ReadFunc  read_func;
-    CloseFunc close_func;
+    ReadFunc    readFunc;
+    CloseFunc   closeFunc;
     IStreamData *data;
     IStreamType type;
     bool        isClosed = false;
@@ -64,19 +64,19 @@ public:
 
     /**
      * @brief Creates input stream from file
-     * @param file_path
+     * @param filePath
      */
-    IStream(String &file_path);
+    IStream(String &filePath);
 
 #endif //__simbuild__
 
     /**
      * @brief Creates input stream from object
-     * @param byte_buffer to use as source
+     * @param byteBuffer to use as source
      * @param size size of buffer
-     * @param do_copy determines whether it should be copied
+     * @param doCopy determines whether it should be copied
      */
-    IStream(ConstPtr byte_buffer, Size size, bool do_copy);
+    IStream(ConstPtr byteBuffer, Size size, bool doCopy);
 
     /**
      * @brief Creates input stream from stdin
@@ -106,12 +106,12 @@ public:
     /**
      * @brief reads bytes from corresponding source
      * @param buffer place for write to
-     * @param buffer_size is @p buffer size in bytes
-     * @return -1 if @p buffer_size is negative
-     * @return -2 if @p buffer is null and @p buffer_size if positive
+     * @param bufferSize is @p buffer size in bytes
+     * @return -1 if @p bufferSize is negative
+     * @return -2 if @p buffer is null and @p bufferSize if positive
      * @return  value of read implementation otherwise
      */
-    SSize read(Ptr buffer, Size buffer_size);
+    SSize read(Ptr buffer, Size bufferSize);
 
     /**
      * @brief releases all resources, associated with this stream
@@ -123,21 +123,21 @@ private:
 
 #ifdef __simbuild__
 
-    SSize read_from_file(Ptr buffer, Size buffer_size);
+    SSize readFromFile(Ptr buffer, Size bufferSize);
 
 #endif //__simbuild__
 
-    SSize read_from_stdin(Ptr buffer, Size buffer_size);
+    SSize readFromStdin(Ptr buffer, Size bufferSize);
 
-    SSize read_from_object(Ptr buffer, Size buffer_size);
+    SSize readFromObject(Ptr buffer, Size bufferSize);
 
-    int close_object();
+    int closeObject();
 
-    int close_stdin();
+    int closeStdin();
 
 #ifdef __simbuild__
 
-    int close_file();
+    int closeFile();
 
 #endif //__simbuild__
 

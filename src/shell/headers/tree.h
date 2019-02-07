@@ -71,7 +71,7 @@ typedef enum DeclarationNodeType {
  */
 class BaseTreeNode {
 public:
-    TreeNodeType node_type; /**< real node type*/
+    TreeNodeType nodeType; /**< real node type*/
 };
 
 /**
@@ -79,7 +79,7 @@ public:
  */
 class LiteralNode : BaseTreeNode {
 public:
-    LiteralNodeType literal_node_type;
+    LiteralNodeType literalNodeType;
 
     LiteralNode();
 };
@@ -135,7 +135,7 @@ public:
  */
 class ExpressionNode : BaseTreeNode {
 public:
-    ExpressionNodeType expression_node_type;
+    ExpressionNodeType expressionNodeType;
 
     ExpressionNode();
 };
@@ -203,7 +203,7 @@ public:
 
 class StatementNode : BaseTreeNode {
 public:
-    StatementNodeType statement_node_type;
+    StatementNodeType statementNodeType;
 
     StatementNode();
 };
@@ -227,96 +227,96 @@ public:
 class IfStatementNode : StatementNode {
 public:
     ExpressionNode *expression;
-    StatementNode  *true_statement;
-    StatementNode  *false_statement;
+    StatementNode  *trueStatement;
+    StatementNode  *falseStatement;
 
     IfStatementNode(ExpressionNode *expression,
-                    StatementNode *true_statement,
-                    StatementNode *false_statement);
+                    StatementNode *trueStatement,
+                    StatementNode *falseStatement);
 
     IfStatementNode(ExpressionNode *expression,
-                    StatementNode *true_statement);
+                    StatementNode *trueStatement);
 };
 
 class CaseSelectionNode : StatementNode {
 public:
-    ConstantExpressionNode *constant_expression;
+    ConstantExpressionNode *constantExpression;
     StatementNode          *statement;
-    CaseSelectionNode      *next_case;
+    CaseSelectionNode      *nextCase;
 
-    CaseSelectionNode(ConstantExpressionNode *constant_expression,
+    CaseSelectionNode(ConstantExpressionNode *constantExpression,
                       StatementNode *statement,
-                      CaseSelectionNode *next_case);
+                      CaseSelectionNode *nextCase);
 };
 
 class SwitchStatementNode : StatementNode {
 public:
     ExpressionNode    *expression;
-    CaseSelectionNode *case_statement;
-    StatementNode     *other_statement;
+    CaseSelectionNode *caseStatement;
+    StatementNode     *otherStatement;
 
     SwitchStatementNode(ExpressionNode *expression,
-                        CaseSelectionNode *case_statement,
-                        StatementNode *other_statement);
+                        CaseSelectionNode *caseStatement,
+                        StatementNode *otherStatement);
 };
 
 class WhileStatementNode : StatementNode {
 public:
     ExpressionNode *expression;
-    StatementNode  *body_statement;
+    StatementNode  *bodyStatement;
 
     WhileStatementNode(ExpressionNode *expression,
-                       StatementNode *body_statement);
+                       StatementNode *bodyStatement);
 };
 
 class DoWhileStatementNode : StatementNode {
 public:
     ExpressionNode *expression;
-    StatementNode  *body_statement;
+    StatementNode  *bodyStatement;
 
     DoWhileStatementNode(ExpressionNode *expression,
-                         StatementNode *body_statement);
+                         StatementNode *bodyStatement);
 };
 
 class ForStatementNode : StatementNode {
 public:
     IdentifierExpressionNode *element;
     IdentifierExpressionNode *list;
-    StatementNode            *body_statement;
+    StatementNode            *bodyStatement;
 
     ForStatementNode(IdentifierExpressionNode *element,
                      IdentifierExpressionNode *list,
-                     StatementNode *body_statement);
+                     StatementNode *bodyStatement);
 };
 
 
 class DeclarationNode : BaseTreeNode {
 public:
-    DeclarationNodeType declaration_node_type;
+    DeclarationNodeType declarationNodeType;
 
     DeclarationNode();
 };
 
 class FuncArgDeclarationNode : DeclarationNode {
 public:
-    PshType       argument_type;
-    phlib::String argument_name;
+    PshType       argumentType;
+    phlib::String argumentName;
 
-    FuncArgDeclarationNode(PshType argument_type,
-                           phlib::String &argument_name);
+    FuncArgDeclarationNode(PshType argumentType1,
+                           phlib::String &argumentName);
 };
 
 class FuncDeclarationNode : DeclarationNode {
 public:
-    FuncDeclarationNode(phlib::String &function_name,
+    FuncDeclarationNode(phlib::String &functionName,
                         FuncArgDeclarationNode *arguments);
 };
 
 class ClassDeclarationNode : DeclarationNode {
 public:
-    phlib::String class_name;
+    phlib::String className;
 
-    ClassDeclarationNode(phlib::String &class_name);
+    ClassDeclarationNode(phlib::String &className);
 };
 
 

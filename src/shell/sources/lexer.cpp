@@ -13,111 +13,112 @@ using namespace psh;
 using namespace phlib;
 
 
-Lexer::Lexer(IStream *input_stream) {
-    istream              = input_stream;
-    read_buffer_pointer  = LEXER_READ_BUFFER_SIZE;
-    read_buffer_size     = LEXER_READ_BUFFER_SIZE;
-    read_buffer          = (uint8 *) phlib::malloc(LEXER_READ_BUFFER_SIZE);
-    stash_buffer_pointer = 0;
-    stash_buffer_size    = LEXER_STASH_BUFFER_SIZE;
-    stash_buffer         = (Symbol *) phlib::malloc(LEXER_STASH_BUFFER_SIZE);
-    current_line         = 1;
+Lexer::Lexer(IStream *inputStream) {
+    istream            = inputStream;
+    readBufferPointer  = LEXER_READ_BUFFER_SIZE;
+    readBufferSize     = LEXER_READ_BUFFER_SIZE;
+    stashBufferSize    = LEXER_STASH_BUFFER_SIZE;
+    readBuffer         = (uint8 *) phlib::malloc(LEXER_READ_BUFFER_SIZE);
+    stashBuffer        = (Symbol *) phlib::malloc(LEXER_STASH_BUFFER_SIZE);
+    stashBufferPointer = 0;
+    currentLine        = 1;
 }
 
 
 Lexer::~Lexer() {
-    phlib::free(read_buffer);
-    phlib::free(stash_buffer);
+    phlib::free(readBuffer);
+    phlib::free(stashBuffer);
 }
 
 
-Lexer::Symbol Lexer::read_next_symbol() {
-    if (read_buffer_pointer >= read_buffer_size) {
-        read_buffer_size = (uint32) update_buffer();
-        if (read_buffer_size == 0) return '\0';
-        read_buffer_pointer = 0;
+Lexer::Symbol Lexer::readNextSymbol() {
+    if (readBufferPointer >= readBufferSize) {
+        readBufferSize = (uint32) updateBuffer();
+        if (readBufferSize == 0) return '\0';
+        readBufferPointer = 0;
     }
-    uint8 hi = read_buffer[read_buffer_pointer++];
+    uint8 hi = readBuffer[readBufferPointer++];
     if ((hi & 0b10000000) == 0x00000000) return hi;
-    uint8 lo = read_buffer[read_buffer_pointer++];
+    uint8 lo = readBuffer[readBufferPointer++];
     return ((hi << 8) & lo);
 }
 
 
-Lexer::Symbol Lexer::get_next_symbol() {
-    if (stash_buffer_pointer != 0) {
-        stash_buffer_pointer -= 1;
-        Symbol ret_value = stash_buffer[stash_buffer_pointer];
-        return ret_value;
+Lexer::Symbol Lexer::getNextSymbol() {
+    if (stashBufferPointer != 0) {
+        stashBufferPointer -= 1;
+        auto retValue = stashBuffer[stashBufferPointer];
+        return retValue;
     }
-    Symbol symbol = read_next_symbol();
+    auto symbol = readNextSymbol();
     return symbol;
 }
 
 
-void Lexer::stash_symbol(Symbol symbol) {
-    stash_buffer[stash_buffer_pointer] = symbol;
-    stash_buffer_pointer += 1;
+void Lexer::stashSymbol(Symbol symbol) {
+    stashBuffer[stashBufferPointer] = symbol;
+    stashBufferPointer += 1;
 }
 
 
-SSize Lexer::update_buffer() {
-    return istream->read(read_buffer, read_buffer_size);
+SSize Lexer::updateBuffer() {
+    return istream->read(readBuffer, readBufferSize);
 }
 
 
-String *Lexer::create_from_stash_buffer() {
-    if (stash_buffer_pointer == 0) return new String();
-    auto ret_str = new String(stash_buffer, (Size) stash_buffer_pointer);
-    stash_buffer_pointer = 0;
-    return ret_str;
+String *Lexer::createFromStashBuffer() {
+    if (stashBufferPointer == 0)
+        return new String();
+    auto retStr = new String(stashBuffer, (Size) stashBufferPointer);
+    stashBufferPointer = 0;
+    return retStr;
 }
 
 
-Operator Lexer::check_if_identifier_is_operator() {
-    if (stash_buffer_pointer != 2 &
-        stash_buffer_pointer != 3) {
+Operator Lexer::checkIfIdentifierIsOperator() {
+    if (stashBufferPointer != 2 &
+        stashBufferPointer != 3) {
         return (Operator) 0;
     }
-    switch (stash_buffer[0]) {
+    switch (stashBuffer[0]) {
         case 'a': {
-            if (stash_buffer_pointer != 3)
+            if (stashBufferPointer != 3)
                 return (Operator) 0;
-            if (stash_buffer[1] == 'n' &
-                stash_buffer[2] == 'd') {
-                stash_buffer_pointer -= 3;
+            if (stashBuffer[1] == 'n' &
+                stashBuffer[2] == 'd') {
+                stashBufferPointer -= 3;
                 return Operator::LOGICAL_AND;
             } else {
                 return (Operator) 0;
             }
         }
         case 'n': {
-            if (stash_buffer_pointer != 3)
+            if (stashBufferPointer != 3)
                 return (Operator) 0;
-            if (stash_buffer[1] == 'o' &
-                stash_buffer[2] == 't') {
-                stash_buffer_pointer -= 3;
+            if (stashBuffer[1] == 'o' &
+                stashBuffer[2] == 't') {
+                stashBufferPointer -= 3;
                 return Operator::LOGICAL_NOT;
             } else {
                 return (Operator) 0;
             }
         }
         case 'o': {
-            if (stash_buffer_pointer != 2)
+            if (stashBufferPointer != 2)
                 return (Operator) 0;
-            if (stash_buffer[1] == 'r') {
-                stash_buffer_pointer -= 2;
+            if (stashBuffer[1] == 'r') {
+                stashBufferPointer -= 2;
                 return Operator::LOGICAL_OR;
             } else {
                 return (Operator) 0;
             }
         }
         case 'x': {
-            if (stash_buffer_pointer != 3)
+            if (stashBufferPointer != 3)
                 return (Operator) 0;
-            if (stash_buffer[1] == 'o' &
-                stash_buffer[2] == 'r') {
-                stash_buffer_pointer -= 3;
+            if (stashBuffer[1] == 'o' &
+                stashBuffer[2] == 'r') {
+                stashBufferPointer -= 3;
                 return Operator::LOGICAL_XOR;
             } else {
                 return (Operator) 0;
@@ -130,43 +131,43 @@ Operator Lexer::check_if_identifier_is_operator() {
 }
 
 
-inline Token *Lexer::make_operator_token(Symbol char1) {
-    Operator oper = make_operator(char1);
+inline Token *Lexer::makeOperatorToken(Symbol char1) {
+    Operator oper = makeOperator(char1);
     if (oper != 0) {
-        return new Token(oper, current_line);
+        return new Token(oper, currentLine);
     } else {
         return nullptr;
     }
 }
 
 
-Operator Lexer::make_operator(Lexer::Symbol char1) {
+Operator Lexer::makeOperator(Lexer::Symbol char1) {
     if (char1 == '+') {
-        Symbol char2 = get_next_symbol();
+        Symbol char2 = getNextSymbol();
         if (char2 == '+') {
             return Operator::POST_INCREMENT;
         } else {
-            stash_symbol(char2);
+            stashSymbol(char2);
             return Operator::ADDITION;
         }
     }
     if (char1 == '-') {
-        Symbol char2 = get_next_symbol();
+        Symbol char2 = getNextSymbol();
         if (char2 == '-') {
             return Operator::POST_DECREMENT;
         } else if (char2 == '>') {
             return Operator::LOGICAL_IMPLICATION;
         } else {
-            stash_symbol(char2);
+            stashSymbol(char2);
             return Operator::SUBTRACTION;
         }
     }
     if (char1 == '=') {
-        Symbol char2 = get_next_symbol();
+        Symbol char2 = getNextSymbol();
         if (char2 == '=') {
             return Operator::EQUAL_TO;
         } else {
-            stash_symbol(char2);
+            stashSymbol(char2);
             return Operator::ASSIGNMENT;
         }
     }
@@ -174,11 +175,11 @@ Operator Lexer::make_operator(Lexer::Symbol char1) {
         return Operator::BITWISE_NOT;
     }
     if (char1 == '!') {
-        Symbol char2 = get_next_symbol();
+        Symbol char2 = getNextSymbol();
         if (char2 == '=') {
             return Operator::NOT_EQUAL_TO;
         } else {
-            stash_symbol(char2);
+            stashSymbol(char2);
             return Operator::LOGICAL_NOT;
         }
     }
@@ -186,56 +187,56 @@ Operator Lexer::make_operator(Lexer::Symbol char1) {
         return Operator::MULTIPLICATION;
     }
     if (char1 == '/') {
-        Symbol char2 = get_next_symbol();
+        Symbol char2 = getNextSymbol();
         if (char2 == '\\') {
             return Operator::BITWISE_AND;
         } else {
-            stash_symbol(char2);
+            stashSymbol(char2);
             return Operator::DIVISION;
         }
     }
     if (char1 == '<') {
-        Symbol char2 = get_next_symbol();
+        Symbol char2 = getNextSymbol();
         if (char2 == '<') {
             return Operator::BITWISE_SHIFT_LEFT;
         } else if (char2 == '=') {
             return Operator::NOT_GREATER_THAN;
         } else {
-            stash_symbol(char2);
+            stashSymbol(char2);
             return Operator::LESS_THAN;
         }
     }
     if (char1 == '>') {
-        Symbol char2 = get_next_symbol();
+        Symbol char2 = getNextSymbol();
         if (char2 == '>') {
             return Operator::BITWISE_SHIFT_RIGHT;
         } else if (char2 == '=') {
             return Operator::NOT_LESS_THAN;
         } else {
-            stash_symbol(char2);
+            stashSymbol(char2);
             return Operator::GREATER_THAN;
         }
     }
     if (char1 == '\\') {
-        Symbol char2 = get_next_symbol();
+        Symbol char2 = getNextSymbol();
         if (char2 == '\'') {
-            Symbol char3 = get_next_symbol();
+            Symbol char3 = getNextSymbol();
             if (char3 == '/') {
                 return Operator::BITWISE_XOR;
             } else {
-                stash_symbol(char3);
+                stashSymbol(char3);
             }
         } else if (char2 == '/') {
             return Operator::BITWISE_OR;
         } else {
-            stash_symbol(char2);
+            stashSymbol(char2);
         }
     }
     return (Operator) 0;
 }
 
 
-Separator Lexer::make_separator(Lexer::Symbol symbol) {
+Separator Lexer::makeSeparator(Lexer::Symbol symbol) {
     if (symbol == '(' | symbol == ')') {
         return symbol == '(' ?
                Separator::PARENTHESIS_OPEN :
@@ -267,127 +268,128 @@ Separator Lexer::make_separator(Lexer::Symbol symbol) {
 }
 
 
-Token *Lexer::get_next_token() {
-    Symbol char_1;
+Token *Lexer::getNextToken() {
+    Symbol char1;
     do {
-        char_1 = get_next_symbol();
-    } while (char_1 == ' ');
-    if (char_1 == '\0') return nullptr;
-    bool  comment_skipped = false;
-    if (char_1 == '/') {
-        Symbol char2 = get_next_symbol();
+        char1 = getNextSymbol();
+    } while (char1 == ' ');
+    if (char1 == '\0') return nullptr;
+    auto  isCommentSkipped = false;
+    if (char1 == '/') {
+        Symbol char2 = getNextSymbol();
         if (char2 == '/') {
-            while (read_next_symbol() != '\n') {}
-            comment_skipped = true;
+            while (readNextSymbol() != '\n') {}
+            isCommentSkipped = true;
         } else if (char2 == '*') {
-            Symbol last_read;
-            bool   last_read_asterisk = false;
-            while (!(last_read_asterisk & ((last_read = read_next_symbol()) == '/'))) {
-                last_read_asterisk = last_read == '*';
+            Symbol lastRead;
+            bool   lastReadAsterisk = false;
+            while (!(lastReadAsterisk & ((lastRead = readNextSymbol()) == '/'))) {
+                lastReadAsterisk = lastRead == '*';
             }
-            comment_skipped                           = true;
+
+            isCommentSkipped = true;
         } else {
-            stash_symbol(char2);
+            stashSymbol(char2);
         }
     }
-    if (comment_skipped) {
-        char_1 = get_next_symbol();
-        if (char_1 == '\0') return nullptr;
-        while (char_1 == ' ') {
-            char_1 = get_next_symbol();
+    if (isCommentSkipped) {
+        char1 = getNextSymbol();
+        if (char1 == '\0') return nullptr;
+        while (char1 == ' ') {
+            char1 = getNextSymbol();
         }
     }
-    if (Character::is_letter(char_1)) {
-        stash_symbol(char_1);
-        Symbol last_read;
-        bool   may_be_keyword = true;
-        bool   last_read_is_letter;
-        bool   last_read_is_digit;
-        bool   last_read_is_underscore;
+    if (Character::isLetter(char1)) {
+        stashSymbol(char1);
+        Symbol lastRead;
+        bool   mayBeKeyword = true;
+        bool   lastReadIsLetter;
+        bool   lastReadIsDigit;
+        bool   lastReadIsUnderscore;
         do {
-            last_read               = read_next_symbol();
-            last_read_is_digit      = Character::is_digit(last_read);
-            last_read_is_letter     = Character::is_letter(last_read);
-            last_read_is_underscore = last_read == '_';
-            stash_symbol(last_read);
-            if (!last_read_is_letter &
-                (last_read_is_digit || last_read_is_underscore)) {
-                may_be_keyword = false;
+            lastRead             = readNextSymbol();
+            lastReadIsDigit      = Character::isDigit(lastRead);
+            lastReadIsLetter     = Character::isLetter(lastRead);
+            lastReadIsUnderscore = lastRead == '_';
+            stashSymbol(lastRead);
+            if (!lastReadIsLetter &
+                (lastReadIsDigit || lastReadIsUnderscore)) {
+                mayBeKeyword = false;
             }
-        } while (last_read_is_letter |
-                 last_read_is_digit |
-                 last_read_is_underscore);
-        stash_buffer_pointer -= 1;
-        uint32 oper          = check_if_identifier_is_operator();
+        } while (lastReadIsLetter |
+                 lastReadIsDigit |
+                 lastReadIsUnderscore);
+        stashBufferPointer -= 1;
+        uint32 oper         = checkIfIdentifierIsOperator();
         if (oper != 0) {
-            auto ret_token = new Token((Operator) oper, current_line);
-            stash_symbol(last_read);
-            return ret_token;
+            auto retToken = new Token((Operator) oper, currentLine);
+            stashSymbol(lastRead);
+            return retToken;
         }
-        String *string_value = create_from_stash_buffer();
-        stash_symbol(last_read);
-        int keyword_value = -1;
-        if (may_be_keyword) {
-            keyword_value = is_keyword(*string_value);
+        String *stringValue = createFromStashBuffer();
+        stashSymbol(lastRead);
+        int keywordValue = -1;
+        if (mayBeKeyword) {
+            keywordValue = isKeyword(*stringValue);
         }
-        DEBUG_LOG_LEX("is keyword ? %s\n", keyword_value != -1 ? "true" : "false");
-        if (keyword_value != -1) {
-            delete string_value;
-            return new Token((Keyword) keyword_value, current_line);
+        DEBUG_LOG_LEX("is keyword ? %s\n", keywordValue != -1 ? "true" : "false");
+        if (keywordValue != -1) {
+            delete stringValue;
+            return new Token((Keyword) keywordValue, currentLine);
         } else {
-            return new Token(string_value, current_line);
+            return new Token(stringValue, currentLine);
         }
     }
     //if we are starting from digits
-    if (Character::is_digit(char_1)) {
-        stash_symbol(char_1);
-        Symbol last_read;
-        bool   has_dot = false;
-        bool   last_read_is_dot;
-        bool   last_read_is_digit;
+    if (Character::isDigit(char1)) {
+        stashSymbol(char1);
+        Symbol lastRead;
+        bool   hasDot = false;
+        bool   lastReadIsDot;
+        bool   lastReadIsDigit;
         do {
-            last_read          = read_next_symbol();
-            last_read_is_digit = Character::is_digit(last_read);
-            last_read_is_dot   = last_read == '.';
-            //TODO: has_dot & last_read_is_dot should be invalid
-            has_dot            = has_dot | last_read_is_dot;
-            stash_symbol(last_read);
-        } while (last_read_is_digit |
-                 last_read_is_dot);
-        stash_buffer_pointer -= 1;
-        if (last_read_is_dot) {
+            lastRead        = readNextSymbol();
+            lastReadIsDigit = Character::isDigit(lastRead);
+            lastReadIsDot   = lastRead == '.';
+            //TODO: hasDot & lastReadIsDot should be invalid
+            hasDot          = hasDot | lastReadIsDot;
+            stashSymbol(lastRead);
+        } while (lastReadIsDigit |
+                 lastReadIsDot);
+        stashBufferPointer -= 1;
+        if (lastReadIsDot) {
             //last symbol is dot. what should we do
         }
-        auto literal_value = create_from_stash_buffer();
-        stash_symbol(last_read);
-        return new Token(has_dot ? Literal::FLOAT_LITERAL : Literal::INTEGER_LITERAL,
-                         literal_value, current_line);
+        auto literalValue = createFromStashBuffer();
+        stashSymbol(lastRead);
+        return new Token(hasDot ? Literal::FLOAT_LITERAL : Literal::INTEGER_LITERAL,
+                         literalValue, currentLine);
     }
-    if (char_1 == '"') {
-        Symbol last_read;
-        bool   last_read_escape;
-        bool   last_read_double_quotes;
+    if (char1 == '"') {
+        Symbol lastRead;
+        bool   lastReadEscape;
+        bool   lastReadDoubleQuotes;
         do {
-            last_read               = read_next_symbol();
-            last_read_escape        = last_read == '\\';
-            last_read_double_quotes = last_read == '"';
-            stash_symbol(last_read);
-        } while (!last_read_double_quotes |
-                 last_read_escape);
-        stash_buffer_pointer -= 1;
-        auto string_literal_value = create_from_stash_buffer();
-        return new Token(Literal::STRING_LITERAL, string_literal_value, current_line);
+            lastRead             = readNextSymbol();
+            lastReadEscape       = lastRead == '\\';
+            lastReadDoubleQuotes = lastRead == '"';
+            stashSymbol(lastRead);
+        } while (!lastReadDoubleQuotes |
+                 lastReadEscape);
+        stashBufferPointer -= 1;
+        auto stringLiteralValue = createFromStashBuffer();
+        return new Token(Literal::STRING_LITERAL, stringLiteralValue, currentLine);
     }
-    Token *operator_token = make_operator_token(char_1);
+    Token *operator_token  = makeOperatorToken(char1);
     if (operator_token != nullptr) {
         return operator_token;
     }
     // only non-digits and non-letters left
-    Separator separator = make_separator(char_1);
+    Separator separator = makeSeparator(char1);
     if (separator != 0) {
-        auto token = new Token(separator, current_line);
+        auto token = new Token(separator, currentLine);
         if (token->separator == Separator::NEW_LINE)
-            current_line++;
+            currentLine++;
         return token;
     } else {
         return nullptr;

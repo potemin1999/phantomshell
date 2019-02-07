@@ -13,41 +13,41 @@ using namespace phlib;
 using namespace psh;
 
 Parser::Parser() {
-    token_buffer = (Token *) phlib::malloc(PARSER_TOKEN_BUFFER_CAPACITY * sizeof(Token *));
-    push_functions[TokenType::IDENTIFIER] = &Parser::push_identifier_token;
-    push_functions[TokenType::KEYWORD]    = &Parser::push_keyword_token;
-    push_functions[TokenType::LITERAL]    = &Parser::push_literal_token;
-    push_functions[TokenType::OPERATOR]   = &Parser::push_operator_token;
-    push_functions[TokenType::SEPARATOR]  = &Parser::push_separator_token;
+    tokenBuffer = (Token *) phlib::malloc(PARSER_TOKEN_BUFFER_CAPACITY * sizeof(Token *));
+    pushFunctions[TokenType::IDENTIFIER] = &Parser::pushIdentifierToken;
+    pushFunctions[TokenType::KEYWORD]    = &Parser::pushKeywordToken;
+    pushFunctions[TokenType::LITERAL]    = &Parser::pushLiteralToken;
+    pushFunctions[TokenType::OPERATOR]   = &Parser::pushOperatorToken;
+    pushFunctions[TokenType::SEPARATOR]  = &Parser::pushSeparatorToken;
 }
 
 Parser::~Parser() {
-    phlib::free(token_buffer);
+    phlib::free(tokenBuffer);
 }
 
-int Parser::push_token(Token *token) {
+int Parser::pushToken(Token *token) {
     TokenType &type = token->type;
     if (type < 1 | type > 5)
         return -1;
-    return (this->*(push_functions[type]))(token);
+    return (this->*(pushFunctions[type]))(token);
 }
 
-int Parser::push_identifier_token(Token *token) {
+int Parser::pushIdentifierToken(Token *token) {
     return 0;
 }
 
-int Parser::push_keyword_token(Token *token) {
+int Parser::pushKeywordToken(Token *token) {
     return 0;
 }
 
-int Parser::push_literal_token(Token *token) {
+int Parser::pushLiteralToken(Token *token) {
     return 0;
 }
 
-int Parser::push_operator_token(Token *token) {
+int Parser::pushOperatorToken(Token *token) {
     return 0;
 }
 
-int Parser::push_separator_token(Token *token) {
+int Parser::pushSeparatorToken(Token *token) {
     return 0;
 }

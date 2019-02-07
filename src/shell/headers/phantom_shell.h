@@ -24,13 +24,13 @@ namespace psh {
  * @brief This structure stores all information from shell startup arguments
  */
 typedef struct PshArguments {
-    unsigned       show_usage: 1;        /**< flag, which requires usage of shell to be shown*/
-    unsigned       show_version: 1;      /**< this flag requires version to be shown */
-    unsigned       debug_mode: 1;        /**< If shell is running in debug mode, this is 1 */
-    unsigned       interactive_shell: 1; /**< 1 if shell is running in interactive mode */
-    unsigned       login_shell: 1;       /**< 1 if shell is used as login shell */
-    phlib::IStream *input_stream;        /**< istream where shell script is located*/
-    phlib::OStream *output_stream;       /**< ostream for shell output*/
+    unsigned       showUsage: 1;        /**< flag, which requires usage of shell to be shown*/
+    unsigned       showVersion: 1;      /**< this flag requires version to be shown */
+    unsigned       debugMode: 1;        /**< If shell is running in debug mode, this is 1 */
+    unsigned       interactiveShell: 1; /**< 1 if shell is running in interactive mode */
+    unsigned       loginShell: 1;       /**< 1 if shell is used as login shell */
+    phlib::IStream *inputStream;        /**< istream where shell script is located*/
+    phlib::OStream *outputStream;       /**< ostream for shell output*/
 } PshArguments;
 
 /**
@@ -50,7 +50,7 @@ class PhantomShell {
 
 private:
 
-    PshArguments *psh_arguments;
+    PshArguments *pshArguments;
     Lexer        *lexer;
     Parser       *parser;
 
@@ -71,7 +71,7 @@ public:
  * @param argv arguments - const char[][]
  * @return 0 if parsing was succeed, @ref ShellExitCode otherwise
  */
-uint32 parse_shell_args(PshArguments *args, int argc, const char **argv);
+uint32 parseShellArgs(PshArguments *args, int argc, const char **argv);
 
 /**
  * @brief Can parse shell option, starts with "-"
@@ -79,7 +79,7 @@ uint32 parse_shell_args(PshArguments *args, int argc, const char **argv);
  * @param option to parse
  * @return 0 if succeed, @ref ShellExitCode otherwise
  */
-uint32 parse_shell_short_options(PshArguments *args, const char *option);
+uint32 parseShellShortOptions(PshArguments *args, const char *option);
 
 /**
  * @brief Can parse shell option, starts with "--"
@@ -87,35 +87,35 @@ uint32 parse_shell_short_options(PshArguments *args, const char *option);
  * @param option to parse
  * @return 0 if succeed, @ref ShellExitCode otherwise
  */
-uint32 parse_shell_long_options(PshArguments *args, const char *option);
+uint32 parseShellLongOptions(PshArguments *args, const char *option);
 
 /**
  *
  * @param args
  * @return
  */
-uint32 cleanup_shell_args(PshArguments *args);
+uint32 cleanupShellArgs(PshArguments *args);
 
 /**
  * @brief Shows shell usage
  * @param args from which the output stream wil be taken
  * @return exit code value
  */
-ShellExitCode shell_show_usage(PshArguments *args);
+ShellExitCode shellShowUsage(PshArguments *args);
 
 /**
  * @brief Shows shell version
  * @param args where output stream to write into is stored
  * @return exit code value
  */
-ShellExitCode shell_show_version(PshArguments *args);
+ShellExitCode shellShowVersion(PshArguments *args);
 
 /**
  * @brief Shell entry point
  * @param args with flags data
  * @return psh::shell_exit_code
  */
-ShellExitCode shell_main(PshArguments *args);
+ShellExitCode shellMain(PshArguments *args);
 
 } //namespace psh
 

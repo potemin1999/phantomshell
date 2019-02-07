@@ -40,7 +40,7 @@ typedef enum Keyword {
  * @return psh::int32 if succeed
  *         -1 otherwise
  */
-inline int32 is_keyword(phlib::String &str) {
+inline int32 isKeyword(phlib::String &str) {
     switch (str[0]) {
         case 'c' : {
             if (str.equals("case")) return psh::Keyword::CASE;
@@ -85,7 +85,7 @@ inline int32 is_keyword(phlib::String &str) {
     }
 }
 
-inline const char *keyword_to_string(psh::Keyword keyword) {
+inline const char *keywordToString(psh::Keyword keyword) {
     switch (keyword) {
         case psh::Keyword::CASE: return "CASE";
         case psh::Keyword::CLASS: return "CLASS";

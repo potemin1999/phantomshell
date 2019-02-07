@@ -13,7 +13,7 @@
 using namespace phlib;
 using namespace psh;
 
-Allocator *token_allocator = Allocator::get_default_allocator();
+Allocator *token_allocator = Allocator::getDefaultAllocator();
 
 Token::Token(TokenType type,
              int32 line) {
@@ -31,11 +31,11 @@ Token::Token(Separator separator,
 
 
 Token::Token(Literal literal,
-             String *literal_value,
+             String *literalValue,
              int32 line) {
     this->type          = TokenType::LITERAL;
     this->literal       = literal;
-    this->literal_value = literal_value;
+    this->literalValue = literalValue;
     this->line          = line;
 }
 
@@ -68,8 +68,8 @@ Token::~Token() {
     if (type == TokenType::IDENTIFIER)
         delete identifier;
     if (type == TokenType::LITERAL)
-        delete literal_value;
-    delete string_value;
+        delete literalValue;
+    delete stringValue;
 }
 
 
@@ -78,16 +78,16 @@ Ptr Token::operator new(Size size) {
 }
 
 
-void Token::operator delete(Ptr token_ptr) {
-    token_allocator->deallocate(token_ptr);
+void Token::operator delete(Ptr tokenPtr) {
+    token_allocator->deallocate(tokenPtr);
 }
 
 
-const char *Token::token_to_string() {
-    delete string_value;
-    this->string_value = new String("Token(type=");
-    String &string_value = *this->string_value;
-    string_value += token_type_to_string(this->type);
+const char *Token::tokenToString() {
+    delete stringValue;
+    this->stringValue = new String("Token(type=");
+    String &string_value = *this->stringValue;
+    string_value += tokenTypeToString(this->type);
     switch (type) {
         case TokenType::IDENTIFIER: {
             string_value += ",identifier=";
@@ -96,35 +96,35 @@ const char *Token::token_to_string() {
         }
         case TokenType::KEYWORD: {
             string_value += ",keyword=";
-            string_value += keyword_to_string(keyword);
+            string_value += keywordToString(keyword);
             break;
         }
         case TokenType::LITERAL: {
             string_value += ",literal=";
-            string_value += literal_to_string(literal);
+            string_value += literalToString(literal);
             string_value += ",value=";
-            string_value += *literal_value;
+            string_value += *literalValue;
             break;
         }
         case TokenType::OPERATOR: {
             string_value += ",operator=";
-            string_value += operator_to_string(oper);
+            string_value += operatorToString(oper);
             break;
         }
         case TokenType::SEPARATOR: {
             string_value += ",separator=";
-            string_value += separator_to_string(separator);
+            string_value += separatorToString(separator);
             break;
         }
     }
     string_value += ",line=";
-    string_value += String::value_of((int32) line);
+    string_value += String::valueOf((int32) line);
     string_value += ")";
-    return string_value.char_value();
+    return string_value.charValue();
 }
 
 
-const char *Token::token_type_to_string(TokenType type) {
+const char *Token::tokenTypeToString(TokenType type) {
     switch (type) {
         case TokenType::LITERAL: return "LITERAL";
         case TokenType::KEYWORD: return "KEYWORD";
@@ -135,7 +135,7 @@ const char *Token::token_type_to_string(TokenType type) {
 }
 
 
-const char *Token::literal_to_string(Literal literal) {
+const char *Token::literalToString(Literal literal) {
     switch (literal) {
         case Literal::FLOAT_LITERAL: return "FLOAT_LITERAL";
         case Literal::STRING_LITERAL: return "STRING_LITERAL";
@@ -146,7 +146,7 @@ const char *Token::literal_to_string(Literal literal) {
 }
 
 
-const char *Token::separator_to_string(Separator separator) {
+const char *Token::separatorToString(Separator separator) {
     switch (separator) {
         case Separator::DOT: return "DOT";
         case Separator::COMMA: return "COMMA";
@@ -169,7 +169,7 @@ bool Token::operator==(const Token &other) {
         }
         case TokenType::LITERAL: {
             return this->literal == other.literal &&
-                   this->literal_value == other.literal_value;
+                   this->literalValue == other.literalValue;
         }
         case TokenType::KEYWORD: {
             return this->keyword == other.keyword;
