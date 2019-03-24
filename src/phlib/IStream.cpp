@@ -9,7 +9,7 @@
 
 #include "IStream.h"
 
-
+//@formatter:off
 union phlib::IStream::IStreamData {
 #ifdef __simbuild__
     /** Stores input file descriptor, when type==FILE_STREAM*/
@@ -25,23 +25,23 @@ union phlib::IStream::IStreamData {
     };
     /** Stores stdin descriptor, when type==STDIN_STREAM*/
     int  stdinFd;
-
 };
+//@formatter:on
 
 
 phlib::IStream::IStream(String &filePath) {
-    data      = new IStreamData();
-    type      = IStreamType::FILE_STREAM;
-    readFunc  = &IStream::readFromFile;
+    data = new IStreamData();
+    type = IStreamType::FILE_STREAM;
+    readFunc = &IStream::readFromFile;
     closeFunc = &IStream::closeFile;
     data->file = phlib::fopen(filePath, "r");
 }
 
 
 phlib::IStream::IStream(ConstPtr byteBuffer, Size size, bool doCopy) {
-    data      = new IStreamData();
-    type      = IStreamType::OBJECT_STREAM;
-    readFunc  = &IStream::readFromObject;
+    data = new IStreamData();
+    type = IStreamType::OBJECT_STREAM;
+    readFunc = &IStream::readFromObject;
     closeFunc = &IStream::closeObject;
     if (doCopy) {
         data->object = phlib::malloc(size);
@@ -50,16 +50,16 @@ phlib::IStream::IStream(ConstPtr byteBuffer, Size size, bool doCopy) {
         data->object = (Ptr) byteBuffer;
     }
 
-    data->objectCopy     = doCopy;
-    data->objectSize     = size;
+    data->objectCopy = doCopy;
+    data->objectSize = size;
     data->currentPointer = 0;
 }
 
 
 phlib::IStream::IStream() {
-    data      = new IStreamData();
-    type      = IStreamType::STDIN_STREAM;
-    readFunc  = &IStream::readFromStdin;
+    data = new IStreamData();
+    type = IStreamType::STDIN_STREAM;
+    readFunc = &IStream::readFromStdin;
     closeFunc = &IStream::closeStdin;
     data->stdinFd = phlib::open("/dev/stdin", OFlags::RDONLY);
     DEBUG_LOG("created input stream from stdin with stdinFd = %d\n", data->stdinFd);

@@ -35,22 +35,23 @@ class Lexer {
     /**
      * @brief if we want to change or redefine symbol, we can do it here
      */
-    typedef char16 Symbol;
+    typedef Char16 Symbol;
+
 
 private:
-
+    //@formatter:off
     phlib::IStream *istream;             /**< data source */
 
-    uint8  *readBuffer;         /**< buffer as read source */
-    uint32 readBufferPointer;  /**< current position in read_buffer*/
-    uint32 readBufferSize;     /**< read buffer size in bytes */
+    UInt8  *readBuffer;         /**< buffer as read source */
+    UInt32 readBufferPointer;   /**< current position in read_buffer*/
+    UInt32 readBufferSize;      /**< read buffer size in bytes */
     Symbol *stashBuffer;        /**< stash stack for symbols */
-    uint32 stashBufferPointer; /**< stores token_buffer offset where the next symbol is stored */
-    uint32 stashBufferSize;    /**< max stash size */
-    int32  currentLine;         /**< variable stores current line, processing by lexer */
+    UInt32 stashBufferPointer;  /**< stores token_buffer offset where the next symbol is stored */
+    UInt32 stashBufferSize;     /**< max stash size */
+    Int32  currentLine;         /**< variable stores current line, processing by lexer */
 
 public:
-
+    //@formatter:on
     /**
      * @brief Main constructor
      * @param inputStream stream from which lexer should lex

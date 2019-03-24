@@ -20,15 +20,16 @@
 /** @brief Default Shell namespace */
 namespace psh {
 
+//@formatter:off
 /**
  * @brief This structure stores all information from shell startup arguments
  */
 typedef struct PshArguments {
-    unsigned       showUsage: 1;        /**< flag, which requires usage of shell to be shown*/
-    unsigned       showVersion: 1;      /**< this flag requires version to be shown */
-    unsigned       debugMode: 1;        /**< If shell is running in debug mode, this is 1 */
-    unsigned       interactiveShell: 1; /**< 1 if shell is running in interactive mode */
-    unsigned       loginShell: 1;       /**< 1 if shell is used as login shell */
+    unsigned int   showUsage: 1;        /**< flag, which requires usage of shell to be shown*/
+    unsigned int   showVersion: 1;      /**< this flag requires version to be shown */
+    unsigned int   debugMode: 1;        /**< If shell is running in debug mode, this is 1 */
+    unsigned int   interactiveShell: 1; /**< 1 if shell is running in interactive mode */
+    unsigned int   loginShell: 1;       /**< 1 if shell is used as login shell */
     phlib::IStream *inputStream;        /**< istream where shell script is located*/
     phlib::OStream *outputStream;       /**< ostream for shell output*/
 } PshArguments;
@@ -42,6 +43,7 @@ typedef enum ShellExitCode {
     EXIT_DUPLICATED_ARGUMENT = 0xa1  /**< Shell found correct argument repeated twice*/
 } ShellExitCode;
 
+//@formatter:on
 
 /**
  * @brief Root level class in shell structure
@@ -51,8 +53,8 @@ class PhantomShell {
 private:
 
     PshArguments *pshArguments;
-    Lexer        *lexer;
-    Parser       *parser;
+    Lexer *lexer;
+    Parser *parser;
 
 public:
 
@@ -71,7 +73,7 @@ public:
  * @param argv arguments - const char[][]
  * @return 0 if parsing was succeed, @ref ShellExitCode otherwise
  */
-uint32 parseShellArgs(PshArguments *args, int argc, const char **argv);
+UInt32 parseShellArgs(PshArguments *args, int argc, const char **argv);
 
 /**
  * @brief Can parse shell option, starts with "-"
@@ -79,7 +81,7 @@ uint32 parseShellArgs(PshArguments *args, int argc, const char **argv);
  * @param option to parse
  * @return 0 if succeed, @ref ShellExitCode otherwise
  */
-uint32 parseShellShortOptions(PshArguments *args, const char *option);
+UInt32 parseShellShortOptions(PshArguments *args, const char *option);
 
 /**
  * @brief Can parse shell option, starts with "--"
@@ -87,14 +89,14 @@ uint32 parseShellShortOptions(PshArguments *args, const char *option);
  * @param option to parse
  * @return 0 if succeed, @ref ShellExitCode otherwise
  */
-uint32 parseShellLongOptions(PshArguments *args, const char *option);
+UInt32 parseShellLongOptions(PshArguments *args, const char *option);
 
 /**
  *
  * @param args
  * @return
  */
-uint32 cleanupShellArgs(PshArguments *args);
+UInt32 cleanupShellArgs(PshArguments *args);
 
 /**
  * @brief Shows shell usage

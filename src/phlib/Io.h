@@ -24,8 +24,8 @@ typedef FILE File;
 #endif
 
 /** @brief Default namespace for Phantom Shell support library */
-namespace phlib {
-
+PHLIB_NAMESPACE_BEGIN
+//@formatter:off
 #ifdef __simbuild__
 typedef enum OFlags {
     RDONLY = O_RDONLY,
@@ -36,6 +36,7 @@ typedef enum OFlags {
 typedef enum OFlags {
 } OFlags;
 #endif //__simbuild__
+//@formatter:on
 
 int print(String str);
 
@@ -59,7 +60,7 @@ int fclose(File *file);
 
 #endif //__simbuild__
 
-} //namespace phlib
+PHLIB_NAMESPACE_END
 
 /*
  * INLINE DEFINITIONS ARE BELOW

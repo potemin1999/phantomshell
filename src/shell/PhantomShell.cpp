@@ -43,7 +43,7 @@ ShellExitCode PhantomShell::run() {
 }
 
 
-uint32 psh::parseShellShortOptions(psh::PshArguments *args, const char *option) {
+UInt32 psh::parseShellShortOptions(psh::PshArguments *args, const char *option) {
     if (option[0] != '-') return 1;
     switch (option[1]) {
         case 'd': {
@@ -91,13 +91,13 @@ uint32 psh::parseShellShortOptions(psh::PshArguments *args, const char *option) 
 }
 
 
-uint32 psh::parseShellLongOptions(psh::PshArguments *args, const char *option) {
+UInt32 psh::parseShellLongOptions(psh::PshArguments *args, const char *option) {
     //TODO: implement
     return 0;
 }
 
 
-uint32 psh::parseShellArgs(PshArguments *args, int argc, const char **argv) {
+UInt32 psh::parseShellArgs(PshArguments *args, int argc, const char **argv) {
 #ifndef __debug__
     args->debugMode = 0;
 #else //__debug__
@@ -143,7 +143,7 @@ uint32 psh::parseShellArgs(PshArguments *args, int argc, const char **argv) {
 }
 
 
-uint32 psh::cleanupShellArgs(psh::PshArguments *args) {
+UInt32 psh::cleanupShellArgs(psh::PshArguments *args) {
     delete args->inputStream;
     delete args->outputStream;
 }

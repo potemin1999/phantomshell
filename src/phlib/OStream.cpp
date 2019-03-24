@@ -9,7 +9,7 @@
 
 #include "OStream.h"
 
-
+//@formatter:off
 union phlib::OStream::OStreamData {
 #ifdef __simbuild__
     /** Stores output file descriptor, when type==FILE_STREAM */
@@ -25,8 +25,8 @@ union phlib::OStream::OStreamData {
     };
     /** Stores stdout descriptor, when type==STDOUT_STREAM*/
     int  stdoutFd;
-
 };
+//@formatter:on
 
 
 phlib::OStream::OStream(String &filePath) {

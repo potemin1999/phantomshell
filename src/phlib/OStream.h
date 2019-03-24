@@ -41,6 +41,7 @@ class OStream {
     /**
     * @brief This enum describes istream types
     */
+    //@formatter:off
     enum OStreamType {
         FILE_STREAM   = 0,
         STDOUT_STREAM = 1,
@@ -56,7 +57,7 @@ protected:
     bool        isClosed = false;
 
 public:
-
+    //@formatter:on
 #ifdef __simbuild__
 
     /**

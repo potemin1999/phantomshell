@@ -16,6 +16,7 @@
 
 /** @brief Default Shell namespace */
 namespace psh {
+//@formatter:off
 
 typedef enum Literal {
     LOGICAL_LITERAL   = 0x01,
@@ -45,6 +46,7 @@ typedef enum TokenType {
     SEPARATOR  = 0x04, /**< described by separator field */
     LITERAL    = 0x05, /**< described by literal and literal_value fields */
 } TokenType;
+//@formatter:on
 
 /**
  * @brief Describes output objects of lexer
@@ -57,17 +59,17 @@ private:
 
 public:
 
-    Token(TokenType type, int32 line);
+    Token(TokenType type, Int32 line);
 
-    Token(Separator separator, int32 line);
+    Token(Separator separator, Int32 line);
 
-    Token(Literal literal, phlib::String *literalValue, int32 line);
+    Token(Literal literal, phlib::String *literalValue, Int32 line);
 
-    Token(Keyword keyword, int32 line);
+    Token(Keyword keyword, Int32 line);
 
-    Token(Operator oper, int32 line);
+    Token(Operator oper, Int32 line);
 
-    Token(phlib::String *identifier, int32 line);
+    Token(phlib::String *identifier, Int32 line);
 
     ~Token();
 
@@ -79,9 +81,11 @@ public:
      * @brief token used always and shows how to interpret other data
      *
      * It determines which data accessed from union will be valid
+     *
      */
+    //@formatter:off
     TokenType type;
-    int32     line;
+    Int32     line;
     union {
         /**
          * if psh::Token::type equal to psh::TokenType::LITERAL,
@@ -97,6 +101,7 @@ public:
 
         phlib::String *identifier;        /**< valid when psh::Token::type=psh::TokenType::IDENTIFIER */
     };
+    //@formatter:on
 
     inline bool assertType(TokenType type) {
         return !(this->type != type);

@@ -33,7 +33,7 @@ class Parser {
 
 private:
 
-    Token         *tokenBuffer = nullptr;  /**< Stack of tokens*/
+    Token *tokenBuffer = nullptr;  /**< Stack of tokens*/
     PushTokenFunc pushFunctions[6];        /**< Array of token push functions for each token type */
 
 public:

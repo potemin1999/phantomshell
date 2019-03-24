@@ -41,7 +41,7 @@ Ptr memmove(Ptr dst, ConstPtr src, Size num);
 }
 
 inline Ptr phlib::memcpy(Ptr dst, ConstPtr src, Size num) {
-    Size i       = 0;
+    Size i = 0;
     auto wordDst = (WordPtr) dst;
     auto wordSrc = (ConstWordPtr) src;
     for (i = 0; i < num / WORDSIZE; i++) {
@@ -64,7 +64,7 @@ inline Ptr phlib::memmove(Ptr dst, ConstPtr src, Size num) {
     auto byteSrc = (ConstBytePtr) src;
     bool overlap = (byteSrc + num > byteDst) &
                    (byteSrc + num < byteDst + num);
-    auto buffer  = src;
+    auto buffer = src;
     if (overlap) {
         Ptr buffer1 = (Ptr) phlib::malloc(num);
         memcpy(buffer1, src, num);

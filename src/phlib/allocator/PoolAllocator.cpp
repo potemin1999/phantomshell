@@ -67,8 +67,8 @@ ChunkHeader *find_free_chunk() {
 
 }
 
-namespace phlib{
-class PoolAllocator : public Allocator{
+namespace phlib {
+class PoolAllocator : public Allocator {
 
 private:
 
@@ -95,7 +95,7 @@ public:
 }
 
 
-phlib::PoolAllocator::PoolAllocator(Size object_size) noexcept : Allocator(){
+phlib::PoolAllocator::PoolAllocator(Size object_size) noexcept : Allocator() {
     this->object_size = object_size;
 }
 

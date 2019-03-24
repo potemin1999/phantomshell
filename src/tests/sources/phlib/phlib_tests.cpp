@@ -4,8 +4,8 @@
 using namespace phlib;
 
 int test1(){
-    byte srcBytePtr[10];
-    byte dstBytePtr[10];
+    Byte srcBytePtr[10];
+    Byte dstBytePtr[10];
     srcBytePtr[0] = 0;
     srcBytePtr[1] = 1;
     srcBytePtr[2] = 2;

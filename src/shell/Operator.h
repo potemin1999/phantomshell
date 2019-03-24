@@ -85,6 +85,7 @@ namespace psh {
  *  Id: from 0x00 up to 0x7f including @n
  *   id can be used to execute these operators in O(1) time
  *
+ * @formatter:off
  */
 typedef enum Operator {
 
@@ -122,7 +123,7 @@ typedef enum Operator {
  * @param oper is operator to get id of
  * @return id of @p oper
  */
-uint16 getOperatorId(Operator oper);
+UInt16 getOperatorId(Operator oper);
 
 /**
  * @brief Check if operator is left-to-right associative
@@ -138,7 +139,7 @@ bool isLeftToRightAssociative(Operator oper);
  * @return 2 if operator @p oper is binary
  * @return 3 if operator @p oper is ternary
  */
-uint8 getOperatorArity(Operator oper);
+UInt8 getOperatorArity(Operator oper);
 
 /**
  * @brief Checks, whether operator is unary
@@ -166,7 +167,7 @@ bool isTernaryOperator(Operator oper);
  * @param oper is an Operator to get info about
  * @return uint8 with precedence [0:15]
  */
-uint8 getOperatorPrecedence(Operator oper);
+UInt8 getOperatorPrecedence(Operator oper);
 
 /**
  * @brief Checks if this operator is increment or decrement operator
@@ -228,9 +229,10 @@ const char* operatorToSymbol(Operator oper);
 
 /*
  *  IMPLEMENTATIONS OF INLINE FUNCTIONS ARE BELOW
+ *  @formatter:on
  */
 
-inline uint16 psh::getOperatorId(psh::Operator oper) {
+inline UInt16 psh::getOperatorId(psh::Operator oper) {
     return oper & OP_ID_MASK;
 }
 
@@ -238,8 +240,8 @@ inline bool psh::isLeftToRightAssociative(psh::Operator oper) {
     return (oper & OP_ASSOCIATIVITY_MASK) == OP_ASSOC_LTR;
 }
 
-inline uint8 psh::getOperatorArity(psh::Operator oper) {
-    ubyte arityBits = (oper & OP_ARITY_MASK);
+inline UInt8 psh::getOperatorArity(psh::Operator oper) {
+    UByte arityBits = (oper & OP_ARITY_MASK);
     return (arityBits >> 30);
 }
 
@@ -255,7 +257,7 @@ inline bool psh::isTernaryOperator(psh::Operator oper) {
     return psh::getOperatorArity(oper) == 3;
 }
 
-inline uint8 psh::getOperatorPrecedence(psh::Operator oper) {
+inline UInt8 psh::getOperatorPrecedence(psh::Operator oper) {
     return ((oper & OP_PRECEDENCE_MASK) >> 8) & 0x8000;
 }
 

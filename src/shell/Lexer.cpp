@@ -18,7 +18,8 @@ Lexer::Lexer(IStream *inputStream) {
     readBufferPointer  = LEXER_READ_BUFFER_SIZE;
     readBufferSize     = LEXER_READ_BUFFER_SIZE;
     stashBufferSize    = LEXER_STASH_BUFFER_SIZE;
-    readBuffer         = (uint8 *) phlib::malloc(LEXER_READ_BUFFER_SIZE);
+    readBuffer = new UInt8[LEXER_READ_BUFFER_SIZE];
+    //readBuffer         = (UInt8 *) phlib::malloc(LEXER_READ_BUFFER_SIZE);
     stashBuffer        = (Symbol *) phlib::malloc(LEXER_STASH_BUFFER_SIZE);
     stashBufferPointer = 0;
     currentLine        = 1;
@@ -33,13 +34,13 @@ Lexer::~Lexer() {
 
 Lexer::Symbol Lexer::readNextSymbol() {
     if (readBufferPointer >= readBufferSize) {
-        readBufferSize = (uint32) updateBuffer();
+        readBufferSize = (UInt32) updateBuffer();
         if (readBufferSize == 0) return '\0';
         readBufferPointer = 0;
     }
-    uint8 hi = readBuffer[readBufferPointer++];
+    UInt8 hi = readBuffer[readBufferPointer++];
     if ((hi & 0b10000000) == 0x00000000) return hi;
-    uint8 lo = readBuffer[readBufferPointer++];
+    UInt8 lo = readBuffer[readBufferPointer++];
     return ((hi << 8) & lo);
 }
 
@@ -320,7 +321,7 @@ Token *Lexer::getNextToken() {
                  lastReadIsDigit |
                  lastReadIsUnderscore);
         stashBufferPointer -= 1;
-        uint32 oper         = checkIfIdentifierIsOperator();
+        UInt32 oper         = checkIfIdentifierIsOperator();
         if (oper != 0) {
             auto retToken = new Token((Operator) oper, currentLine);
             stashSymbol(lastRead);

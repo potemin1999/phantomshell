@@ -13,15 +13,15 @@ using namespace phlib;
 using namespace psh;
 
 DeclarationNode::DeclarationNode() : BaseTreeNode() {
-    this->nodeType            = TreeNodeType::DECLARATION_NODE;
+    this->nodeType = TreeNodeType::DECLARATION_NODE;
     this->declarationNodeType = (DeclarationNodeType) 0;
 }
 
 FuncArgDeclarationNode::FuncArgDeclarationNode(PshType argumentType, String &argumentName)
         : DeclarationNode() {
     this->declarationNodeType = DeclarationNodeType::FUNC_ARG_DECLARATION_NODE;
-    this->argumentType        = argumentType;
-    this->argumentName        = argumentName;
+    this->argumentType = argumentType;
+    this->argumentName = argumentName;
 }
 
 FuncDeclarationNode::FuncDeclarationNode(String &functionName, FuncArgDeclarationNode *arguments)
@@ -37,39 +37,39 @@ ClassDeclarationNode::ClassDeclarationNode(String &className)
 //Expressions
 
 ExpressionNode::ExpressionNode() : BaseTreeNode() {
-    this->nodeType           = TreeNodeType::EXPRESSION_NODE;
+    this->nodeType = TreeNodeType::EXPRESSION_NODE;
     this->expressionNodeType = (ExpressionNodeType) 0;
 }
 
 ConstantExpressionNode::ConstantExpressionNode(LiteralNode *literal)
         : ExpressionNode() {
     this->expressionNodeType = ExpressionNodeType::CONSTANT_EXPRESSION_NODE;
-    this->literal            = literal;
+    this->literal = literal;
 }
 
 UnaryExpressionNode::UnaryExpressionNode(Operator oper, ExpressionNode *operand)
         : ExpressionNode() {
     this->expressionNodeType = ExpressionNodeType::UNARY_EXPRESSION_NODE;
-    this->oper               = oper;
-    this->operand            = operand;
+    this->oper = oper;
+    this->operand = operand;
 }
 
 BinaryExpressionNode::BinaryExpressionNode(Operator oper, ExpressionNode *operand1, ExpressionNode *operand2)
         : ExpressionNode() {
     this->expressionNodeType = ExpressionNodeType::BINARY_EXPRESSION_NODE;
-    this->oper               = oper;
-    this->operand1           = operand1;
-    this->operand2           = operand2;
+    this->oper = oper;
+    this->operand1 = operand1;
+    this->operand2 = operand2;
 }
 
 TernaryExpressionNode::TernaryExpressionNode(Operator oper, ExpressionNode *operand1,
                                              ExpressionNode *operand2, ExpressionNode *operand3)
         : ExpressionNode() {
     this->expressionNodeType = ExpressionNodeType::TERNARY_EXPRESSION_NODE;
-    this->oper               = oper;
-    this->operand1           = operand1;
-    this->operand2           = operand2;
-    this->operand3           = operand3;
+    this->oper = oper;
+    this->operand1 = operand1;
+    this->operand2 = operand2;
+    this->operand3 = operand3;
 }
 
 IdentifierExpressionNode::IdentifierExpressionNode()
@@ -80,7 +80,7 @@ IdentifierExpressionNode::IdentifierExpressionNode()
 //Literals
 
 LiteralNode::LiteralNode() : BaseTreeNode() {
-    this->nodeType        = TreeNodeType::LITERAL_NODE;
+    this->nodeType = TreeNodeType::LITERAL_NODE;
     this->literalNodeType = (LiteralNodeType) 0;
 }
 
@@ -138,30 +138,30 @@ StringLiteralNode::StringLiteralNode(PshString &value)
 //Statements
 
 StatementNode::StatementNode() : BaseTreeNode() {
-    this->nodeType          = TreeNodeType::STATEMENT_NODE;
+    this->nodeType = TreeNodeType::STATEMENT_NODE;
     this->statementNodeType = (StatementNodeType) 0;
 }
 
 DefVarStatementNode::DefVarStatementNode(IdentifierExpressionNode *identifier, ExpressionNode *value)
         : StatementNode() {
     this->statementNodeType = StatementNodeType::DEF_VAR_STATEMENT_NODE;
-    this->identifier        = identifier;
-    this->value             = value;
+    this->identifier = identifier;
+    this->value = value;
 }
 
 ExpressionStatementNode::ExpressionStatementNode(ExpressionNode *expression)
         : StatementNode() {
     this->statementNodeType = StatementNodeType::EXPRESSION_STATEMENT_NODE;
-    this->expression        = expression;
+    this->expression = expression;
 }
 
 IfStatementNode::IfStatementNode(ExpressionNode *expression, StatementNode *trueStatement,
                                  StatementNode *falseStatement)
         : StatementNode() {
     this->statementNodeType = StatementNodeType::IF_SELECTION_NODE;
-    this->expression        = expression;
-    this->trueStatement     = trueStatement;
-    this->falseStatement    = falseStatement;
+    this->expression = expression;
+    this->trueStatement = trueStatement;
+    this->falseStatement = falseStatement;
 }
 
 IfStatementNode::IfStatementNode(ExpressionNode *expression, StatementNode *trueStatement)
@@ -171,40 +171,40 @@ IfStatementNode::IfStatementNode(ExpressionNode *expression, StatementNode *true
 CaseSelectionNode::CaseSelectionNode(ConstantExpressionNode *constantExpression, StatementNode *statement,
                                      CaseSelectionNode *nextCase)
         : StatementNode() {
-    this->statementNodeType  = StatementNodeType::CASE_SELECTION_NODE;
+    this->statementNodeType = StatementNodeType::CASE_SELECTION_NODE;
     this->constantExpression = constantExpression;
-    this->statement          = statement;
-    this->nextCase           = nextCase;
+    this->statement = statement;
+    this->nextCase = nextCase;
 }
 
 SwitchStatementNode::SwitchStatementNode(ExpressionNode *expression, CaseSelectionNode *caseStatement,
                                          StatementNode *otherStatement)
         : StatementNode() {
     this->statementNodeType = StatementNodeType::SWITCH_SELECTION_NODE;
-    this->expression        = expression;
-    this->caseStatement     = caseStatement;
-    this->otherStatement    = otherStatement;
+    this->expression = expression;
+    this->caseStatement = caseStatement;
+    this->otherStatement = otherStatement;
 }
 
 WhileStatementNode::WhileStatementNode(ExpressionNode *expression, StatementNode *bodyStatement)
         : StatementNode() {
     this->statementNodeType = StatementNodeType::WHILE_ITERATION_NODE;
-    this->expression        = expression;
-    this->bodyStatement     = bodyStatement;
+    this->expression = expression;
+    this->bodyStatement = bodyStatement;
 }
 
 DoWhileStatementNode::DoWhileStatementNode(ExpressionNode *expression, StatementNode *bodyStatement)
         : StatementNode() {
     this->statementNodeType = StatementNodeType::DO_WHILE_ITERATION_NODE;
-    this->expression        = expression;
-    this->bodyStatement     = bodyStatement;
+    this->expression = expression;
+    this->bodyStatement = bodyStatement;
 }
 
 ForStatementNode::ForStatementNode(IdentifierExpressionNode *element, IdentifierExpressionNode *list,
                                    StatementNode *bodyStatement)
         : StatementNode() {
     this->statementNodeType = StatementNodeType::FOR_ITERATION_NODE;
-    this->element           = element;
-    this->list              = list;
-    this->bodyStatement     = bodyStatement;
+    this->element = element;
+    this->list = list;
+    this->bodyStatement = bodyStatement;
 }

@@ -22,15 +22,15 @@ namespace phlib {
 class String {
 
 private:
-
+    //@formatter:off
     char          *strCharValue = nullptr;
-    char16        *strValue     = nullptr; /**< null terminated char16 sequence */
+    Char16        *strValue     = nullptr; /**< null terminated char16 sequence */
     Size          strLength     = 0;
-    static char16 digits[10];
+    static Char16 digits[10];
     static int    intSizeTable[9];
 
 public:
-
+    //@formatter:on
     /**
      * @brief Creates string by copying other string value
      * @param other
@@ -41,14 +41,14 @@ public:
      * @brief Creates string from null terminated char16 array
      * @param str is array
      */
-    String(const char16 *str) : String(str, getLength(str)) {}
+    String(const Char16 *str) : String(str, getLength(str)) {}
 
     /**
      * @brief Creates string from char16* sequence with requested length
      * @param str is a pointer to string beginning
      * @param length is size of array to copy
      */
-    String(const char16 *str, Size length);
+    String(const Char16 *str, Size length);
 
     /**
      * @brief Creates string from null terminated char array
@@ -71,7 +71,7 @@ public:
      * @param i index of character
      * @return char16 value
      */
-    char16 &operator[](int i) {
+    Char16 &operator[](int i) {
         return strValue[i];
     }
 
@@ -87,7 +87,7 @@ public:
      * @param str second operand
      * @return this with str value
      */
-    String &operator=(const char16 *&str);
+    String &operator=(const Char16 *&str);
 
     /**
      * @brief += operator
@@ -101,7 +101,7 @@ public:
      * @param str value to append
      * @return this string with appended @p str
      */
-    String &operator+=(const char16 *str);
+    String &operator+=(const Char16 *str);
 
     /**
      * @brief allocates memory for new string
@@ -120,7 +120,7 @@ public:
      * @brief converts string to const char16 array
      * @return pointer to value;
      */
-    inline operator const char16 *() {
+    inline operator const Char16 *() {
         return value();
     }
 
@@ -144,7 +144,7 @@ public:
      * @brief <tt>char*</tt> value of string
      * @return null terminated <tt>char*</tt>
      */
-    inline const char16 *value() {
+    inline const Char16 *value() {
         return strValue;
     }
 
@@ -166,7 +166,7 @@ public:
      * @param prefix char* to compare beginning with
      * @return true, if string starts with prefix
      */
-    bool startsWith(const char16 *prefix);
+    bool startsWith(const Char16 *prefix);
 
     /**
      * @brief Checks, whether this string ends by other string
@@ -180,7 +180,7 @@ public:
      * @param suffix to check
      * @return true if ends, false if does not
      */
-    bool endsWith(const char16 *suffix);
+    bool endsWith(const Char16 *suffix);
 
     /**
      * @brief Checks, whether string ends with suffix
@@ -190,13 +190,13 @@ public:
      * @param suffixLength suffix length without null terminator
      * @return true if ends, false if does not
      */
-    bool endsWith(const char16 *suffix, Size suffixLength);
+    bool endsWith(const Char16 *suffix, Size suffixLength);
 
     /**
      * @brief Computes hash code of string by Java-like method
      * @return hash code of the string
      */
-    uint32 hashCode();
+    UInt32 hashCode();
 
     /**
      * @brief Compares two strings
@@ -210,19 +210,19 @@ public:
      * @param str second operand
      * @return true, if value of string equals to str
      */
-    bool equals(const char16 *str);
+    bool equals(const Char16 *str);
 
     int compare(const String &str1, const String &str2);
 
-    int compare(const char16 *str1, const char16 *str2);
+    int compare(const Char16 *str1, const Char16 *str2);
 
-    static String value_of(uint32 value) {
+    static String value_of(UInt32 value) {
 
     }
 
-    static String valueOf(int32 value);
+    static String valueOf(Int32 value);
 
-    static String valueOf(uint8 value) {
+    static String valueOf(UInt8 value) {
 
     }
 
@@ -230,29 +230,29 @@ public:
 
 private:
 
-    static int stringSizeOfInteger(int32 integer);
+    static int stringSizeOfInteger(Int32 integer);
 
-    String &plusEqualOperator(const char16 *str, Size strLength);
+    String &plusEqualOperator(const Char16 *str, Size strLength);
 
     static Size getLength(const char *str);
 
-    static Size getLength(const char16 *str);
+    static Size getLength(const Char16 *str);
 
-    static void setupString(String *dst, const char16 *src);
+    static void setupString(String *dst, const Char16 *src);
 
     static void setupString(String *dst, const char *src);
 
     static void setupString(String *dst, const char *src, Size length);
 
-    static void setupString(String *dst, const char16 *src, Size length);
+    static void setupString(String *dst, const Char16 *src, Size length);
 
-    inline static void copyStr(char16 *dst, const char16 *src, Size length) {
+    inline static void copyStr(Char16 *dst, const Char16 *src, Size length) {
         for (int i = 0; i < length; dst[i] = src[i], i++);
     }
 
-    inline static void addStr(char16 *dst,
-                              const char16 *src1, Size src1Length,
-                              const char16 *src2, Size src2Length) {
+    inline static void addStr(Char16 *dst,
+                              const Char16 *src1, Size src1Length,
+                              const Char16 *src2, Size src2Length) {
         copyStr(dst, src1, src1Length);
         copyStr(dst + src1Length, src2, src2Length);
     }

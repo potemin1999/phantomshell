@@ -27,18 +27,18 @@ void phlib::free(Ptr p) {
 #endif //__simbuild__
 }
 
-void* operator new(Size size){
+void *operator new(Size size) {
     return phlib::malloc(size);
 }
 
-void* operator new[](Size size){
+void *operator new[](Size size) {
     return phlib::malloc(size);
 }
 
-void operator delete(void* what) noexcept{
+void operator delete(void *what) noexcept {
     phlib::free(what);
 }
 
-void operator delete[](void* what) noexcept{
+void operator delete[](void *what) noexcept {
     phlib::free(what);
 }

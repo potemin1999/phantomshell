@@ -24,10 +24,10 @@ public:
 class PshBoolean : PshType {
 public:
 
-    uint8 value;
+    UInt8 value;
 
     PshBoolean(bool value) {
-        this->value = (uint8) (value ? 1 : 0);
+        this->value = (UInt8) (value ? 1 : 0);
     }
 
     PshBoolean(const PshBoolean &other) {
@@ -39,10 +39,10 @@ public:
 class PshInteger : PshType {
 public:
 
-    int32 value;
+    Int32 value;
 
     PshInteger(int value) {
-        this->value = (int32) value;
+        this->value = (Int32) value;
     }
 
     PshInteger(const PshInteger &other) {
@@ -57,9 +57,9 @@ public:
     union {
         float value;
         struct {
-            uint8  sign: 1;
-            uint8  exponent: 8;
-            uint32 fraction: 23;
+            UInt8 sign: 1;
+            UInt8 exponent: 8;
+            UInt32 fraction: 23;
         };
     };
 
@@ -71,10 +71,10 @@ public:
 class PshCharacter : PshType {
 public:
 
-    uint16 value;
+    UInt16 value;
 
     PshCharacter(char value) {
-        this->value = (uint16) (0x00ff & value);
+        this->value = (UInt16) (0x00ff & value);
     }
 
 };
@@ -82,7 +82,7 @@ public:
 class PshString : PshType {
 public:
 
-    const char16 *value = nullptr;
+    const Char16 *value = nullptr;
 
     PshString(phlib::String &value) {
         this->value = value.value();

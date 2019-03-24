@@ -13,7 +13,7 @@
 #include "Types.h"
 
 /** @brief Default namespace for Phantom Shell support library */
-namespace phlib {
+PHLIB_NAMESPACE_BEGIN
 
 /**
  * @brief Character class is used for char/char16 manipulations
@@ -21,29 +21,29 @@ namespace phlib {
 class Character {
 public:
 
-    char16 value;
+    Char16 value;
 
     Character(const char &value) {
-        this->value = (char16) (0x007f & value);
+        this->value = (Char16) (0x007f & value);
     }
 
-    Character(const char16 &value) {
+    Character(const Char16 &value) {
         this->value = value;
     }
 
     Character(int value) {
-        this->value = (char16) value;
+        this->value = (Char16) value;
     }
 
     operator char() {
         return (char) (this->value & 0x7f);
     }
 
-    operator char16() {
+    operator Char16() {
         return this->value;
     }
 
-    bool operator==(const char16 &c) {
+    bool operator==(const Char16 &c) {
         return this->value == c;
     }
 
@@ -59,16 +59,16 @@ public:
         return isLetter(this->value);
     }
 
-    static inline bool isDigit(char16 symbol) {
+    static inline bool isDigit(Char16 symbol) {
         return symbol >= '0' & symbol <= '9';
     }
 
-    static inline bool isLetter(char16 symbol) {
+    static inline bool isLetter(Char16 symbol) {
         return (symbol > 0x40 & symbol < 0x5b) || (symbol > 0x60 & symbol < 0x7b);
     }
 
 };
 
-}
+PHLIB_NAMESPACE_END
 
 #endif //PHANTOMSHELL_CHARACTER_H

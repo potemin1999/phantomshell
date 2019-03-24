@@ -10,6 +10,7 @@
 #include "PshTypes.h"
 
 namespace psh {
+//@formatter:off
 
 /**
  * @brief Basic AST node types
@@ -66,6 +67,7 @@ typedef enum DeclarationNodeType {
     CLASS_DECLARATION_NODE    = 0x03
 } DeclarationNodeType;
 
+//@formatter:on
 /**
  * @brief Basic class for all AST nodes
  */
@@ -155,7 +157,7 @@ public:
  */
 class UnaryExpressionNode : ExpressionNode {
 public:
-    Operator       oper;
+    Operator oper;
     ExpressionNode *operand;
 
     UnaryExpressionNode(Operator oper,
@@ -167,7 +169,7 @@ public:
  */
 class BinaryExpressionNode : ExpressionNode {
 public:
-    Operator       oper;
+    Operator oper;
     ExpressionNode *operand1;
     ExpressionNode *operand2;
 
@@ -181,7 +183,7 @@ public:
  */
 class TernaryExpressionNode : ExpressionNode {
 public:
-    Operator       oper;
+    Operator oper;
     ExpressionNode *operand1;
     ExpressionNode *operand2;
     ExpressionNode *operand3;
@@ -211,7 +213,7 @@ public:
 class DefVarStatementNode : StatementNode {
 public:
     IdentifierExpressionNode *identifier;
-    ExpressionNode           *value;
+    ExpressionNode *value;
 
     DefVarStatementNode(IdentifierExpressionNode *identifier,
                         ExpressionNode *value);
@@ -227,8 +229,8 @@ public:
 class IfStatementNode : StatementNode {
 public:
     ExpressionNode *expression;
-    StatementNode  *trueStatement;
-    StatementNode  *falseStatement;
+    StatementNode *trueStatement;
+    StatementNode *falseStatement;
 
     IfStatementNode(ExpressionNode *expression,
                     StatementNode *trueStatement,
@@ -241,8 +243,8 @@ public:
 class CaseSelectionNode : StatementNode {
 public:
     ConstantExpressionNode *constantExpression;
-    StatementNode          *statement;
-    CaseSelectionNode      *nextCase;
+    StatementNode *statement;
+    CaseSelectionNode *nextCase;
 
     CaseSelectionNode(ConstantExpressionNode *constantExpression,
                       StatementNode *statement,
@@ -251,9 +253,9 @@ public:
 
 class SwitchStatementNode : StatementNode {
 public:
-    ExpressionNode    *expression;
+    ExpressionNode *expression;
     CaseSelectionNode *caseStatement;
-    StatementNode     *otherStatement;
+    StatementNode *otherStatement;
 
     SwitchStatementNode(ExpressionNode *expression,
                         CaseSelectionNode *caseStatement,
@@ -263,7 +265,7 @@ public:
 class WhileStatementNode : StatementNode {
 public:
     ExpressionNode *expression;
-    StatementNode  *bodyStatement;
+    StatementNode *bodyStatement;
 
     WhileStatementNode(ExpressionNode *expression,
                        StatementNode *bodyStatement);
@@ -272,7 +274,7 @@ public:
 class DoWhileStatementNode : StatementNode {
 public:
     ExpressionNode *expression;
-    StatementNode  *bodyStatement;
+    StatementNode *bodyStatement;
 
     DoWhileStatementNode(ExpressionNode *expression,
                          StatementNode *bodyStatement);
@@ -282,7 +284,7 @@ class ForStatementNode : StatementNode {
 public:
     IdentifierExpressionNode *element;
     IdentifierExpressionNode *list;
-    StatementNode            *bodyStatement;
+    StatementNode *bodyStatement;
 
     ForStatementNode(IdentifierExpressionNode *element,
                      IdentifierExpressionNode *list,
@@ -299,7 +301,7 @@ public:
 
 class FuncArgDeclarationNode : DeclarationNode {
 public:
-    PshType       argumentType;
+    PshType argumentType;
     phlib::String argumentName;
 
     FuncArgDeclarationNode(PshType argumentType1,
@@ -316,7 +318,7 @@ class ClassDeclarationNode : DeclarationNode {
 public:
     phlib::String className;
 
-    ClassDeclarationNode(phlib::String &className);
+    explicit ClassDeclarationNode(phlib::String &className);
 };
 
 

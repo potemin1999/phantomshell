@@ -42,6 +42,7 @@ class IStream {
     /**
      * @brief This enum describes IStream types
      */
+    //@formatter:off
     enum IStreamType {
 #ifdef __simbuild__
         FILE_STREAM = 0,
@@ -59,7 +60,7 @@ protected:
     bool        isClosed = false;
 
 public:
-
+    //@formatter:on
 #ifdef __simbuild__
 
     /**
