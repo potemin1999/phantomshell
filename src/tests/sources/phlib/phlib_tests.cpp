@@ -1,5 +1,5 @@
-#include "types.h"
-#include "phlib.h"
+#include "Types.h"
+#include "Phlib.h"
 
 using namespace phlib;
 
