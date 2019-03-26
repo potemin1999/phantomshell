@@ -55,11 +55,14 @@ inline void debugLogFunc(const char *file, unsigned line, const char *format, ..
 
 void phlib::debugLogFunc(const char *file, unsigned line, const char *format, ...) {
 #ifdef __simbuild__
-    printf("%s:%u\n", file, line);
+    printf("[%s:%u]: ", file, line);
     va_list list;
     va_start(list, format);
     vprintf(format, list);
     va_end(list);
+    printf("\n");
+#else
+    TODO: do phantom logging
 #endif //__simbuild__
 }
 

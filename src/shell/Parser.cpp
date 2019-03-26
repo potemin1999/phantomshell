@@ -12,42 +12,64 @@
 using namespace phlib;
 using namespace psh;
 
+typedef int (*PushTokenFunc)(const Token &);
+
+class Parser::ParserData {
+public:
+    Token *tokenBuffer;             /**< Stack of tokens*/
+    PushTokenFunc pushFunctions[6]; /**< Array of token push functions for each token type */
+};
+
+int PushIdentifierToken(const Token &token);
+
+int PushKeywordToken(const Token &token);
+
+int PushLiteralToken(const Token &token);
+
+int PushOperatorToken(const Token &token);
+
+int PushSeparatorToken(const Token &token);
+
 Parser::Parser() {
-    tokenBuffer = (Token *) phlib::malloc(PARSER_TOKEN_BUFFER_CAPACITY * sizeof(Token *));
-    pushFunctions[TokenType::IDENTIFIER] = &Parser::pushIdentifierToken;
-    pushFunctions[TokenType::KEYWORD]    = &Parser::pushKeywordToken;
-    pushFunctions[TokenType::LITERAL]    = &Parser::pushLiteralToken;
-    pushFunctions[TokenType::OPERATOR]   = &Parser::pushOperatorToken;
-    pushFunctions[TokenType::SEPARATOR]  = &Parser::pushSeparatorToken;
+    this->data = new ParserData();
+    auto tokenBufferSize = PARSER_TOKEN_BUFFER_CAPACITY * sizeof(Token);
+    this->data->tokenBuffer = static_cast<Token *>(malloc(tokenBufferSize));
+    auto pushFunctions = this->data->pushFunctions;
+    pushFunctions[TokenType::IDENTIFIER] = &PushIdentifierToken;
+    pushFunctions[TokenType::KEYWORD] = &PushKeywordToken;
+    pushFunctions[TokenType::LITERAL] = &PushLiteralToken;
+    pushFunctions[TokenType::OPERATOR] = &PushOperatorToken;
+    pushFunctions[TokenType::SEPARATOR] = &PushSeparatorToken;
 }
 
 Parser::~Parser() {
-    phlib::free(tokenBuffer);
+    free(data->tokenBuffer);
+    delete data;
 }
 
 int Parser::pushToken(Token *token) {
     TokenType &type = token->type;
     if (type < 1 | type > 5)
         return -1;
-    return (this->*(pushFunctions[type]))(token);
+    return (*this->data->pushFunctions[type])(*token);
 }
 
-int Parser::pushIdentifierToken(Token *token) {
+int PushIdentifierToken(const Token &token) {
     return 0;
 }
 
-int Parser::pushKeywordToken(Token *token) {
+int PushKeywordToken(const Token &token) {
     return 0;
 }
 
-int Parser::pushLiteralToken(Token *token) {
+int PushLiteralToken(const Token &token) {
     return 0;
 }
 
-int Parser::pushOperatorToken(Token *token) {
+int PushOperatorToken(const Token &token) {
     return 0;
 }
 
-int Parser::pushSeparatorToken(Token *token) {
+int PushSeparatorToken(const Token &token) {
     return 0;
 }

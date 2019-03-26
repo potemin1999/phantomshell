@@ -123,14 +123,14 @@ typedef enum Operator {
  * @param oper is operator to get id of
  * @return id of @p oper
  */
-UInt16 getOperatorId(Operator oper);
+UInt16 GetOperatorId(Operator oper);
 
 /**
  * @brief Check if operator is left-to-right associative
  * @param oper to check
  * @return true if operator @p oper has left-to-right associativity
  */
-bool isLeftToRightAssociative(Operator oper);
+bool IsLtRAssociative(Operator oper);
 
 /**
  * @brief Gets operator arity
@@ -139,91 +139,91 @@ bool isLeftToRightAssociative(Operator oper);
  * @return 2 if operator @p oper is binary
  * @return 3 if operator @p oper is ternary
  */
-UInt8 getOperatorArity(Operator oper);
+UInt8 GetOperatorArity(Operator oper);
 
 /**
  * @brief Checks, whether operator is unary
  * @param oper to get info about
  * @return true if operator @p oper is unary, false otherwise
  */
-bool isUnaryOperator(Operator oper);
+bool IsUnaryOperator(Operator oper);
 
 /**
  * @brief Checks, whether operator is binary
  * @param oper to get info about
  * @return true if operator @p oper is binary, false otherwise
  */
-bool isBinaryOperator(Operator oper);
+bool IsBinaryOperator(Operator oper);
 
 /**
  * @brief Checks, whether operator is ternary
  * @param oper is an Operator to get info about
  * @return true if operator @p oper is ternary, false otherwise
  */
-bool isTernaryOperator(Operator oper);
+bool IsTernaryOperator(Operator oper);
 
 /**
  * @brief Get precedence of operator
  * @param oper is an Operator to get info about
  * @return uint8 with precedence [0:15]
  */
-UInt8 getOperatorPrecedence(Operator oper);
+UInt8 GetOperatorPrecedence(Operator oper);
 
 /**
  * @brief Checks if this operator is increment or decrement operator
  * @param oper is an Operator to to check
  * @return true if @p oper is increment or decrement
  */
-bool isIncrementOrDecrementOperator(Operator oper);
+bool IsIncrementOrDecrementOperator(Operator oper);
 
 /**
  * @brief Checks if this operator is bitwise operator
  * @param oper is an Operator to to check
  * @return true if @p oper is bitwise
  */
-bool isBitwiseOperator(Operator oper);
+bool IsBitwiseOperator(Operator oper);
 
 /**
  * @brief Checks if this operator is arithmetic operator
  * @param oper to check
  * @return true if @p oper is arithmetic
  */
-bool isArithmeticOperator(Operator oper);
+bool IsArithmeticOperator(Operator oper);
 
 /**
  * @brief Checks if this operator is priority operator
  * @param oper to check
  * @return true if @p oper is priority
  */
-bool isPriorityOperator(Operator oper);
+bool IsPriorityOperator(Operator oper);
 
 /**
  * @brief Checks if this operator is comparison operator
  * @param oper to check
  * @return true if @p oper is comparison
  */
-bool isComparisonOperator(Operator oper);
+bool IsComparisonOperator(Operator oper);
 
 /**
  * @brief Checks if this operator is logical operator
  * @param oper to check
  * @return true if @p oper is logical
  */
-bool isLogicalOperator(Operator oper);
+bool IsLogicalOperator(Operator oper);
 
 /**
  * @brief Converts operator code to string
  * @param oper to convert
  * @return char* name of operator
  */
-const char* operatorToString(Operator oper);
+const char* OperatorToString(Operator oper);
 
 /**
  * @brief Converts operator code to symbol, representing this operator
  * @param oper to convert
  * @return char* symbol of operator
  */
-const char* operatorToSymbol(Operator oper);
+const char* OperatorToSymbol(Operator oper);
 
 } //namespace psh
 
@@ -232,60 +232,60 @@ const char* operatorToSymbol(Operator oper);
  *  @formatter:on
  */
 
-inline UInt16 psh::getOperatorId(psh::Operator oper) {
+inline UInt16 psh::GetOperatorId(psh::Operator oper) {
     return oper & OP_ID_MASK;
 }
 
-inline bool psh::isLeftToRightAssociative(psh::Operator oper) {
+inline bool psh::IsLtRAssociative(psh::Operator oper) {
     return (oper & OP_ASSOCIATIVITY_MASK) == OP_ASSOC_LTR;
 }
 
-inline UInt8 psh::getOperatorArity(psh::Operator oper) {
+inline UInt8 psh::GetOperatorArity(psh::Operator oper) {
     UByte arityBits = (oper & OP_ARITY_MASK);
     return (arityBits >> 30);
 }
 
-inline bool psh::isUnaryOperator(psh::Operator oper) {
-    return psh::getOperatorArity(oper) == 1;
+inline bool psh::IsUnaryOperator(psh::Operator oper) {
+    return psh::GetOperatorArity(oper) == 1;
 }
 
-inline bool psh::isBinaryOperator(psh::Operator oper) {
-    return psh::getOperatorArity(oper) == 2;
+inline bool psh::IsBinaryOperator(psh::Operator oper) {
+    return psh::GetOperatorArity(oper) == 2;
 }
 
-inline bool psh::isTernaryOperator(psh::Operator oper) {
-    return psh::getOperatorArity(oper) == 3;
+inline bool psh::IsTernaryOperator(psh::Operator oper) {
+    return psh::GetOperatorArity(oper) == 3;
 }
 
-inline UInt8 psh::getOperatorPrecedence(psh::Operator oper) {
+inline UInt8 psh::GetOperatorPrecedence(psh::Operator oper) {
     return ((oper & OP_PRECEDENCE_MASK) >> 8) & 0x8000;
 }
 
-inline bool psh::isIncrementOrDecrementOperator(psh::Operator oper) {
+inline bool psh::IsIncrementOrDecrementOperator(psh::Operator oper) {
     return (oper & OP_TYPE_MASK) == OP_TYPE_INCDEC;
 }
 
-inline bool psh::isBitwiseOperator(psh::Operator oper) {
+inline bool psh::IsBitwiseOperator(psh::Operator oper) {
     return (oper & OP_TYPE_MASK) == OP_TYPE_BIT;
 }
 
-inline bool psh::isArithmeticOperator(psh::Operator oper) {
+inline bool psh::IsArithmeticOperator(psh::Operator oper) {
     return (oper & OP_TYPE_MASK) == OP_TYPE_ARITHM;
 }
 
-inline bool psh::isPriorityOperator(psh::Operator oper) {
+inline bool psh::IsPriorityOperator(psh::Operator oper) {
     return (oper & OP_TYPE_MASK) == OP_TYPE_PRIOR;
 }
 
-inline bool psh::isComparisonOperator(psh::Operator oper) {
+inline bool psh::IsComparisonOperator(psh::Operator oper) {
     return (oper & OP_TYPE_MASK) == OP_TYPE_COMP;
 }
 
-inline bool psh::isLogicalOperator(psh::Operator oper) {
+inline bool psh::IsLogicalOperator(psh::Operator oper) {
     return (oper & OP_TYPE_MASK) == OP_TYPE_LOGIC;
 }
 
-inline const char *psh::operatorToString(psh::Operator oper) {
+inline const char *psh::OperatorToString(psh::Operator oper) {
     switch (oper) {
         case EQUAL_TO: return "EQUAL_TO";
         case ADDITION: return "ADDITION";
@@ -317,7 +317,7 @@ inline const char *psh::operatorToString(psh::Operator oper) {
     }
 }
 
-inline const char *psh::operatorToSymbol(psh::Operator oper) {
+inline const char *psh::OperatorToSymbol(psh::Operator oper) {
     switch (oper) {
         case EQUAL_TO: return "==";
         case ADDITION: return "+";

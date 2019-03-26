@@ -77,9 +77,16 @@ Ptr Token::operator new(Size size) {
     return token_allocator->allocate(size);
 }
 
+Ptr Token::operator new[](Size size) {
+    return malloc(size);
+}
 
 void Token::operator delete(Ptr tokenPtr) {
     token_allocator->deallocate(tokenPtr);
+}
+
+void Token::operator delete[](Ptr tokensPtr) {
+    return free(tokensPtr);
 }
 
 
@@ -108,7 +115,7 @@ const char *Token::tokenToString() {
         }
         case TokenType::OPERATOR: {
             string_value += ",operator=";
-            string_value += operatorToString(oper);
+            string_value += OperatorToString(oper);
             break;
         }
         case TokenType::SEPARATOR: {

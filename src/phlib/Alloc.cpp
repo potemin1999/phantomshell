@@ -9,6 +9,12 @@
 
 #include "Alloc.h"
 
+#ifdef __simbuild__
+
+#include <malloc.h>
+
+#endif //__simbuild__
+
 Ptr phlib::malloc(Size size) {
 #ifdef __simbuild__
     Ptr pointer = ::malloc(size);

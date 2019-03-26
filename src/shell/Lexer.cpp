@@ -14,21 +14,20 @@ using namespace phlib;
 
 
 Lexer::Lexer(IStream *inputStream) {
-    istream            = inputStream;
-    readBufferPointer  = LEXER_READ_BUFFER_SIZE;
-    readBufferSize     = LEXER_READ_BUFFER_SIZE;
-    stashBufferSize    = LEXER_STASH_BUFFER_SIZE;
+    istream = inputStream;
+    readBufferPointer = LEXER_READ_BUFFER_SIZE;
+    readBufferSize = LEXER_READ_BUFFER_SIZE;
+    stashBufferSize = LEXER_STASH_BUFFER_SIZE;
     readBuffer = new UInt8[LEXER_READ_BUFFER_SIZE];
-    //readBuffer         = (UInt8 *) phlib::malloc(LEXER_READ_BUFFER_SIZE);
-    stashBuffer        = (Symbol *) phlib::malloc(LEXER_STASH_BUFFER_SIZE);
+    stashBuffer = new Symbol[LEXER_STASH_BUFFER_SIZE];
     stashBufferPointer = 0;
-    currentLine        = 1;
+    currentLine = 1;
 }
 
 
 Lexer::~Lexer() {
-    phlib::free(readBuffer);
-    phlib::free(stashBuffer);
+    delete[] readBuffer;
+    delete[] stashBuffer;
 }
 
 
@@ -79,61 +78,61 @@ String *Lexer::createFromStashBuffer() {
 Operator Lexer::checkIfIdentifierIsOperator() {
     if (stashBufferPointer != 2 &
         stashBufferPointer != 3) {
-        return (Operator) 0;
+        return static_cast<Operator>(0);
     }
     switch (stashBuffer[0]) {
         case 'a': {
             if (stashBufferPointer != 3)
-                return (Operator) 0;
+                return static_cast<Operator>(0);
             if (stashBuffer[1] == 'n' &
                 stashBuffer[2] == 'd') {
                 stashBufferPointer -= 3;
                 return Operator::LOGICAL_AND;
             } else {
-                return (Operator) 0;
+                return static_cast<Operator>(0);
             }
         }
         case 'n': {
             if (stashBufferPointer != 3)
-                return (Operator) 0;
+                return static_cast<Operator>(0);
             if (stashBuffer[1] == 'o' &
                 stashBuffer[2] == 't') {
                 stashBufferPointer -= 3;
                 return Operator::LOGICAL_NOT;
             } else {
-                return (Operator) 0;
+                return static_cast<Operator>(0);
             }
         }
         case 'o': {
             if (stashBufferPointer != 2)
-                return (Operator) 0;
+                return static_cast<Operator>(0);
             if (stashBuffer[1] == 'r') {
                 stashBufferPointer -= 2;
                 return Operator::LOGICAL_OR;
             } else {
-                return (Operator) 0;
+                return static_cast<Operator>(0);
             }
         }
         case 'x': {
             if (stashBufferPointer != 3)
-                return (Operator) 0;
+                return static_cast<Operator>(0);
             if (stashBuffer[1] == 'o' &
                 stashBuffer[2] == 'r') {
                 stashBufferPointer -= 3;
                 return Operator::LOGICAL_XOR;
             } else {
-                return (Operator) 0;
+                return static_cast<Operator>(0);
             }
         }
         default: {
-            return (Operator) 0;
+            return static_cast<Operator>(0);
         }
     }
 }
 
 
 inline Token *Lexer::makeOperatorToken(Symbol char1) {
-    Operator oper = makeOperator(char1);
+    auto oper = makeOperator(char1);
     if (oper != 0) {
         return new Token(oper, currentLine);
     } else {
@@ -144,7 +143,7 @@ inline Token *Lexer::makeOperatorToken(Symbol char1) {
 
 Operator Lexer::makeOperator(Lexer::Symbol char1) {
     if (char1 == '+') {
-        Symbol char2 = getNextSymbol();
+        auto char2 = getNextSymbol();
         if (char2 == '+') {
             return Operator::POST_INCREMENT;
         } else {
@@ -153,7 +152,7 @@ Operator Lexer::makeOperator(Lexer::Symbol char1) {
         }
     }
     if (char1 == '-') {
-        Symbol char2 = getNextSymbol();
+        auto char2 = getNextSymbol();
         if (char2 == '-') {
             return Operator::POST_DECREMENT;
         } else if (char2 == '>') {
@@ -164,7 +163,7 @@ Operator Lexer::makeOperator(Lexer::Symbol char1) {
         }
     }
     if (char1 == '=') {
-        Symbol char2 = getNextSymbol();
+        auto char2 = getNextSymbol();
         if (char2 == '=') {
             return Operator::EQUAL_TO;
         } else {
@@ -176,7 +175,7 @@ Operator Lexer::makeOperator(Lexer::Symbol char1) {
         return Operator::BITWISE_NOT;
     }
     if (char1 == '!') {
-        Symbol char2 = getNextSymbol();
+        auto char2 = getNextSymbol();
         if (char2 == '=') {
             return Operator::NOT_EQUAL_TO;
         } else {
@@ -188,7 +187,7 @@ Operator Lexer::makeOperator(Lexer::Symbol char1) {
         return Operator::MULTIPLICATION;
     }
     if (char1 == '/') {
-        Symbol char2 = getNextSymbol();
+        auto char2 = getNextSymbol();
         if (char2 == '\\') {
             return Operator::BITWISE_AND;
         } else {
@@ -197,7 +196,7 @@ Operator Lexer::makeOperator(Lexer::Symbol char1) {
         }
     }
     if (char1 == '<') {
-        Symbol char2 = getNextSymbol();
+        auto char2 = getNextSymbol();
         if (char2 == '<') {
             return Operator::BITWISE_SHIFT_LEFT;
         } else if (char2 == '=') {
@@ -208,7 +207,7 @@ Operator Lexer::makeOperator(Lexer::Symbol char1) {
         }
     }
     if (char1 == '>') {
-        Symbol char2 = getNextSymbol();
+        auto char2 = getNextSymbol();
         if (char2 == '>') {
             return Operator::BITWISE_SHIFT_RIGHT;
         } else if (char2 == '=') {
@@ -219,9 +218,9 @@ Operator Lexer::makeOperator(Lexer::Symbol char1) {
         }
     }
     if (char1 == '\\') {
-        Symbol char2 = getNextSymbol();
+        auto char2 = getNextSymbol();
         if (char2 == '\'') {
-            Symbol char3 = getNextSymbol();
+            auto char3 = getNextSymbol();
             if (char3 == '/') {
                 return Operator::BITWISE_XOR;
             } else {
@@ -233,7 +232,7 @@ Operator Lexer::makeOperator(Lexer::Symbol char1) {
             stashSymbol(char2);
         }
     }
-    return (Operator) 0;
+    return static_cast<Operator>(0);
 }
 
 
@@ -265,7 +264,7 @@ Separator Lexer::makeSeparator(Lexer::Symbol symbol) {
     if (symbol == ',') {
         return Separator::COMMA;
     }
-    return (Separator) 0;
+    return static_cast<Separator>(0);
 }
 
 
@@ -275,15 +274,15 @@ Token *Lexer::getNextToken() {
         char1 = getNextSymbol();
     } while (char1 == ' ');
     if (char1 == '\0') return nullptr;
-    auto  isCommentSkipped = false;
+    auto isCommentSkipped = false;
     if (char1 == '/') {
-        Symbol char2 = getNextSymbol();
+        auto char2 = getNextSymbol();
         if (char2 == '/') {
             while (readNextSymbol() != '\n') {}
             isCommentSkipped = true;
         } else if (char2 == '*') {
             Symbol lastRead;
-            bool   lastReadAsterisk = false;
+            auto lastReadAsterisk = false;
             while (!(lastReadAsterisk & ((lastRead = readNextSymbol()) == '/'))) {
                 lastReadAsterisk = lastRead == '*';
             }
@@ -303,14 +302,14 @@ Token *Lexer::getNextToken() {
     if (Character::isLetter(char1)) {
         stashSymbol(char1);
         Symbol lastRead;
-        bool   mayBeKeyword = true;
-        bool   lastReadIsLetter;
-        bool   lastReadIsDigit;
-        bool   lastReadIsUnderscore;
+        auto mayBeKeyword = true;
+        bool lastReadIsLetter;
+        bool lastReadIsDigit;
+        bool lastReadIsUnderscore;
         do {
-            lastRead             = readNextSymbol();
-            lastReadIsDigit      = Character::isDigit(lastRead);
-            lastReadIsLetter     = Character::isLetter(lastRead);
+            lastRead = readNextSymbol();
+            lastReadIsDigit = Character::isDigit(lastRead);
+            lastReadIsLetter = Character::isLetter(lastRead);
             lastReadIsUnderscore = lastRead == '_';
             stashSymbol(lastRead);
             if (!lastReadIsLetter &
@@ -321,22 +320,22 @@ Token *Lexer::getNextToken() {
                  lastReadIsDigit |
                  lastReadIsUnderscore);
         stashBufferPointer -= 1;
-        UInt32 oper         = checkIfIdentifierIsOperator();
+        auto oper = checkIfIdentifierIsOperator();
         if (oper != 0) {
-            auto retToken = new Token((Operator) oper, currentLine);
+            auto retToken = new Token(oper, currentLine);
             stashSymbol(lastRead);
             return retToken;
         }
-        String *stringValue = createFromStashBuffer();
+        auto stringValue = createFromStashBuffer();
         stashSymbol(lastRead);
-        int keywordValue = -1;
+        auto keywordValue = -1;
         if (mayBeKeyword) {
             keywordValue = isKeyword(*stringValue);
         }
         DEBUG_LOG_LEX("is keyword ? %s\n", keywordValue != -1 ? "true" : "false");
         if (keywordValue != -1) {
             delete stringValue;
-            return new Token((Keyword) keywordValue, currentLine);
+            return new Token(static_cast<Keyword>(keywordValue), currentLine);
         } else {
             return new Token(stringValue, currentLine);
         }
@@ -345,15 +344,15 @@ Token *Lexer::getNextToken() {
     if (Character::isDigit(char1)) {
         stashSymbol(char1);
         Symbol lastRead;
-        bool   hasDot = false;
-        bool   lastReadIsDot;
-        bool   lastReadIsDigit;
+        auto hasDot = false;
+        bool lastReadIsDot;
+        bool lastReadIsDigit;
         do {
-            lastRead        = readNextSymbol();
+            lastRead = readNextSymbol();
             lastReadIsDigit = Character::isDigit(lastRead);
-            lastReadIsDot   = lastRead == '.';
+            lastReadIsDot = lastRead == '.';
             //TODO: hasDot & lastReadIsDot should be invalid
-            hasDot          = hasDot | lastReadIsDot;
+            hasDot = hasDot | lastReadIsDot;
             stashSymbol(lastRead);
         } while (lastReadIsDigit |
                  lastReadIsDot);
@@ -368,11 +367,11 @@ Token *Lexer::getNextToken() {
     }
     if (char1 == '"') {
         Symbol lastRead;
-        bool   lastReadEscape;
-        bool   lastReadDoubleQuotes;
+        bool lastReadEscape;
+        bool lastReadDoubleQuotes;
         do {
-            lastRead             = readNextSymbol();
-            lastReadEscape       = lastRead == '\\';
+            lastRead = readNextSymbol();
+            lastReadEscape = lastRead == '\\';
             lastReadDoubleQuotes = lastRead == '"';
             stashSymbol(lastRead);
         } while (!lastReadDoubleQuotes |
@@ -381,12 +380,12 @@ Token *Lexer::getNextToken() {
         auto stringLiteralValue = createFromStashBuffer();
         return new Token(Literal::STRING_LITERAL, stringLiteralValue, currentLine);
     }
-    Token *operator_token  = makeOperatorToken(char1);
+    auto operator_token = makeOperatorToken(char1);
     if (operator_token != nullptr) {
         return operator_token;
     }
     // only non-digits and non-letters left
-    Separator separator = makeSeparator(char1);
+    auto separator = makeSeparator(char1);
     if (separator != 0) {
         auto token = new Token(separator, currentLine);
         if (token->separator == Separator::NEW_LINE)

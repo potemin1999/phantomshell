@@ -216,9 +216,7 @@ public:
 
     int compare(const Char16 *str1, const Char16 *str2);
 
-    static String value_of(UInt32 value) {
-
-    }
+    static String valueOf(UInt32 value);
 
     static String valueOf(Int32 value);
 

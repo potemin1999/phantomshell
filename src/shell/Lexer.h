@@ -56,7 +56,7 @@ public:
      * @brief Main constructor
      * @param inputStream stream from which lexer should lex
      */
-    Lexer(phlib::IStream *inputStream);
+    explicit Lexer(phlib::IStream *inputStream);
 
     /**
      * @brief Just destructor

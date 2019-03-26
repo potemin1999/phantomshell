@@ -75,7 +75,11 @@ public:
 
     Ptr operator new(Size size);
 
+    Ptr operator new[](Size size);
+
     void operator delete(Ptr tokenPtr);
+
+    void operator delete[](Ptr tokensPtr);
 
     /**
      * @brief token used always and shows how to interpret other data

@@ -13,12 +13,6 @@
 #include "Log.h"
 #include "Types.h"
 
-#ifdef __simbuild__
-
-#include <malloc.h>
-
-#endif //__simbuild__
-
 #ifdef __debug_memory__
 #define DEBUG_LOG_MEM(...) DEBUG_LOG(__VA_ARGS__)
 #else

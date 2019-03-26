@@ -29,12 +29,11 @@ class Parser {
     /**
      * @brief Function called on each token push
      */
-    typedef int (Parser::*PushTokenFunc)(Token *);
+    class ParserData;
 
 private:
 
-    Token *tokenBuffer = nullptr;  /**< Stack of tokens*/
-    PushTokenFunc pushFunctions[6];        /**< Array of token push functions for each token type */
+    ParserData* data;
 
 public:
 
@@ -48,18 +47,6 @@ public:
      * @return push code
      */
     int pushToken(Token *token);
-
-private:
-
-    int pushIdentifierToken(Token *token);
-
-    int pushKeywordToken(Token *token);
-
-    int pushLiteralToken(Token *token);
-
-    int pushOperatorToken(Token *token);
-
-    int pushSeparatorToken(Token *token);
 
 };
 

@@ -17,7 +17,7 @@ union phlib::IStream::IStreamData {
 #endif //__simbuild__
     struct {
         /** Stores pointer to source object, when type==OBJECT_STREAM*/
-        Ptr   object;
+        ConstPtr object;
         bool  objectCopy;
         SSize currentPointer;
         /** Stores source object size, when type==OBJECT_STREAM*/
@@ -44,10 +44,12 @@ phlib::IStream::IStream(ConstPtr byteBuffer, Size size, bool doCopy) {
     readFunc = &IStream::readFromObject;
     closeFunc = &IStream::closeObject;
     if (doCopy) {
-        data->object = phlib::malloc(size);
-        for (int i = 0; i < size; ((char *) data->object)[i] = ((char *) byteBuffer)[i], i++);
+        auto charObject = new Byte[size];
+        auto charBuffer = static_cast<const Byte *>(byteBuffer);
+        for (int i = 0; i < size; charObject[i] = charBuffer[i], i++);
+        data->object = charObject;
     } else {
-        data->object = (Ptr) byteBuffer;
+        data->object = byteBuffer;
     }
 
     data->objectCopy = doCopy;
@@ -62,7 +64,6 @@ phlib::IStream::IStream() {
     readFunc = &IStream::readFromStdin;
     closeFunc = &IStream::closeStdin;
     data->stdinFd = phlib::open("/dev/stdin", OFlags::RDONLY);
-    DEBUG_LOG("created input stream from stdin with stdinFd = %d\n", data->stdinFd);
 }
 
 
@@ -103,9 +104,10 @@ SSize phlib::IStream::readFromStdin(Ptr buffer, Size bufferSize) {
 SSize phlib::IStream::readFromObject(Ptr buffer, Size bufferSize) {
     ssize_t read_size = bufferSize < (data->objectSize - data->currentPointer - 1) ?
                         bufferSize : data->objectSize - data->currentPointer - 1;
-
+    auto byteBuffer = static_cast<Byte *>(buffer);
+    auto objectBytes = static_cast<const Byte *>(data->object);
     for (int i = 0; i < read_size; i++, data->currentPointer++) {
-        ((char *) buffer)[i] = ((char *) data->object)[data->currentPointer];
+        byteBuffer[i] = objectBytes[data->currentPointer];
     }
     return read_size;
 }
@@ -113,20 +115,21 @@ SSize phlib::IStream::readFromObject(Ptr buffer, Size bufferSize) {
 
 int phlib::IStream::closeObject() {
     if (data->objectCopy) {
-        phlib::free(data->object);
+        phlib::free(const_cast<Ptr>(data->object));
     }
+    return 0;
 }
 
 
 int phlib::IStream::closeStdin() {
-    phlib::close(data->stdinFd);
+    return phlib::close(data->stdinFd);
 }
 
 
 #ifdef __simbuild__
 
 int phlib::IStream::closeFile() {
-    phlib::fclose(data->file);
+    return phlib::fclose(data->file);
 }
 
 #endif //__simbuild__

@@ -58,7 +58,7 @@ private:
 
 public:
 
-    PhantomShell(PshArguments *args);
+    explicit PhantomShell(PshArguments *args);
 
     ~PhantomShell();
 
@@ -73,7 +73,7 @@ public:
  * @param argv arguments - const char[][]
  * @return 0 if parsing was succeed, @ref ShellExitCode otherwise
  */
-UInt32 parseShellArgs(PshArguments *args, int argc, const char **argv);
+UInt32 ParseShellArgs(PshArguments *args, int argc, const char **argv);
 
 /**
  * @brief Can parse shell option, starts with "-"
@@ -81,7 +81,7 @@ UInt32 parseShellArgs(PshArguments *args, int argc, const char **argv);
  * @param option to parse
  * @return 0 if succeed, @ref ShellExitCode otherwise
  */
-UInt32 parseShellShortOptions(PshArguments *args, const char *option);
+UInt32 ParseShellShortOptions(PshArguments *args, const char *option);
 
 /**
  * @brief Can parse shell option, starts with "--"
@@ -89,35 +89,35 @@ UInt32 parseShellShortOptions(PshArguments *args, const char *option);
  * @param option to parse
  * @return 0 if succeed, @ref ShellExitCode otherwise
  */
-UInt32 parseShellLongOptions(PshArguments *args, const char *option);
+UInt32 ParseShellLongOptions(PshArguments *args, const char *option);
 
 /**
  *
  * @param args
  * @return
  */
-UInt32 cleanupShellArgs(PshArguments *args);
+UInt32 CleanupShellArgs(PshArguments *args);
 
 /**
  * @brief Shows shell usage
  * @param args from which the output stream wil be taken
  * @return exit code value
  */
-ShellExitCode shellShowUsage(PshArguments *args);
+ShellExitCode ShellShowUsage(PshArguments *args);
 
 /**
  * @brief Shows shell version
  * @param args where output stream to write into is stored
  * @return exit code value
  */
-ShellExitCode shellShowVersion(PshArguments *args);
+ShellExitCode ShellShowVersion(PshArguments *args);
 
 /**
  * @brief Shell entry point
  * @param args with flags data
  * @return psh::shell_exit_code
  */
-ShellExitCode shellMain(PshArguments *args);
+ShellExitCode ShellMain(PshArguments *args);
 
 } //namespace psh
 

@@ -30,8 +30,8 @@ union phlib::OStream::OStreamData {
 
 
 phlib::OStream::OStream(String &filePath) {
-    data       = new OStreamData();
-    type       = OStreamType::FILE_STREAM;
+    data = new OStreamData();
+    type = OStreamType::FILE_STREAM;
     writeFunc = &OStream::writeToFile;
     closeFunc = &OStream::closeFile;
     data->file = fopen(filePath, "w+");
@@ -44,12 +44,11 @@ phlib::OStream::OStream(Ptr buffer) {
 
 
 phlib::OStream::OStream() {
-    data       = new OStreamData();
-    type       = OStreamType::STDOUT_STREAM;
+    data = new OStreamData();
+    type = OStreamType::STDOUT_STREAM;
     writeFunc = &OStream::writeToStdout;
     closeFunc = &OStream::closeStdout;
     data->stdoutFd = open("/dev/stdout", OFlags::WRONLY);
-    DEBUG_LOG("created new stdout output stream with stdoutFd = %d\n", data->stdoutFd);
 }
 
 
