@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include "Tree.h"
+#include <Tree.h>
 
 using namespace phlib;
 using namespace psh;
@@ -24,7 +24,7 @@ FuncArgDeclarationNode::FuncArgDeclarationNode(PshType argumentType, String &arg
     this->argumentName        = argumentName;
 }
 
-FuncDeclarationNode::FuncDeclarationNode(String &functionName, FuncArgDeclarationNode *arguments)
+FuncDeclarationNode::FuncDeclarationNode(String &functionName, FuncArgDeclarationNode *arguments, int argumentsCount)
         : DeclarationNode() {
     this->declarationNodeType = DeclarationNodeType::FUNCTION_DECLARATION_NODE;
 }

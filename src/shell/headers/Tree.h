@@ -5,6 +5,7 @@
 #ifndef PHANTOMSHELL_TREE_H
 #define PHANTOMSHELL_TREE_H
 
+#include "OutputStream.h"
 #include "String.h"
 #include "Operator.h"
 #include "PhantomShellTypes.h"
@@ -77,14 +78,14 @@ public:
 /**
  * @brief This type of nodes can store user-printed literals
  */
-class LiteralNode : BaseTreeNode {
+class LiteralNode : public BaseTreeNode {
 public:
     LiteralNodeType literalNodeType;
 
     LiteralNode();
 };
 
-class BooleanLiteralNode : LiteralNode {
+class BooleanLiteralNode : public LiteralNode {
 public:
     PshBoolean value;
 
@@ -93,7 +94,7 @@ public:
     explicit BooleanLiteralNode(PshBoolean &value);
 };
 
-class IntegerLiteralNode : LiteralNode {
+class IntegerLiteralNode : public LiteralNode {
 public:
     PshInteger value;
 
@@ -102,7 +103,7 @@ public:
     explicit IntegerLiteralNode(PshInteger &value);
 };
 
-class FloatLiteralNode : LiteralNode {
+class FloatLiteralNode : public LiteralNode {
 public:
     PshFloat value;
 
@@ -111,7 +112,7 @@ public:
     explicit FloatLiteralNode(PshFloat &value);
 };
 
-class CharacterLiteralNode : LiteralNode {
+class CharacterLiteralNode : public LiteralNode {
 public:
     PshCharacter value;
 
@@ -120,7 +121,7 @@ public:
     explicit CharacterLiteralNode(PshCharacter &value);
 };
 
-class StringLiteralNode : LiteralNode {
+class StringLiteralNode : public LiteralNode {
 public:
     PshString value;
 
@@ -133,7 +134,7 @@ public:
 /**
  * @brief Expression nodes stores any kind of expressions
  */
-class ExpressionNode : BaseTreeNode {
+class ExpressionNode : public BaseTreeNode {
 public:
     ExpressionNodeType expressionNodeType;
 
@@ -143,7 +144,7 @@ public:
 /**
  * @brief Wraps literal nodes as constant expression
  */
-class ConstantExpressionNode : ExpressionNode {
+class ConstantExpressionNode : public ExpressionNode {
 public:
     LiteralNode *literal;
 
@@ -153,7 +154,7 @@ public:
 /**
  * @brief Stores unary operator and its operand
  */
-class UnaryExpressionNode : ExpressionNode {
+class UnaryExpressionNode : public ExpressionNode {
 public:
     Operator       oper;
     ExpressionNode *operand;
@@ -165,7 +166,7 @@ public:
 /**
  * @brief Stores binary operator and its operands
  */
-class BinaryExpressionNode : ExpressionNode {
+class BinaryExpressionNode : public ExpressionNode {
 public:
     Operator       oper;
     ExpressionNode *operand1;
@@ -179,7 +180,7 @@ public:
 /**
  * @brief Stores ternary operator and its operands
  */
-class TernaryExpressionNode : ExpressionNode {
+class TernaryExpressionNode : public ExpressionNode {
 public:
     Operator       oper;
     ExpressionNode *operand1;
@@ -195,20 +196,20 @@ public:
 /**
  * @brief Wraps value, represented as identifier
  */
-class IdentifierExpressionNode : ExpressionNode {
+class IdentifierExpressionNode : public ExpressionNode {
 public:
     IdentifierExpressionNode();
 };
 
 
-class StatementNode : BaseTreeNode {
+class StatementNode : public BaseTreeNode {
 public:
     StatementNodeType statementNodeType;
 
     StatementNode();
 };
 
-class DefVarStatementNode : StatementNode {
+class DefVarStatementNode : public StatementNode {
 public:
     IdentifierExpressionNode *identifier;
     ExpressionNode           *value;
@@ -217,14 +218,14 @@ public:
                         ExpressionNode *value);
 };
 
-class ExpressionStatementNode : StatementNode {
+class ExpressionStatementNode : public StatementNode {
 public:
     ExpressionNode *expression;
 
     explicit ExpressionStatementNode(ExpressionNode *expression);
 };
 
-class IfStatementNode : StatementNode {
+class IfStatementNode : public StatementNode {
 public:
     ExpressionNode *expression;
     StatementNode  *trueStatement;
@@ -238,7 +239,7 @@ public:
                     StatementNode *trueStatement);
 };
 
-class CaseSelectionNode : StatementNode {
+class CaseSelectionNode : public StatementNode {
 public:
     ConstantExpressionNode *constantExpression;
     StatementNode          *statement;
@@ -249,7 +250,7 @@ public:
                       CaseSelectionNode *nextCase);
 };
 
-class SwitchStatementNode : StatementNode {
+class SwitchStatementNode : public StatementNode {
 public:
     ExpressionNode    *expression;
     CaseSelectionNode *caseStatement;
@@ -260,7 +261,7 @@ public:
                         StatementNode *otherStatement);
 };
 
-class WhileStatementNode : StatementNode {
+class WhileStatementNode : public StatementNode {
 public:
     ExpressionNode *expression;
     StatementNode  *bodyStatement;
@@ -269,7 +270,7 @@ public:
                        StatementNode *bodyStatement);
 };
 
-class DoWhileStatementNode : StatementNode {
+class DoWhileStatementNode : public StatementNode {
 public:
     ExpressionNode *expression;
     StatementNode  *bodyStatement;
@@ -278,7 +279,7 @@ public:
                          StatementNode *bodyStatement);
 };
 
-class ForStatementNode : StatementNode {
+class ForStatementNode : public StatementNode {
 public:
     IdentifierExpressionNode *element;
     IdentifierExpressionNode *list;
@@ -290,14 +291,14 @@ public:
 };
 
 
-class DeclarationNode : BaseTreeNode {
+class DeclarationNode : public BaseTreeNode {
 public:
     DeclarationNodeType declarationNodeType;
 
     DeclarationNode();
 };
 
-class FuncArgDeclarationNode : DeclarationNode {
+class FuncArgDeclarationNode : public DeclarationNode {
 public:
     PshType       argumentType;
     phlib::String argumentName;
@@ -306,13 +307,14 @@ public:
                            phlib::String &argumentName);
 };
 
-class FuncDeclarationNode : DeclarationNode {
+class FuncDeclarationNode : public DeclarationNode {
 public:
     FuncDeclarationNode(phlib::String &functionName,
-                        FuncArgDeclarationNode *arguments);
+                        FuncArgDeclarationNode *arguments,
+                        int argumentsCount);
 };
 
-class ClassDeclarationNode : DeclarationNode {
+class ClassDeclarationNode : public DeclarationNode {
 public:
     phlib::String className;
 

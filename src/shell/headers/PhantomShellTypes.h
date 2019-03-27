@@ -18,7 +18,9 @@ namespace psh {
 
 class PshType {
 public:
-
+    virtual const phlib::String getTypeName(){
+        return phlib::String("BaseType");
+    };
 };
 
 class PshBoolean : PshType {
@@ -34,6 +36,10 @@ public:
         this->value = other.value;
     }
 
+    const phlib::String getTypeName() override{
+        return phlib::String("Boolean");
+    }
+
 };
 
 class PshInteger : PshType {
@@ -47,6 +53,10 @@ public:
 
     PshInteger(const PshInteger &other) {
         this->value = other.value;
+    }
+
+    const phlib::String getTypeName() override{
+        return phlib::String("Integer");
     }
 
 };
@@ -66,6 +76,10 @@ public:
     PshFloat(float value) {
         this->value = value;
     }
+
+    const phlib::String getTypeName() override{
+        return phlib::String("Float");
+    }
 };
 
 class PshCharacter : PshType {
@@ -75,6 +89,10 @@ public:
 
     PshCharacter(char value) {
         this->value = (uint16) (0x00ff & value);
+    }
+
+    const phlib::String getTypeName() override{
+        return phlib::String("Character");
     }
 
 };
@@ -88,9 +106,16 @@ public:
         this->value = value.value();
     }
 
+    const phlib::String getTypeName() override{
+        return phlib::String("String");
+    }
 };
 
 class PshObject : PshType {
+
+    const phlib::String getTypeName() override{
+        return phlib::String("Object");
+    }
 
 };
 

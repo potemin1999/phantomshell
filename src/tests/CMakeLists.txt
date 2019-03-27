@@ -53,3 +53,18 @@ target_include_directories(${SHELL_LEXER_TEST} PUBLIC ${MODULES_ROOT}/shell/head
 set_target_properties(${SHELL_LEXER_TEST} PROPERTIES LINK_FLAGS -lstdc++)
 target_link_libraries(${SHELL_LEXER_TEST} phlib)
 add_test(NAME ${SHELL_LEXER_TEST} COMMAND ${SHELL_LEXER_TEST})
+
+#parser tests
+set(SHELL_PARSER_TEST parser_lexer_tests)
+set(SHELL_PARSER_TEST_SRC
+        sources/shell/parser_tests.cpp
+        ${MODULES_ROOT}/shell/sources/Lexer.cpp
+        ${MODULES_ROOT}/shell/sources/Parser.cpp
+        ${MODULES_ROOT}/shell/sources/Token.cpp
+        ${MODULES_ROOT}/phlib/sources/allocator/pool_allocator.cpp
+        )
+add_executable(${SHELL_PARSER_TEST} ${SHELL_PARSER_TEST_SRC})
+target_include_directories(${SHELL_PARSER_TEST} PUBLIC ${MODULES_ROOT}/shell/headers)
+set_target_properties(${SHELL_PARSER_TEST} PROPERTIES LINK_FLAGS -lstdc++)
+target_link_libraries(${SHELL_PARSER_TEST} phlib)
+add_test(NAME ${SHELL_PARSER_TEST} COMMAND ${SHELL_PARSER_TEST})

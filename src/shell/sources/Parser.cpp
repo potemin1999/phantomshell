@@ -13,7 +13,8 @@ using namespace phlib;
 using namespace psh;
 
 Parser::Parser() {
-    tokenBuffer = (Token *) phlib::malloc(PARSER_TOKEN_BUFFER_CAPACITY * sizeof(Token *));
+    nodeBuffer = (BaseTreeNode*) phlib::malloc(PARSER_TOKEN_BUFFER_CAPACITY * sizeof(BaseTreeNode*));
+    //tokenBuffer = (Token *) phlib::malloc(PARSER_TOKEN_BUFFER_CAPACITY * sizeof(Token *));
     pushFunctions[TokenType::IDENTIFIER] = &Parser::pushIdentifierToken;
     pushFunctions[TokenType::KEYWORD]    = &Parser::pushKeywordToken;
     pushFunctions[TokenType::LITERAL]    = &Parser::pushLiteralToken;
@@ -22,7 +23,7 @@ Parser::Parser() {
 }
 
 Parser::~Parser() {
-    phlib::free(tokenBuffer);
+    phlib::free(nodeBuffer);
 }
 
 int Parser::pushToken(Token *token) {
@@ -33,10 +34,21 @@ int Parser::pushToken(Token *token) {
 }
 
 int Parser::pushIdentifierToken(Token *token) {
+    auto node = new IdentifierExpressionNode();
     return 0;
 }
 
 int Parser::pushKeywordToken(Token *token) {
+    BaseTreeNode* node = nullptr;
+    switch (token->keyword){
+        case Keyword::CASE:{
+            node = new CaseSelectionNode()
+        }
+        case Keyword::CLASS:{
+
+        }
+        case Keyword
+    }
     return 0;
 }
 
