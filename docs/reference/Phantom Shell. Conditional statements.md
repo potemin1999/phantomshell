@@ -1,32 +1,38 @@
 ﻿Скрипты для Phantom Shell будут иметь следующие условные конструкции:
 
-1. if [<boolean expression>] {
+```
+if [<boolean expression>] {
 	...
-    } elif [<boolean expression>] {
-    	...
-    } else [<boolean expression>] {
-	...
-    }
+} elif [<boolean expression>] {
+    ...
+} else [<boolean expression>] {
+    ...
+}
+```
 
 Конструкция if опционально может иметь блоки elif и/или else (блоков elif может быть и более одного). Блоки if, elif, else проверяются
 последовательно и код из блока выполняется в случае, если соответствующее выражение является истинным, а после контроль переходит к
 коду, находящемуся за закрывающей фигурной скобкой блока if.
 
-2. switch [variable] {
-        case <const-expression-1>:
-            ...
-        case <const-expression-2>:
-            ...
+```
+switch [variable] {
+    case <const-expression-1>:
+        ...
+    case <const-expression-2>:
+        ...
 	...
-        other:
-            ...
-    }
+    other:
+        ...
+}
+```
 
 Switch проверяет переменную на равенство константам. Если она равна одной из них, то выполняется блок кода, находящийся внутри
 совпавшего case'а (и только внутри этого), а после контроль переходит за закрывающую скобку switch-конструкции. Блок 'other'
 является опциональным и выполняется в случае, если ни одно из const-expression не совпало с переменной 'variable'.
 
-3. <boolean expression> ? {block_true} : {block_false}
+```
+<boolean expression> ? {block_true} : {block_false}
+```
 
 Тернарный оператор выполняет блок кода block_true, если выражение истинно и block_false в обратном случае. Возможно, стоит
 включить подобие такого тернарного оператора и в интерактивный режим Phantom Shell, так как его можно удобно писать в одну строку, а внутри

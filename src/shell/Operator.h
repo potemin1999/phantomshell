@@ -22,6 +22,8 @@
 #define OP_TYPE_PRIOR  0x03000000u /**< 011 */
 #define OP_TYPE_COMP   0x04000000u /**< 100 */
 #define OP_TYPE_LOGIC  0x05000000u /**< 101 */
+#define OP_TYPE_ACCESS 0x06000000u /**< 110 */
+#define OP_TYPE_OTHER  0x07000000u /**< 111 */
 
 #define OP_PRECED_0  0x000000u
 #define OP_PRECED_1  0x100000u
@@ -95,30 +97,34 @@ typedef enum Operator {
 
     POST_INCREMENT      = OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x01u,  /**< <div> ++  </div> */
     POST_DECREMENT      = OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x02u,  /**< <div> --  </div> */
-    BITWISE_NOT         = OP_UNARY  | OP_TYPE_BIT    | OP_PRECED_3  | OP_ASSOC_RTL | 0x03u,  /**< <div>  ~  </div> */
-    LOGICAL_NOT         = OP_UNARY  | OP_TYPE_LOGIC  | OP_PRECED_10 | OP_ASSOC_RTL | 0x04u,  /**< <div> ! / not </div> */
-    MULTIPLICATION      = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_6  | OP_ASSOC_LTR | 0x05u,  /**< <div>  *  </div> */
-    DIVISION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_6  | OP_ASSOC_LTR | 0x06u,  /**< <div>  /  </div>*/
-    ADDITION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_7  | OP_ASSOC_LTR | 0x07u,  /**< <div>  +  </div> */
-    SUBTRACTION         = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_7  | OP_ASSOC_LTR | 0x08u,  /**< <div>  -  </div> */
-    ASSIGNMENT          = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_15 | OP_ASSOC_RTL | 0x09u,  /**< <div>  =  </div>*/
-    BITWISE_SHIFT_LEFT  = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_LTR | 0x0au,  /**< <div> <<  </div>*/
-    BITWISE_SHIFT_RIGHT = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_LTR | 0x0bu,  /**< <div> >>  </div>*/
-    BITWISE_AND         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_4  | OP_ASSOC_LTR | 0x0cu,  /**< <div> /\  </div>*/
-    BITWISE_OR          = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0du,  /**< <div> \/  </div>*/
-    BITWISE_XOR         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0eu,  /**< <div> \'/ </div>*/
+    BITWISE_NOT         = OP_UNARY  | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_RTL | 0x03u,  /**< <div>  ~  </div> */
+    LOGICAL_NOT         = OP_UNARY  | OP_TYPE_LOGIC  | OP_PRECED_2  | OP_ASSOC_RTL | 0x04u,  /**< <div> ! / not </div>*/
+    MULTIPLICATION      = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_3  | OP_ASSOC_LTR | 0x05u,  /**< <div>  *  </div> */
+    DIVISION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_3  | OP_ASSOC_LTR | 0x06u,  /**< <div>  /  </div>*/
+    ADDITION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_4  | OP_ASSOC_LTR | 0x07u,  /**< <div>  +  </div> */
+    SUBTRACTION         = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_4  | OP_ASSOC_LTR | 0x08u,  /**< <div>  -  </div> */
+    ASSIGNMENT          = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_14 | OP_ASSOC_RTL | 0x09u,  /**< <div>  =  </div>*/
+    BITWISE_SHIFT_LEFT  = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0au,  /**< <div> <<  </div>*/
+    BITWISE_SHIFT_RIGHT = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0bu,  /**< <div> >>  </div>*/
+    BITWISE_AND         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_8  | OP_ASSOC_LTR | 0x0cu,  /**< <div> /\  </div>*/
+    BITWISE_OR          = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_9  | OP_ASSOC_LTR | 0x0du,  /**< <div> \/  </div>*/
+    BITWISE_XOR         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_9  | OP_ASSOC_LTR | 0x0eu,  /**< <div> \'/ </div>*/
     PAREN_OPEN          = OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x0fu,  /**< <div>  (  </div>*/
     PAREN_CLOSE         = OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x10u,  /**< <div>  )  </div>*/
-    EQUAL_TO            = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x11u,  /**< <div> ==  </div>*/
-    NOT_EQUAL_TO        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x12u,  /**< <div> !=  </div>*/
-    GREATER_THAN        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x13u,  /**< <div>  >  </div>*/
-    LESS_THAN           = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x14u,  /**< <div>  <  </div>*/
-    NOT_GREATER_THAN    = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x15u,  /**< <div> <=  </div>*/
-    NOT_LESS_THAN       = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x16u,  /**< <div> >=  </div>*/
-    LOGICAL_AND         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_11 | OP_ASSOC_LTR | 0x17u,  /**< <div> and </div>*/
+    EQUAL_TO            = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_7  | OP_ASSOC_LTR | 0x11u,  /**< <div> ==  </div>*/
+    NOT_EQUAL_TO        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_7  | OP_ASSOC_LTR | 0x12u,  /**< <div> !=  </div>*/
+    GREATER_THAN        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_6  | OP_ASSOC_LTR | 0x13u,  /**< <div>  >  </div>*/
+    LESS_THAN           = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_6  | OP_ASSOC_LTR | 0x14u,  /**< <div>  <  </div>*/
+    NOT_GREATER_THAN    = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_6  | OP_ASSOC_LTR | 0x15u,  /**< <div> <=  </div>*/
+    NOT_LESS_THAN       = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_6  | OP_ASSOC_LTR | 0x16u,  /**< <div> >=  </div>*/
+    LOGICAL_AND         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_10 | OP_ASSOC_LTR | 0x17u,  /**< <div> and </div>*/
     LOGICAL_OR          = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x18u,  /**< <div> or  </div>*/
-    LOGICAL_XOR         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x19u,  /**< <div> xor </div>*/
-    LOGICAL_IMPLICATION = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_13 | OP_ASSOC_LTR | 0x1au   /**< <div> ->  </div>*/
+    LOGICAL_XOR         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_11 | OP_ASSOC_LTR | 0x19u,  /**< <div> xor </div>*/
+    LOGICAL_IMPLICATION = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x1au,  /**< <div> ->  </div>*/
+    TERNARY_CONDITIONAL = OP_TERNARY| OP_TYPE_OTHER  | OP_PRECED_13 | OP_ASSOC_RTL | 0x1bu,  /**< <div> ? : </div>*/
+    FUNCTION_CALL       = OP_BINARY | OP_TYPE_OTHER  | OP_PRECED_2  | OP_ASSOC_LTR | 0x1cu,  /**< <div> a() </div>*/
+    SUBSCRIPT           = OP_BINARY | OP_TYPE_ACCESS | OP_PRECED_2  | OP_ASSOC_LTR | 0x1du,  /**< <div> a[b]</div>*/
+    MEMBER_ACCESS       = OP_BINARY | OP_TYPE_ACCESS | OP_PRECED_2  | OP_ASSOC_LTR | 0x1eu   /**< <div> a.b </div>*/
 
 } Operator;
 
