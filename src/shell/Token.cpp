@@ -149,6 +149,7 @@ const char *Token::literalToString(Literal literal) {
         case Literal::LOGICAL_LITERAL: return "LOGICAL_LITERAL";
         case Literal::INTEGER_LITERAL: return "INTEGER_LITERAL";
         case Literal::CHARACTER_LITERAL: return "CHARACTER_LITERAL";
+        default : return "??_LITERAL";
     }
 }
 
@@ -165,6 +166,7 @@ const char *Token::separatorToString(Separator separator) {
         case Separator::BRACKET_CLOSE: return "BRACKET_CLOSE";
         case Separator::PARENTHESIS_OPEN: return "PARENTHESIS_OPEN";
         case Separator::PARENTHESIS_CLOSE: return "PARENTHESIS_CLOSE";
+        default : return "??_SEPARATOR";
     }
 }
 

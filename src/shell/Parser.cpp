@@ -12,23 +12,23 @@
 using namespace phlib;
 using namespace psh;
 
-typedef int (*PushTokenFunc)(const Token &);
+typedef int (*PushTokenFunc)(Parser::ParserData &,const Token &);
 
-class Parser::ParserData {
+class psh::Parser::ParserData {
 public:
     Token *tokenBuffer;             /**< Stack of tokens*/
     PushTokenFunc pushFunctions[6]; /**< Array of token push functions for each token type */
 };
 
-int PushIdentifierToken(const Token &token);
+int PushIdentifierToken(Parser::ParserData &data,const Token &token);
 
-int PushKeywordToken(const Token &token);
+int PushKeywordToken(Parser::ParserData &data,const Token &token);
 
-int PushLiteralToken(const Token &token);
+int PushLiteralToken(Parser::ParserData &data,const Token &token);
 
-int PushOperatorToken(const Token &token);
+int PushOperatorToken(Parser::ParserData &data,const Token &token);
 
-int PushSeparatorToken(const Token &token);
+int PushSeparatorToken(Parser::ParserData &data,const Token &token);
 
 Parser::Parser() {
     this->data = new ParserData();
@@ -51,25 +51,25 @@ int Parser::pushToken(Token *token) {
     TokenType &type = token->type;
     if (type < 1 | type > 5)
         return -1;
-    return (*this->data->pushFunctions[type])(*token);
+    return (*this->data->pushFunctions[type])(*data,*token);
 }
 
-int PushIdentifierToken(const Token &token) {
+int PushIdentifierToken(Parser::ParserData &data,const Token &token) {
     return 0;
 }
 
-int PushKeywordToken(const Token &token) {
+int PushKeywordToken(Parser::ParserData &data,const Token &token) {
     return 0;
 }
 
-int PushLiteralToken(const Token &token) {
+int PushLiteralToken(Parser::ParserData &data,const Token &token) {
     return 0;
 }
 
-int PushOperatorToken(const Token &token) {
+int PushOperatorToken(Parser::ParserData &data,const Token &token) {
     return 0;
 }
 
-int PushSeparatorToken(const Token &token) {
+int PushSeparatorToken(Parser::ParserData &data,const Token &token) {
     return 0;
 }

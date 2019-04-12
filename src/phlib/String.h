@@ -221,7 +221,7 @@ public:
     static String valueOf(Int32 value);
 
     static String valueOf(UInt8 value) {
-
+        return String(); //TODO: valueOf
     }
 
     static int strcmp(const char *str1, const char *str2);

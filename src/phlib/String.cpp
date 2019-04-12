@@ -71,6 +71,7 @@ String &String::operator=(const String &other) {
     this->strValue = new Char16[other.strLength + 1];
     copyStr(strValue, other.strValue, other.strLength + 1);
     this->strLength = other.strLength;
+    return *this;
 }
 
 

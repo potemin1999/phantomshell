@@ -146,10 +146,11 @@ UInt32 psh::ParseShellArgs(PshArguments *args, int argc, const char **argv) {
 UInt32 psh::CleanupShellArgs(psh::PshArguments *args) {
     delete args->inputStream;
     delete args->outputStream;
+    return 0;
 }
 
 
-psh::ShellExitCode psh::ShellShowUsage(PshArguments *args) {
+ShellExitCode psh::ShellShowUsage(PshArguments *args) {
     ShellShowVersion(args);
     const char *usage = "Usage: psh [options]\n"\
                         "       psh [options] script_file\n"\

@@ -84,14 +84,14 @@ SSize phlib::OStream::writeToFile(ConstPtr buffer, Size buffer_size) {
 
 
 int phlib::OStream::closeStdout() {
-    phlib::close(data->stdoutFd);
+    return phlib::close(data->stdoutFd);
 }
 
 
 #ifdef __simbuild__
 
 int phlib::OStream::closeFile() {
-    phlib::fclose(data->file);
+    return phlib::fclose(data->file);
 }
 
 #endif //__simbuild__

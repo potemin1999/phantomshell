@@ -25,15 +25,12 @@ namespace psh {
  * psh::Parser consumes (but not destroys) psh::Token, usually made by psh::Lexer
  */
 class Parser {
-
-    /**
-     * @brief Function called on each token push
-     */
+public:
     class ParserData;
 
 private:
 
-    ParserData* data;
+    ParserData *data;
 
 public:
 
