@@ -1,5 +1,7 @@
 .idea/
+.sonar/
 build/
 cmake-build-debug/
 cmake-build-release/
 docs/doxydocs/html/
+src/.scannerwork
