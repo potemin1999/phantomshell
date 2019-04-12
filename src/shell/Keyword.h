@@ -20,6 +20,7 @@ namespace psh {
  * @brief Describes keywords of Phantom Shell
  */
 typedef enum Keyword {
+    //@formatter:off
     DEF    = 0x00, /**< def */
     RETURN = 0x01, /**< return */
     IF     = 0x10, /**< if */
@@ -32,6 +33,7 @@ typedef enum Keyword {
     CASE   = 0x17, /**< case */
     OTHER  = 0x18, /**< other */
     CLASS  = 0x20 /**< class */
+    //@formatter:on
 } Keyword;
 
 /**
@@ -98,7 +100,7 @@ inline const char *keywordToString(psh::Keyword keyword) {
         case psh::Keyword::RETURN: return "RETURN";
         case psh::Keyword::SWITCH: return "SWITCH";
         case psh::Keyword::WHILE: return "WHILE";
-        default: return "NOT A KEYWORD";
+        default: return "??_KEYWORD";
     }
 }
 

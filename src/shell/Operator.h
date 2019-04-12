@@ -12,42 +12,46 @@
 
 #include "Types.h"
 
-#define OP_UNARY   0x00000000 /**< 00 */
-#define OP_BINARY  0x40000000 /**< 01 */
-#define OP_TERNARY 0x80000000 /**< 10 */
+#define OP_UNARY   0x00000000u /**< 00 */
+#define OP_BINARY  0x40000000u /**< 01 */
+#define OP_TERNARY 0x80000000u /**< 10 */
 
-#define OP_TYPE_INCDEC 0x00000000 /**< 000 */
-#define OP_TYPE_BIT    0x01000000 /**< 001 */
-#define OP_TYPE_ARITHM 0x02000000 /**< 010 */
-#define OP_TYPE_PRIOR  0x03000000 /**< 011 */
-#define OP_TYPE_COMP   0x04000000 /**< 100 */
-#define OP_TYPE_LOGIC  0x05000000 /**< 101 */
+#define OP_TYPE_INCDEC 0x00000000u /**< 000 */
+#define OP_TYPE_BIT    0x01000000u /**< 001 */
+#define OP_TYPE_ARITHM 0x02000000u /**< 010 */
+#define OP_TYPE_PRIOR  0x03000000u /**< 011 */
+#define OP_TYPE_COMP   0x04000000u /**< 100 */
+#define OP_TYPE_LOGIC  0x05000000u /**< 101 */
 
-#define OP_PRECED_0  0x000000
-#define OP_PRECED_1  0x100000
-#define OP_PRECED_2  0x200000
-#define OP_PRECED_3  0x300000
-#define OP_PRECED_4  0x400000
-#define OP_PRECED_5  0x500000
-#define OP_PRECED_6  0x600000
-#define OP_PRECED_7  0x700000
-#define OP_PRECED_8  0x800000
-#define OP_PRECED_9  0x900000
-#define OP_PRECED_10 0xa00000
-#define OP_PRECED_11 0xb00000
-#define OP_PRECED_12 0xc00000
-#define OP_PRECED_13 0xd00000
-#define OP_PRECED_14 0xe00000
-#define OP_PRECED_15 0xf00000
+#define OP_PRECED_0  0x000000u
+#define OP_PRECED_1  0x100000u
+#define OP_PRECED_2  0x200000u
+#define OP_PRECED_3  0x300000u
+#define OP_PRECED_4  0x400000u
+#define OP_PRECED_5  0x500000u
+#define OP_PRECED_6  0x600000u
+#define OP_PRECED_7  0x700000u
+#define OP_PRECED_8  0x800000u
+#define OP_PRECED_9  0x900000u
+#define OP_PRECED_10 0xa00000u
+#define OP_PRECED_11 0xb00000u
+#define OP_PRECED_12 0xc00000u
+#define OP_PRECED_13 0xd00000u
+#define OP_PRECED_14 0xe00000u
+#define OP_PRECED_15 0xf00000u
 
-#define OP_ASSOC_LTR 0x00000
-#define OP_ASSOC_RTL 0x40000
+#define OP_ASSOC_LTR 0x00000u
+#define OP_ASSOC_RTL 0x40000u
 
-#define OP_ARITY_MASK         0xc0000000
-#define OP_TYPE_MASK          0x3f000000
-#define OP_PRECEDENCE_MASK    0x00f80000
-#define OP_ASSOCIATIVITY_MASK 0x00040000
-#define OP_ID_MASK            0x0000ffff
+#define OP_ARITY_MASK         0xc0000000u
+#define OP_TYPE_MASK          0x3f000000u
+#define OP_PRECEDENCE_MASK    0x00f80000u
+#define OP_ASSOCIATIVITY_MASK 0x00040000u
+#define OP_ID_MASK            0x0000ffffu
+
+#define OP_ARITY_SHIFT       30u
+#define OP_PRECEDENCE_SHIFT  8u
+
 
 /** @brief Default Shell namespace */
 namespace psh {
@@ -89,32 +93,32 @@ namespace psh {
  */
 typedef enum Operator {
 
-    POST_INCREMENT      = OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x01,  /**< <div> ++  </div> */
-    POST_DECREMENT      = OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x02,  /**< <div> --  </div> */
-    BITWISE_NOT         = OP_UNARY  | OP_TYPE_BIT    | OP_PRECED_3  | OP_ASSOC_RTL | 0x03,  /**< <div>  ~  </div> */
-    LOGICAL_NOT         = OP_UNARY  | OP_TYPE_LOGIC  | OP_PRECED_10 | OP_ASSOC_RTL | 0x04,  /**< <div> ! / not </div> */
-    MULTIPLICATION      = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_6  | OP_ASSOC_LTR | 0x05,  /**< <div>  *  </div> */
-    DIVISION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_6  | OP_ASSOC_LTR | 0x06,  /**< <div>  /  </div>*/
-    ADDITION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_7  | OP_ASSOC_LTR | 0x07,  /**< <div>  +  </div> */
-    SUBTRACTION         = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_7  | OP_ASSOC_LTR | 0x08,  /**< <div>  -  </div> */
-    ASSIGNMENT          = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_15 | OP_ASSOC_RTL | 0x09,  /**< <div>  =  </div>*/
-    BITWISE_SHIFT_LEFT  = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_LTR | 0x0a,  /**< <div> <<  </div>*/
-    BITWISE_SHIFT_RIGHT = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_LTR | 0x0b,  /**< <div> >>  </div>*/
-    BITWISE_AND         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_4  | OP_ASSOC_LTR | 0x0c,  /**< <div> /\  </div>*/
-    BITWISE_OR          = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0d,  /**< <div> \/  </div>*/
-    BITWISE_XOR         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0e,  /**< <div> \'/ </div>*/
-    PAREN_OPEN          = OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x0f,  /**< <div>  (  </div>*/
-    PAREN_CLOSE         = OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x10,  /**< <div>  )  </div>*/
-    EQUAL_TO            = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x11,  /**< <div> ==  </div>*/
-    NOT_EQUAL_TO        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x12,  /**< <div> !=  </div>*/
-    GREATER_THAN        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x13,  /**< <div>  >  </div>*/
-    LESS_THAN           = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x14,  /**< <div>  <  </div>*/
-    NOT_GREATER_THAN    = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x15,  /**< <div> <=  </div>*/
-    NOT_LESS_THAN       = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x16,  /**< <div> >=  </div>*/
-    LOGICAL_AND         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_11 | OP_ASSOC_LTR | 0x17,  /**< <div> and </div>*/
-    LOGICAL_OR          = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x18,  /**< <div> or  </div>*/
-    LOGICAL_XOR         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x19,  /**< <div> xor </div>*/
-    LOGICAL_IMPLICATION = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_13 | OP_ASSOC_LTR | 0x1a   /**< <div> ->  </div>*/
+    POST_INCREMENT      = OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x01u,  /**< <div> ++  </div> */
+    POST_DECREMENT      = OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x02u,  /**< <div> --  </div> */
+    BITWISE_NOT         = OP_UNARY  | OP_TYPE_BIT    | OP_PRECED_3  | OP_ASSOC_RTL | 0x03u,  /**< <div>  ~  </div> */
+    LOGICAL_NOT         = OP_UNARY  | OP_TYPE_LOGIC  | OP_PRECED_10 | OP_ASSOC_RTL | 0x04u,  /**< <div> ! / not </div> */
+    MULTIPLICATION      = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_6  | OP_ASSOC_LTR | 0x05u,  /**< <div>  *  </div> */
+    DIVISION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_6  | OP_ASSOC_LTR | 0x06u,  /**< <div>  /  </div>*/
+    ADDITION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_7  | OP_ASSOC_LTR | 0x07u,  /**< <div>  +  </div> */
+    SUBTRACTION         = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_7  | OP_ASSOC_LTR | 0x08u,  /**< <div>  -  </div> */
+    ASSIGNMENT          = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_15 | OP_ASSOC_RTL | 0x09u,  /**< <div>  =  </div>*/
+    BITWISE_SHIFT_LEFT  = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_LTR | 0x0au,  /**< <div> <<  </div>*/
+    BITWISE_SHIFT_RIGHT = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_LTR | 0x0bu,  /**< <div> >>  </div>*/
+    BITWISE_AND         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_4  | OP_ASSOC_LTR | 0x0cu,  /**< <div> /\  </div>*/
+    BITWISE_OR          = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0du,  /**< <div> \/  </div>*/
+    BITWISE_XOR         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0eu,  /**< <div> \'/ </div>*/
+    PAREN_OPEN          = OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x0fu,  /**< <div>  (  </div>*/
+    PAREN_CLOSE         = OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x10u,  /**< <div>  )  </div>*/
+    EQUAL_TO            = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x11u,  /**< <div> ==  </div>*/
+    NOT_EQUAL_TO        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x12u,  /**< <div> !=  </div>*/
+    GREATER_THAN        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x13u,  /**< <div>  >  </div>*/
+    LESS_THAN           = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x14u,  /**< <div>  <  </div>*/
+    NOT_GREATER_THAN    = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x15u,  /**< <div> <=  </div>*/
+    NOT_LESS_THAN       = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_14 | OP_ASSOC_LTR | 0x16u,  /**< <div> >=  </div>*/
+    LOGICAL_AND         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_11 | OP_ASSOC_LTR | 0x17u,  /**< <div> and </div>*/
+    LOGICAL_OR          = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x18u,  /**< <div> or  </div>*/
+    LOGICAL_XOR         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x19u,  /**< <div> xor </div>*/
+    LOGICAL_IMPLICATION = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_13 | OP_ASSOC_LTR | 0x1au   /**< <div> ->  </div>*/
 
 } Operator;
 
@@ -242,7 +246,7 @@ inline bool psh::IsLtRAssociative(psh::Operator oper) {
 
 inline UInt8 psh::GetOperatorArity(psh::Operator oper) {
     UByte arityBits = (oper & OP_ARITY_MASK);
-    return (arityBits >> 30);
+    return (arityBits >> OP_ARITY_SHIFT);
 }
 
 inline bool psh::IsUnaryOperator(psh::Operator oper) {
@@ -258,7 +262,8 @@ inline bool psh::IsTernaryOperator(psh::Operator oper) {
 }
 
 inline UInt8 psh::GetOperatorPrecedence(psh::Operator oper) {
-    return ((oper & OP_PRECEDENCE_MASK) >> 8) & 0x8000;
+    const auto result_mask = 0x8000u;
+    return ((oper & OP_PRECEDENCE_MASK) >> OP_PRECEDENCE_SHIFT) & result_mask;
 }
 
 inline bool psh::IsIncrementOrDecrementOperator(psh::Operator oper) {

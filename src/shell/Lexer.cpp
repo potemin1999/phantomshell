@@ -316,8 +316,8 @@ Token *Lexer::getNextToken() {
                 (lastReadIsDigit || lastReadIsUnderscore)) {
                 mayBeKeyword = false;
             }
-        } while (lastReadIsLetter |
-                 lastReadIsDigit |
+        } while (lastReadIsLetter ||
+                 lastReadIsDigit ||
                  lastReadIsUnderscore);
         stashBufferPointer -= 1;
         auto oper = checkIfIdentifierIsOperator();

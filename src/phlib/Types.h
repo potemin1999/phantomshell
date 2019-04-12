@@ -10,6 +10,9 @@
 #ifndef PHANTOMSHELL_TYPES_H
 #define PHANTOMSHELL_TYPES_H
 
+#define UNUSED(expr) ((void)(expr));
+#define __UNUSED __attribute__((unused))
+
 #define WORDSIZE 4
 
 #ifdef __simbuild__

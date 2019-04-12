@@ -55,7 +55,7 @@ inline void debugLogFunc(const char *file, unsigned line, const char *format, ..
 
 void phlib::debugLogFunc(const char *file, unsigned line, const char *format, ...) {
 #ifdef __simbuild__
-    printf("[%s:%u]: ", file, line);
+    printf("[%58.58s:%.5u]: ", file, line);
     va_list list;
     va_start(list, format);
     vprintf(format, list);

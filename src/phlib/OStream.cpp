@@ -39,6 +39,7 @@ phlib::OStream::OStream(String &filePath) {
 
 
 phlib::OStream::OStream(Ptr buffer) {
+    UNUSED(buffer)
     //TODO: implement later
 }
 

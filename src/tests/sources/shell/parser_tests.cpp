@@ -8,7 +8,7 @@
  */
 
 #include <cstring>
-#include "InputStream.h"
+#include "IStream.h"
 #include "Lexer.h"
 #include "Parser.h"
 

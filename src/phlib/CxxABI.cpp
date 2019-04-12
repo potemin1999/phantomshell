@@ -9,20 +9,27 @@
 #include "Alloc.h"
 #include "Types.h"
 
-void *__gxx_personality_v0;
+#define ABI_NAMESPACE __cxxabiv1
 
-namespace phabiv1 {
-class __class_type_info {
-    virtual void dummy();
+namespace ABI_NAMESPACE {
+
+class __UNUSED __class_type_info {
+    __UNUSED virtual void dummy();
 };
 
-class __si_class_type_info {
-    virtual void dummy();
+class __UNUSED __si_class_type_info {
+    __UNUSED virtual void dummy();
 };
-};
+}
 
-void phabiv1::__class_type_info::dummy() {}
+void ABI_NAMESPACE::__class_type_info::dummy() {}
 
-void phabiv1::__si_class_type_info::dummy() {}
+void ABI_NAMESPACE::__si_class_type_info::dummy() {}
 
-namespace abi = phabiv1;
+extern "C" {
+
+__UNUSED void *__gxx_personality_v0;
+
+__UNUSED void __cxa_throw_bad_array_new_length() {}
+
+}

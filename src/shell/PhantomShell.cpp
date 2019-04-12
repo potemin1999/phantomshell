@@ -34,9 +34,9 @@ ShellExitCode PhantomShell::run() {
     while (lexer != nullptr) {
         auto token = lexer->getNextToken();
         if (token == nullptr) break;
-#ifdef __debug__
+#       ifdef __debug__
         DEBUG_LOG("%s", token->tokenToString());
-#endif
+#       endif
         parser->pushToken(token);
     }
     return ShellExitCode::EXIT_NORMAL;
@@ -47,10 +47,10 @@ UInt32 psh::ParseShellShortOptions(psh::PshArguments *args, const char *option) 
     if (option[0] != '-') return 1;
     switch (option[1]) {
         case 'd': {
-#ifndef __debug__
+#           ifndef __debug__
             if (args->debugMode == 1)
                     return ShellExitCode::EXIT_DUPLICATED_ARGUMENT;
-#endif //__debug__
+#           endif //__debug__
             args->debugMode = 1;
             DEBUG_LOG("debug mode activated");
             break;
@@ -92,17 +92,19 @@ UInt32 psh::ParseShellShortOptions(psh::PshArguments *args, const char *option) 
 
 
 UInt32 psh::ParseShellLongOptions(psh::PshArguments *args, const char *option) {
+    UNUSED(args)
+    UNUSED(option)
     //TODO: implement
     return 0;
 }
 
 
 UInt32 psh::ParseShellArgs(PshArguments *args, int argc, const char **argv) {
-#ifndef __debug__
+#   ifndef __debug__
     args->debugMode = 0;
-#else //__debug__
+#   else //__debug__
     args->debugMode = 1;
-#endif //__debug__
+#   endif //__debug__
     args->interactiveShell = 0;
     args->loginShell = 0;
     args->showVersion = 0;
@@ -121,7 +123,7 @@ UInt32 psh::ParseShellArgs(PshArguments *args, int argc, const char **argv) {
                 DEBUG_LOG("interactive and login shell does not accept other parameters");
                 return ShellExitCode::EXIT_INVALID_ARGUMENTS;
             }
-#ifdef __simbuild__
+#           ifdef __simbuild__
             if (argStr.endsWith(".psh")) {
                 DEBUG_LOG("found script location : %s", argStr.charValue());
                 args->inputStream = new IStream(argStr);
@@ -130,7 +132,7 @@ UInt32 psh::ParseShellArgs(PshArguments *args, int argc, const char **argv) {
                 DEBUG_LOG("invalid script file : %s", argStr.charValue());
                 return ShellExitCode::EXIT_INVALID_ARGUMENTS;
             }
-#endif //__simbuild__
+#           endif //__simbuild__
         }
     }
     if (args->inputStream == nullptr) {

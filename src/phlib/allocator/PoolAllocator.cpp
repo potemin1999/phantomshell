@@ -106,11 +106,13 @@ phlib::PoolAllocator::~PoolAllocator() {
 
 
 phlib::PoolAllocator *phlib::PoolAllocator::get_instance(Size objects_size) {
+    UNUSED(objects_size)
     return nullptr;
 }
 
 
 Ptr phlib::PoolAllocator::allocate(Size size) {
+    UNUSED(size)
     ChunkHeader *free_chunk = find_free_chunk();
     if (free_chunk == nullptr) {
         allocate_new_chunks(object_size);
