@@ -13,8 +13,8 @@
  * [Утверждения][4]
  * [Функции][5]
  
- [1]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/Comments.md
- [2]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/Types.md
- [3]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/Expressions.md
- [4]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/Statements.md
- [5]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/Functions.md
+ [1]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/ru/Comments.md
+ [2]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/ru/Types.md
+ [3]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/ru/Expressions.md
+ [4]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/ru/Statements.md
+ [5]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/ru/Functions.md
