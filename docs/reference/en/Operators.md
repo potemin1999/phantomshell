@@ -40,7 +40,7 @@
     * `a ? b : c`      - ternary conditional operator
     
 ---
-##### Precedence
+### Precedence
 
 Operators with a higher precedence are at the top of list
  

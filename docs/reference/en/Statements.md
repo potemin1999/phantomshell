@@ -24,24 +24,27 @@ Just an expression
 ##### Selection statements
 simple if statement
 
-    if <expression>
+    if <expression> {
         <statement>
+    }
     
 if statement with else block
 
-    if <expression>
+    if <expression> {
         <statement> 
-    else 
+    } else { 
         <statement>
+    }
     
 if statement with elif and else blocks
  
-    if <expression> 
+    if <expression> {
         <statement>
-    elif <expression> 
+    } elif <expression> { 
         <statement>
-    else
+    } else {
         <statement>
+    }
     
 switch statement ([BNF reference][1])
 
@@ -53,24 +56,27 @@ switch statement ([BNF reference][1])
 ##### Iteration statements
 while-do statement
     
-    while <expression>
+    while <expression> {
         <statement>
+    }
     
 do-while statement
 
-    do 
+    do { 
         <statement>
-    while <expression>
+    } while <expression>
     
 for statement
 
-    for <expression> ; <expression> ; <expression>
+    for <expression> ; <expression> ; <expression> {
         <statement>
+    }
         
 foreach statement
 
-    for <identifier> in <expression>
+    for <identifier> in <expression> {
         <statement>
+    }
 
 ---     
 ##### Jump statements
