@@ -64,7 +64,7 @@ public:
      * @brief Creates stream, writing to the file
      * @param filePath
      */
-    OStream(String &filePath);
+    explicit OStream(String &filePath);
 
 #endif //__simbuild__
 
@@ -72,7 +72,7 @@ public:
      * @brief Creates stream, writing to pointed buffer
      * @param buffer
      */
-    OStream(Ptr buffer);
+    explicit OStream(Ptr buffer);
 
     /**
      * @brief Creates stream, writing to stdout

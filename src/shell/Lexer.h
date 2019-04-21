@@ -64,23 +64,6 @@ public:
     ~Lexer();
 
     /**
-     * @brief Operator new for creating lexer on stack
-     * @param size is a size of lexer in memory
-     * @return pointer to allocated memory
-     */
-    void *operator new(Size size) {
-        return phlib::malloc(size);
-    }
-
-    /**
-     * @brief Removes lexer from memory
-     * @param ptr to lexer location
-     */
-    void operator delete(Ptr ptr) {
-        phlib::free(ptr);
-    }
-
-    /**
      * @brief Returns next lexed token
      * @return token from input stream, nullptr if stream have ended
      */

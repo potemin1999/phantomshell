@@ -78,7 +78,7 @@ Ptr Token::operator new(Size size) {
 }
 
 Ptr Token::operator new[](Size size) {
-    return malloc(size);
+    return Malloc(size);
 }
 
 void Token::operator delete(Ptr tokenPtr) {
@@ -86,7 +86,7 @@ void Token::operator delete(Ptr tokenPtr) {
 }
 
 void Token::operator delete[](Ptr tokensPtr) {
-    return free(tokensPtr);
+    return Free(tokensPtr);
 }
 
 
@@ -103,7 +103,7 @@ const char *Token::tokenToString() {
         }
         case TokenType::KEYWORD: {
             string_value += ",keyword=";
-            string_value += keywordToString(keyword);
+            string_value += KeywordToString(keyword);
             break;
         }
         case TokenType::LITERAL: {

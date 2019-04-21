@@ -19,7 +19,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-typedef FILE File;
+typedef FILE *File;
 
 #endif
 
@@ -38,25 +38,25 @@ typedef enum OFlags {
 #endif //__simbuild__
 //@formatter:on
 
-int print(String str);
+int Print(String str);
 
-int open(String file, OFlags flag);
+int Open(String file, OFlags flag);
 
-SSize read(int fd, Ptr buffer, Size bufferSize);
+SSize Read(int fd, Ptr buffer, Size bufferSize);
 
-SSize write(int fd, ConstPtr buffer, Size nbytes);
+SSize Write(int fd, ConstPtr buffer, Size nbytes);
 
-int close(int fd);
+int Close(int fd);
 
 #ifdef __simbuild__
 
-File *fopen(String file, const char *modes);
+File FOpen(String file, const char *modes);
 
-SSize fread(File *file, Ptr buffer, Size bufferSize);
+SSize FRead(File file, Ptr buffer, Size bufferSize);
 
-SSize fwrite(File *file, ConstPtr buffer, Size nbytes);
+SSize FWrite(File file, ConstPtr buffer, Size nbytes);
 
-int fclose(File *file);
+int FClose(File file);
 
 #endif //__simbuild__
 
@@ -67,39 +67,39 @@ PHLIB_NAMESPACE_END
  */
 #ifdef __simbuild__
 
-inline int phlib::print(String str) {
+inline int phlib::Print(String str) {
     return ::printf("%s", str.charValue());
 }
 
-inline int phlib::open(String file, phlib::OFlags flag) {
+inline int phlib::Open(String file, phlib::OFlags flag) {
     return ::open(file.charValue(), flag);
 }
 
-inline SSize phlib::read(int fd, Ptr buffer, Size bufferSize) {
+inline SSize phlib::Read(int fd, Ptr buffer, Size bufferSize) {
     return ::read(fd, buffer, bufferSize);
 }
 
-inline SSize phlib::write(int fd, ConstPtr buffer, Size nbytes) {
+inline SSize phlib::Write(int fd, ConstPtr buffer, Size nbytes) {
     return ::write(fd, buffer, nbytes);
 }
 
-inline int phlib::close(int fd) {
+inline int phlib::Close(int fd) {
     return ::close(fd);
 }
 
-inline File *phlib::fopen(String file, const char *modes) {
+inline File phlib::FOpen(String file, const char *modes) {
     return ::fopen(file.charValue(), modes);
 }
 
-inline SSize phlib::fread(File *file, Ptr buffer, Size bufferSize) {
+inline SSize phlib::FRead(File file, Ptr buffer, Size bufferSize) {
     return ::fread(buffer, 1, bufferSize, file);
 }
 
-inline SSize phlib::fwrite(File *file, ConstPtr buffer, Size nbytes) {
+inline SSize phlib::FWrite(File file, ConstPtr buffer, Size nbytes) {
     return ::fwrite(buffer, 1, nbytes, file);
 }
 
-inline int phlib::fclose(File *file) {
+inline int phlib::FClose(File file) {
     return ::fclose(file);
 }
 

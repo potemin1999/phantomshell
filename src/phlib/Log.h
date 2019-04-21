@@ -54,16 +54,16 @@ inline void debugLogFunc(const char *file, unsigned line, const char *format, ..
 #ifdef __debug__
 
 void phlib::debugLogFunc(const char *file, unsigned line, const char *format, ...) {
-#ifdef __simbuild__
+#   ifdef __simbuild__
     printf("[%58.58s:%.5u]: ", file, line);
     va_list list;
     va_start(list, format);
     vprintf(format, list);
     va_end(list);
     printf("\n");
-#else
+#   else
     TODO: do phantom logging
-#endif //__simbuild__
+#   endif //__simbuild__
 }
 
 #endif //__debug__

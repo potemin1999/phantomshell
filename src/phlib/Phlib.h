@@ -26,7 +26,7 @@ namespace phlib {
  * @param num Number of bytes to copy
  * @return @p destination
  */
-Ptr memcpy(Ptr dst, ConstPtr src, Size num);
+Ptr Memcpy(Ptr dst, ConstPtr src, Size num);
 
 /**
  * @brief Moves bytes from one location to another
@@ -36,11 +36,11 @@ Ptr memcpy(Ptr dst, ConstPtr src, Size num);
  * @param num Number of bytes to move
  * @return
  */
-Ptr memmove(Ptr dst, ConstPtr src, Size num);
+Ptr Memmove(Ptr dst, ConstPtr src, Size num);
 
 }
 
-inline Ptr phlib::memcpy(Ptr dst, ConstPtr src, Size num) {
+inline Ptr phlib::Memcpy(Ptr dst, ConstPtr src, Size num) {
     Size i = 0;
     auto wordDst = (WordPtr) dst;
     auto wordSrc = (ConstWordPtr) src;
@@ -57,7 +57,7 @@ inline Ptr phlib::memcpy(Ptr dst, ConstPtr src, Size num) {
     return dst;
 }
 
-inline Ptr phlib::memmove(Ptr dst, ConstPtr src, Size num) {
+inline Ptr phlib::Memmove(Ptr dst, ConstPtr src, Size num) {
     if (dst == src)
         return dst;
     auto byteDst = (BytePtr) dst;
@@ -66,11 +66,11 @@ inline Ptr phlib::memmove(Ptr dst, ConstPtr src, Size num) {
                    (byteSrc + num < byteDst + num);
     auto buffer = src;
     if (overlap) {
-        Ptr buffer1 = (Ptr) phlib::malloc(num);
-        memcpy(buffer1, src, num);
+        Ptr buffer1 = (Ptr) phlib::Malloc(num);
+        Memcpy(buffer1, src, num);
         buffer = buffer1;
     }
-    memcpy(dst, buffer, num);
+    Memcpy(dst, buffer, num);
     return dst;
 }
 

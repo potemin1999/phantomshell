@@ -11,6 +11,8 @@
 
 #define ALLOCATION_INCREASE_COUNT 40
 
+using namespace phlib;
+
 namespace {
 
 typedef struct ChunkHeader {
@@ -27,7 +29,7 @@ ChunkHeader *last_chunk = nullptr;
 
 Ptr allocate_new_chunks(Size object_size) {
     Size step = chunk_header_size + object_size;
-    Ptr mem_ptr = phlib::malloc((chunk_header_size + object_size) * ALLOCATION_INCREASE_COUNT);
+    Ptr mem_ptr = Malloc((chunk_header_size + object_size) * ALLOCATION_INCREASE_COUNT);
     char *pointer = (char *) mem_ptr;
     ChunkHeader *new_last_chunk = nullptr;
     for (int i = 0; i < ALLOCATION_INCREASE_COUNT; i++, pointer += step) {
@@ -67,7 +69,8 @@ ChunkHeader *find_free_chunk() {
 
 }
 
-namespace phlib {
+PHLIB_NAMESPACE_BEGIN
+
 class PoolAllocator : public Allocator {
 
 private:
@@ -92,26 +95,27 @@ public:
 
     void operator delete(Ptr allocator_ptr);
 };
-}
+
+PHLIB_NAMESPACE_END
 
 
-phlib::PoolAllocator::PoolAllocator(Size object_size) noexcept : Allocator() {
+PoolAllocator::PoolAllocator(Size object_size) noexcept : Allocator() {
     this->object_size = object_size;
 }
 
 
-phlib::PoolAllocator::~PoolAllocator() {
+PoolAllocator::~PoolAllocator() {
     release();
 }
 
 
-phlib::PoolAllocator *phlib::PoolAllocator::get_instance(Size objects_size) {
+PoolAllocator *PoolAllocator::get_instance(Size objects_size) {
     UNUSED(objects_size)
     return nullptr;
 }
 
 
-Ptr phlib::PoolAllocator::allocate(Size size) {
+Ptr PoolAllocator::allocate(Size size) {
     UNUSED(size)
     ChunkHeader *free_chunk = find_free_chunk();
     if (free_chunk == nullptr) {
@@ -126,20 +130,20 @@ Ptr phlib::PoolAllocator::allocate(Size size) {
 }
 
 
-void phlib::PoolAllocator::deallocate(Ptr ptr) {
+void PoolAllocator::deallocate(Ptr ptr) {
     char *raw_ptr = (char *) ptr;
     auto header = (ChunkHeader *) (raw_ptr - chunk_header_size);
     header->is_free = true;
 }
 
 
-void phlib::PoolAllocator::release() {
+void PoolAllocator::release() {
     ChunkHeader *last_arena_starting_chunk = nullptr;
     ChunkHeader *current_chunk = first_chunk;
     while (current_chunk != nullptr) {
         if (current_chunk->is_start_arena) {
             if (last_arena_starting_chunk != nullptr) {
-                phlib::free(last_arena_starting_chunk);
+                Free(last_arena_starting_chunk);
             }
             last_arena_starting_chunk = current_chunk;
         }
@@ -148,11 +152,11 @@ void phlib::PoolAllocator::release() {
 }
 
 
-Ptr phlib::PoolAllocator::operator new(Size size) {
-    return phlib::malloc(size);
+Ptr PoolAllocator::operator new(Size size) {
+    return Malloc(size);
 }
 
 
-void phlib::PoolAllocator::operator delete(Ptr allocator_ptr) {
-    phlib::free(allocator_ptr);
+void PoolAllocator::operator delete(Ptr allocator_ptr) {
+    Free(allocator_ptr);
 }

@@ -61,15 +61,15 @@ protected:
 
 public:
     //@formatter:on
-#ifdef __simbuild__
+#   ifdef __simbuild__
 
     /**
      * @brief Creates input stream from file
      * @param filePath
      */
-    IStream(String &filePath);
+    explicit IStream(String &filePath);
 
-#endif //__simbuild__
+#   endif //__simbuild__
 
     /**
      * @brief Creates input stream from object

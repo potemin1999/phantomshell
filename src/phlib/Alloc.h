@@ -26,13 +26,13 @@ PHLIB_NAMESPACE_BEGIN
  * @param size in bytes requested to allocate
  * @return pointer to allocated memory if succeed, 0 otherwise
  */
-Ptr malloc(Size size);
+Ptr Malloc(Size size);
 
 /**
  * @brief OS independent wrap for free function
  * @param p pointer to allocated by phlib::malloc memory
  */
-void free(Ptr p);
+void Free(Ptr p);
 
 
 /**

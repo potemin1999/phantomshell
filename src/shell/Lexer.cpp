@@ -330,7 +330,7 @@ Token *Lexer::getNextToken() {
         stashSymbol(lastRead);
         auto keywordValue = -1;
         if (mayBeKeyword) {
-            keywordValue = isKeyword(*stringValue);
+            keywordValue = IsKeyword(*stringValue);
         }
         DEBUG_LOG_LEX("is keyword ? %s\n", keywordValue != -1 ? "true" : "false");
         if (keywordValue != -1) {

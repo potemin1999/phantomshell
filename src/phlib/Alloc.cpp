@@ -15,36 +15,36 @@
 
 #endif //__simbuild__
 
-Ptr phlib::malloc(Size size) {
-#ifdef __simbuild__
+Ptr phlib::Malloc(Size size) {
+#   ifdef __simbuild__
     Ptr pointer = ::malloc(size);
     return pointer;
-#else //__simbuild__
+#   else //__simbuild__
     //TODO: create custom malloc wrap, using phantom api
-#endif //__simbuild__
+#   endif //__simbuild__
 }
 
 
-void phlib::free(Ptr p) {
-#ifdef __simbuild__
+void phlib::Free(Ptr p) {
+#   ifdef __simbuild__
     ::free(p);
-#else //__simbuild__
+#   else //__simbuild__
     //TODO: create free wrap for phantom api
-#endif //__simbuild__
+#   endif //__simbuild__
 }
 
 void *operator new(Size size) {
-    return phlib::malloc(size);
+    return phlib::Malloc(size);
 }
 
 void *operator new[](Size size) {
-    return phlib::malloc(size);
+    return phlib::Malloc(size);
 }
 
 void operator delete(void *what) noexcept {
-    phlib::free(what);
+    phlib::Free(what);
 }
 
 void operator delete[](void *what) noexcept {
-    phlib::free(what);
+    phlib::Free(what);
 }

@@ -9,11 +9,13 @@
 
 #include "OStream.h"
 
+using namespace phlib;
+
 //@formatter:off
-union phlib::OStream::OStreamData {
+union OStream::OStreamData {
 #ifdef __simbuild__
     /** Stores output file descriptor, when type==FILE_STREAM */
-    File *file;
+    File file;
 #endif //__simbuild__
     struct {
         /** Stores pointer to destination object, when type==OBJECT_STREAM*/
@@ -29,70 +31,70 @@ union phlib::OStream::OStreamData {
 //@formatter:on
 
 
-phlib::OStream::OStream(String &filePath) {
+OStream::OStream(String &filePath) {
     data = new OStreamData();
     type = OStreamType::FILE_STREAM;
     writeFunc = &OStream::writeToFile;
     closeFunc = &OStream::closeFile;
-    data->file = fopen(filePath, "w+");
+    data->file = FOpen(filePath, "w+");
 }
 
 
-phlib::OStream::OStream(Ptr buffer) {
+OStream::OStream(Ptr buffer) {
     UNUSED(buffer)
     //TODO: implement later
 }
 
 
-phlib::OStream::OStream() {
+OStream::OStream() {
     data = new OStreamData();
     type = OStreamType::STDOUT_STREAM;
     writeFunc = &OStream::writeToStdout;
     closeFunc = &OStream::closeStdout;
-    data->stdoutFd = open("/dev/stdout", OFlags::WRONLY);
+    data->stdoutFd = Open("/dev/stdout", OFlags::WRONLY);
 }
 
 
-phlib::OStream::~OStream() {
+OStream::~OStream() {
     if (!isClosed) {
         close();
     }
     delete data;
 }
 
-SSize phlib::OStream::write(ConstPtr buffer, Size bufferSize) {
+SSize OStream::write(ConstPtr buffer, Size bufferSize) {
     return (this->*writeFunc)(buffer, bufferSize);
 }
 
-int phlib::OStream::close() {
+int OStream::close() {
     if (isClosed) return -1;
     return (this->*closeFunc)();
 }
 
 
-SSize phlib::OStream::writeToStdout(ConstPtr buffer, Size bufferSize) {
-    return phlib::write(data->stdoutFd, buffer, bufferSize);
+SSize OStream::writeToStdout(ConstPtr buffer, Size bufferSize) {
+    return Write(data->stdoutFd, buffer, bufferSize);
 }
 
 
 #ifdef __simbuild__
 
-SSize phlib::OStream::writeToFile(ConstPtr buffer, Size buffer_size) {
-    return phlib::fwrite(data->file, buffer, buffer_size);
+SSize OStream::writeToFile(ConstPtr buffer, Size buffer_size) {
+    return FWrite(data->file, buffer, buffer_size);
 }
 
 #endif //__simbuild__
 
 
-int phlib::OStream::closeStdout() {
-    return phlib::close(data->stdoutFd);
+int OStream::closeStdout() {
+    return Close(data->stdoutFd);
 }
 
 
 #ifdef __simbuild__
 
-int phlib::OStream::closeFile() {
-    return phlib::fclose(data->file);
+int OStream::closeFile() {
+    return FClose(data->file);
 }
 
 #endif //__simbuild__

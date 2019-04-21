@@ -9,11 +9,13 @@
 
 #include "IStream.h"
 
+using namespace phlib;
+
 //@formatter:off
-union phlib::IStream::IStreamData {
+union IStream::IStreamData {
 #ifdef __simbuild__
     /** Stores input file descriptor, when type==FILE_STREAM*/
-    File *file;
+    File file;
 #endif //__simbuild__
     struct {
         /** Stores pointer to source object, when type==OBJECT_STREAM*/
@@ -29,16 +31,16 @@ union phlib::IStream::IStreamData {
 //@formatter:on
 
 
-phlib::IStream::IStream(String &filePath) {
+IStream::IStream(String &filePath) {
     data = new IStreamData();
     type = IStreamType::FILE_STREAM;
     readFunc = &IStream::readFromFile;
     closeFunc = &IStream::closeFile;
-    data->file = phlib::fopen(filePath, "r");
+    data->file = FOpen(filePath, "r");
 }
 
 
-phlib::IStream::IStream(ConstPtr byteBuffer, Size size, bool doCopy) {
+IStream::IStream(ConstPtr byteBuffer, Size size, bool doCopy) {
     data = new IStreamData();
     type = IStreamType::OBJECT_STREAM;
     readFunc = &IStream::readFromObject;
@@ -58,30 +60,30 @@ phlib::IStream::IStream(ConstPtr byteBuffer, Size size, bool doCopy) {
 }
 
 
-phlib::IStream::IStream() {
+IStream::IStream() {
     data = new IStreamData();
     type = IStreamType::STDIN_STREAM;
     readFunc = &IStream::readFromStdin;
     closeFunc = &IStream::closeStdin;
-    data->stdinFd = phlib::open("/dev/stdin", OFlags::RDONLY);
+    data->stdinFd = Open("/dev/stdin", OFlags::RDONLY);
 }
 
 
-phlib::IStream::~IStream() {
+IStream::~IStream() {
     if (!isClosed) {
         close();
     }
     delete data;
 }
 
-SSize phlib::IStream::read(Ptr buffer, Size bufferSize) {
+SSize IStream::read(Ptr buffer, Size bufferSize) {
     if (bufferSize < 0) return -1;
     if (buffer == nullptr && bufferSize > 0) return -2;
     return (this->*readFunc)(buffer, bufferSize);
 }
 
 
-int phlib::IStream::close() {
+int IStream::close() {
     if (isClosed) return -1;
     return (this->*closeFunc)();
 }
@@ -89,21 +91,21 @@ int phlib::IStream::close() {
 
 #ifdef __simbuild__
 
-SSize phlib::IStream::readFromFile(Ptr buffer, Size bufferSize) {
-    return phlib::fread(data->file, buffer, bufferSize);
+SSize IStream::readFromFile(Ptr buffer, Size bufferSize) {
+    return FRead(data->file, buffer, bufferSize);
 }
 
 #endif //__simbuild__
 
 
-SSize phlib::IStream::readFromStdin(Ptr buffer, Size bufferSize) {
-    return phlib::read(data->stdinFd, buffer, bufferSize);
+SSize IStream::readFromStdin(Ptr buffer, Size bufferSize) {
+    return Read(data->stdinFd, buffer, bufferSize);
 }
 
 
-SSize phlib::IStream::readFromObject(Ptr buffer, Size bufferSize) {
-    ssize_t read_size = bufferSize < (data->objectSize - data->currentPointer - 1) ?
-                        bufferSize : data->objectSize - data->currentPointer - 1;
+SSize IStream::readFromObject(Ptr buffer, Size bufferSize) {
+    auto read_size = bufferSize < (data->objectSize - data->currentPointer - 1) ?
+                     bufferSize : data->objectSize - data->currentPointer - 1;
     auto byteBuffer = static_cast<Byte *>(buffer);
     auto objectBytes = static_cast<const Byte *>(data->object);
     for (int i = 0; i < read_size; i++, data->currentPointer++) {
@@ -113,23 +115,23 @@ SSize phlib::IStream::readFromObject(Ptr buffer, Size bufferSize) {
 }
 
 
-int phlib::IStream::closeObject() {
+int IStream::closeObject() {
     if (data->objectCopy) {
-        phlib::free(const_cast<Ptr>(data->object));
+        Free(const_cast<Ptr>(data->object));
     }
     return 0;
 }
 
 
-int phlib::IStream::closeStdin() {
-    return phlib::close(data->stdinFd);
+int IStream::closeStdin() {
+    return Close(data->stdinFd);
 }
 
 
 #ifdef __simbuild__
 
-int phlib::IStream::closeFile() {
-    return phlib::fclose(data->file);
+int IStream::closeFile() {
+    return FClose(data->file);
 }
 
 #endif //__simbuild__

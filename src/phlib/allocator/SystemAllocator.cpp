@@ -21,18 +21,18 @@ public:
 };
 
 Ptr SystemAllocator::allocate(Size size) {
-    Ptr ptr = phlib::malloc(size);
-#ifdef __debug__
+    Ptr ptr = Malloc(size);
+#   ifdef __debug__
     DEBUG_LOG_MEM("allocated %lu bytes at address %p\n", size, ptr);
-#endif //__debug__
+#   endif //__debug__
     return ptr;
 }
 
 void SystemAllocator::deallocate(Ptr ptr) {
-    phlib::free(ptr);
-#ifdef __debug__
+    Free(ptr);
+#   ifdef __debug__
     DEBUG_LOG_MEM("released address %p\n", ptr);
-#endif //__debug__
+#   endif //__debug__
 }
 
 SystemAllocator defaultAllocator;
