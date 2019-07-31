@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <String.h>
 
 
 using namespace phlib;
@@ -12,7 +12,7 @@ int test1() {
     auto str = new String();
     *str += "hello";
     *str += " world";
-    return String::strcmp(str->char_value(), "hello world");
+    return String::strcmp(str->charValue(), "hello world");
 }
 
 

@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include "alloc.h"
+#include "Alloc.h"
 #include <chrono>
 #include <stdio.h>
 
@@ -70,7 +70,7 @@ int test1_malloc() {
 
 
 int test1_allocator() {
-    current_allocator = phlib::Allocator::get_default_allocator();
+    current_allocator = phlib::Allocator::getDefaultAllocator();
     AllocatorTestStruct *ptr[TEST_1_SIZE];
     for (auto &i : ptr) {
         i = new AllocatorTestStruct();

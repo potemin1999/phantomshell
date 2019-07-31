@@ -1,7 +1,7 @@
 ### Phantom Shell
 
-Details about syntax, data types and other language decisions:
- [link](https://github.com/potemin1999/phantomshell/tree/master/docs/plain)
+Language reference documents in Russian:
+ [link](https://github.com/potemin1999/phantomshell/tree/master/docs/reference/Intro.md)
  
 Language description in Backus-Naur form:
 [link](https://github.com/potemin1999/phantomshell/tree/master/docs/markdown/BNF.md)

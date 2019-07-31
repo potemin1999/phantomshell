@@ -1,7 +1,7 @@
 #undef __debug__
 
-#include "istream.h"
-#include "lexer.h"
+#include "IStream.h"
+#include "Lexer.h"
 #include <chrono>
 #include <stdio.h>
 
@@ -33,9 +33,9 @@ int tokenizing_test(const char *src_buffer, Size size) {
     auto input_stream = new IStream(src_buffer, size, false);
     auto lexer = new Lexer(input_stream);
     while (true) {
-        Token *token = lexer->get_next_token();
+        Token *token = lexer->getNextToken();
         if (token == nullptr) break;
-        printf("token lexed : %s\n", token->token_to_string());
+        printf("token lexed : %s\n", token->tokenToString());
         delete token;
     }
     delete lexer;
@@ -58,7 +58,7 @@ int test2() {
     int counter = 0;
     high_resolution_clock::time_point start_time = high_resolution_clock::now();
     while (true) {
-        Token *token = lexer->get_next_token();
+        Token *token = lexer->getNextToken();
         if (token == nullptr) break;
         delete token;
     }
