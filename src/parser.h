@@ -15,6 +15,7 @@
 #include "y.tab.h"
 
 #define AST_NODE_TYPE_EMPTY 0b00000000
+#define AST_NODE_STAT_MASK              0b10000000u
 #define AST_NODE_TYPE_STAT_EXPR         0b10000001u
 #define AST_NODE_TYPE_STAT_RET          0b10000010u
 #define AST_NODE_TYPE_STAT_IF           0b10000011u
@@ -22,10 +23,8 @@
 #define AST_NODE_TYPE_STAT_SWITCH_CASE  0b10000101u
 #define AST_NODE_TYPE_STAT_SWITCH_OTHER 0b10000110u
 #define AST_NODE_TYPE_STAT_WHILE        0b10000111u
-
 #define AST_NODE_TYPE_DECL_FUNC         0b00000100u
 #define AST_NODE_TYPE_FUNC_ARG          0b00000101u
-
 #define AST_NODE_EXPR_MASK              0b01000000u
 #define AST_NODE_TYPE_GROUP             0b00000010u
 #define AST_NODE_TYPE_SCOPE             0b00000011u
@@ -38,6 +37,8 @@
 #define AST_NODE_TYPE_UNARY_OP          0b01001000u
 #define AST_NODE_TYPE_BINARY_OP         0b01001001u
 #define AST_NODE_TYPE_TERNARY_OP        0b01001010u
+
+#define NODE_TO_STRING_FUNC(type) string_t ast_node_##type##_to_string(ast_node_t *node)
 
 #define ENABLE_NODE_STRING_REPR 1
 
@@ -57,11 +58,20 @@ typedef string_t (*to_string_func)(struct ast_node_t *);
     struct ast_node_##name##_t{ \
         AST_NODE_HEADER()       \
         struct body;            \
-    }ast_node_##name##_t;
+    }ast_node_##name##_t;       \
+    NODE_TO_STRING_FUNC(name);
 
 typedef struct ast_node_t {
     AST_NODE_HEADER()
 } ast_node_t;
+
+/**
+ * Every structure define below represent an Abstract Syntax Tree node
+ * Header contains enough information to understand the size of structure and its values
+ * IF DEFINED ENABLE_NODE_STRING_REPR
+ *   Each node struct should implement ast_node_##type_name##_to_string function, as it autowired while allocation
+ * ENDIF
+ */
 
 DEF_AST_NODE(expr, {})
 
@@ -149,6 +159,16 @@ DEF_AST_NODE(func_arg, {
     string_t arg_name;
     ast_node_t *next;
 })
+
+NODE_TO_STRING_FUNC(literal_bool);
+
+NODE_TO_STRING_FUNC(literal_int);
+
+NODE_TO_STRING_FUNC(literal_float);
+
+NODE_TO_STRING_FUNC(literal_char);
+
+NODE_TO_STRING_FUNC(literal_string);
 
 string_t ast_node_to_string(ast_node_t *node);
 
