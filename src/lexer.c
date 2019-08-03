@@ -35,11 +35,13 @@ int lexer_handle_int(const char *text_value) {
 
 int lexer_handle_float(const char *text_value) {
     TRACE_TOKEN("FloatLiteral")
+    yylval.float_value = atof(text_value);
     return FloatLiteral;
 }
 
 int lexer_handle_char(const char *text_value) {
     TRACE_TOKEN("CharLiteral")
+    yylval.char_value = *(text_value + 1);
     return CharLiteral;
 }
 

@@ -59,7 +59,6 @@
 #define NODE_UPCAST_GROUP(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_GROUP)
 #define NODE_UPCAST_SCOPE(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_SCOPE)
 #define NODE_UPCAST_IDENT(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_IDENT)
-#define NODE_UPCAST_LITERAL(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_LITERAL)
 #define NODE_UPCAST_UNARY_OP(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_UNARY_OP)
 #define NODE_UPCAST_BINARY_OP(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_BINARY_OP)
 #define NODE_UPCAST_TERNARY_OP(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_TERNARY_OP)
@@ -151,20 +150,20 @@ string_t ast_node_to_string(ast_node_t *node) {
 }
 
 ast_node_t *ast_new_node_group(ast_node_t *expr) {
-    TRACEf("group of %d", expr->type)
     NODE_UPCAST_EXPR(expr, &expr)
     ASSERT_NON_NULL(expr, "group expr cast failed")
     AST_NEW_NODE(group)
     node->type = AST_NODE_TYPE_GROUP;
     node->expr = expr;
+    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
 ast_node_t *ast_new_node_scope(ast_node_t *statements) {
-    TRACEf("scope of %d", statements->type);
     AST_NEW_NODE(scope)
     node->type = AST_NODE_TYPE_SCOPE;
     node->stats = statements;
+    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -178,38 +177,38 @@ ast_node_t *ast_new_node_ident(const char *value) {
 }
 
 ast_node_t *ast_new_node_literal_bool(bool_t value) {
-    TRACE("literal bool")
     AST_NEW_NODEnt(literal, node, literal_bool)
     node->type = AST_NODE_TYPE_LITERAL_BOOL;
     node->bool_val = value;
+    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
 ast_node_t *ast_new_node_literal_int(int_t value) {
-    TRACE("literal int")
     AST_NEW_NODEnt(literal, node, literal_int)
     node->int_val = value;
+    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
 ast_node_t *ast_new_node_literal_float(float_t value) {
-    TRACE("literal float")
     AST_NEW_NODEnt(literal, node, literal_float)
     node->float_val = value;
+    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
 ast_node_t *ast_new_node_literal_char(char_t value) {
-    TRACE("literal char")
     AST_NEW_NODEnt(literal, node, literal_char)
     node->char_val = value;
+    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
 ast_node_t *ast_new_node_literal_string(string_t value) {
-    TRACE("literal string")
     AST_NEW_NODEnt(literal, node, literal_string)
     node->string_val = value;
+    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -430,7 +429,38 @@ NODE_TO_STRING_FUNC(scope) {
 }
 
 NODE_TO_STRING_FUNC(literal) {
-    return strdup("literal_string");
+    ast_node_literal_t *literal_node;
+    literal_node = (ast_node_literal_t *) node;
+    string_t str_repr;
+    switch (node->type) {
+        case AST_NODE_TYPE_LITERAL_BOOL: {
+            str_repr = (string_t) malloc(16);
+            sprintf(str_repr, "L(B)=%s", literal_node->bool_val ? "true" : "false");
+            return str_repr;
+        }
+        case AST_NODE_TYPE_LITERAL_INT: {
+            str_repr = (string_t) malloc(24);
+            sprintf(str_repr, "L(I)=%d", literal_node->int_val);
+            return str_repr;
+        }
+        case AST_NODE_TYPE_LITERAL_FLOAT: {
+            str_repr = (string_t) malloc(32);
+            sprintf(str_repr, "L(F)=%f", literal_node->float_val);
+            return str_repr;
+        }
+        case AST_NODE_TYPE_LITERAL_CHAR: {
+            str_repr = (string_t) malloc(16);
+            sprintf(str_repr, "L(C)=%c", literal_node->char_val);
+            return str_repr;
+        }
+        case AST_NODE_TYPE_LITERAL_STRING: {
+            string_t val = literal_node->string_val;
+            str_repr = (string_t) malloc(8 + strlen(val));
+            sprintf(str_repr, "L(S)=%s", val);
+            return str_repr;
+        }
+    }
+    return strdup("(error: unexpected literal type)");
 }
 
 NODE_TO_STRING_FUNC(stat_expr) {
