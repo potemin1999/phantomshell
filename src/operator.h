@@ -1,16 +1,17 @@
 /**
  * @headerfile
  * @author Ilya Potemin <potemin1999@bk.ru>
- * @date 11/18/18
+ * @date 7/31/19
  * This file is part of Phantom Shell project,
  * which is child project of Phantom OS.
  * GNU Lesser General Public License v3.0
  */
 
-#ifndef PHANTOMSHELL_OPERATOR_H
-#define PHANTOMSHELL_OPERATOR_H
+#ifndef SHELL_OPERATOR_H
+#define SHELL_OPERATOR_H
 
-#include "Types.h"
+
+#include "types.h"
 
 #define OP_UNARY   0x00000000u /**< 00 */
 #define OP_BINARY  0x40000000u /**< 01 */
@@ -54,10 +55,6 @@
 #define OP_ARITY_SHIFT       30u
 #define OP_PRECEDENCE_SHIFT  8u
 
-
-/** @brief Default Shell namespace */
-namespace psh {
-
 /**
  * @brief Describes all operators used in Phantom Shell
  *
@@ -93,54 +90,50 @@ namespace psh {
  *
  * @formatter:off
  */
-typedef enum Operator {
-
-    POST_INCREMENT      = OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x01u,  /**< <div> ++  </div> */
-    POST_DECREMENT      = OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x02u,  /**< <div> --  </div> */
-    BITWISE_NOT         = OP_UNARY  | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_RTL | 0x03u,  /**< <div>  ~  </div> */
-    LOGICAL_NOT         = OP_UNARY  | OP_TYPE_LOGIC  | OP_PRECED_2  | OP_ASSOC_RTL | 0x04u,  /**< <div> ! / not </div>*/
-    MULTIPLICATION      = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_3  | OP_ASSOC_LTR | 0x05u,  /**< <div>  *  </div> */
-    DIVISION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_3  | OP_ASSOC_LTR | 0x06u,  /**< <div>  /  </div>*/
-    ADDITION            = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_4  | OP_ASSOC_LTR | 0x07u,  /**< <div>  +  </div> */
-    SUBTRACTION         = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_4  | OP_ASSOC_LTR | 0x08u,  /**< <div>  -  </div> */
-    ASSIGNMENT          = OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_14 | OP_ASSOC_RTL | 0x09u,  /**< <div>  =  </div>*/
-    BITWISE_SHIFT_LEFT  = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0au,  /**< <div> <<  </div>*/
-    BITWISE_SHIFT_RIGHT = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0bu,  /**< <div> >>  </div>*/
-    BITWISE_AND         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_8  | OP_ASSOC_LTR | 0x0cu,  /**< <div> /\  </div>*/
-    BITWISE_OR          = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_9  | OP_ASSOC_LTR | 0x0du,  /**< <div> \/  </div>*/
-    BITWISE_XOR         = OP_BINARY | OP_TYPE_BIT    | OP_PRECED_9  | OP_ASSOC_LTR | 0x0eu,  /**< <div> \'/ </div>*/
-    PAREN_OPEN          = OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x0fu,  /**< <div>  (  </div>*/
-    PAREN_CLOSE         = OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x10u,  /**< <div>  )  </div>*/
-    EQUAL_TO            = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_7  | OP_ASSOC_LTR | 0x11u,  /**< <div> ==  </div>*/
-    NOT_EQUAL_TO        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_7  | OP_ASSOC_LTR | 0x12u,  /**< <div> !=  </div>*/
-    GREATER_THAN        = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_6  | OP_ASSOC_LTR | 0x13u,  /**< <div>  >  </div>*/
-    LESS_THAN           = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_6  | OP_ASSOC_LTR | 0x14u,  /**< <div>  <  </div>*/
-    NOT_GREATER_THAN    = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_6  | OP_ASSOC_LTR | 0x15u,  /**< <div> <=  </div>*/
-    NOT_LESS_THAN       = OP_BINARY | OP_TYPE_COMP   | OP_PRECED_6  | OP_ASSOC_LTR | 0x16u,  /**< <div> >=  </div>*/
-    LOGICAL_AND         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_10 | OP_ASSOC_LTR | 0x17u,  /**< <div> and </div>*/
-    LOGICAL_OR          = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x18u,  /**< <div> or  </div>*/
-    LOGICAL_XOR         = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_11 | OP_ASSOC_LTR | 0x19u,  /**< <div> xor </div>*/
-    LOGICAL_IMPLICATION = OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x1au,  /**< <div> ->  </div>*/
-    TERNARY_CONDITIONAL = OP_TERNARY| OP_TYPE_OTHER  | OP_PRECED_13 | OP_ASSOC_RTL | 0x1bu,  /**< <div> ? : </div>*/
-    FUNCTION_CALL       = OP_BINARY | OP_TYPE_OTHER  | OP_PRECED_2  | OP_ASSOC_LTR | 0x1cu,  /**< <div> a() </div>*/
-    SUBSCRIPT           = OP_BINARY | OP_TYPE_ACCESS | OP_PRECED_2  | OP_ASSOC_LTR | 0x1du,  /**< <div> a[b]</div>*/
-    MEMBER_ACCESS       = OP_BINARY | OP_TYPE_ACCESS | OP_PRECED_2  | OP_ASSOC_LTR | 0x1eu   /**< <div> a.b </div>*/
-
-} Operator;
+#define POST_INCREMENT      (OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x01u)  /**< <div> ++  </div> */
+#define POST_DECREMENT      (OP_UNARY  | OP_TYPE_INCDEC | OP_PRECED_1  | OP_ASSOC_LTR | 0x02u)  /**< <div> --  </div> */
+#define BITWISE_NOT         (OP_UNARY  | OP_TYPE_BIT    | OP_PRECED_2  | OP_ASSOC_RTL | 0x03u)  /**< <div>  ~  </div> */
+#define LOGICAL_NOT         (OP_UNARY  | OP_TYPE_LOGIC  | OP_PRECED_2  | OP_ASSOC_RTL | 0x04u)  /**< <div> ! / not </div>*/
+#define MULTIPLICATION      (OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_3  | OP_ASSOC_LTR | 0x05u)  /**< <div>  *  </div> */
+#define DIVISION            (OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_3  | OP_ASSOC_LTR | 0x06u)  /**< <div>  /  </div>*/
+#define ADDITION            (OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_4  | OP_ASSOC_LTR | 0x07u)  /**< <div>  +  </div> */
+#define SUBTRACTION         (OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_4  | OP_ASSOC_LTR | 0x08u)  /**< <div>  -  </div> */
+#define ASSIGNMENT          (OP_BINARY | OP_TYPE_ARITHM | OP_PRECED_14 | OP_ASSOC_RTL | 0x09u)  /**< <div>  =  </div>*/
+#define BITWISE_SHIFT_LEFT  (OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0au)  /**< <div> <<  </div>*/
+#define BITWISE_SHIFT_RIGHT (OP_BINARY | OP_TYPE_BIT    | OP_PRECED_5  | OP_ASSOC_LTR | 0x0bu)  /**< <div> >>  </div>*/
+#define BITWISE_AND         (OP_BINARY | OP_TYPE_BIT    | OP_PRECED_8  | OP_ASSOC_LTR | 0x0cu)  /**< <div> /\  </div>*/
+#define BITWISE_OR          (OP_BINARY | OP_TYPE_BIT    | OP_PRECED_9  | OP_ASSOC_LTR | 0x0du)  /**< <div> \/  </div>*/
+#define BITWISE_XOR         (OP_BINARY | OP_TYPE_BIT    | OP_PRECED_9  | OP_ASSOC_LTR | 0x0eu)  /**< <div> \'/ </div>*/
+//#define PAREN_OPEN          (OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x0fu)  /**< <div>  (  </div>*/
+//#define PAREN_CLOSE         (OP_BINARY | OP_TYPE_PRIOR  | OP_PRECED_1  | OP_ASSOC_LTR | 0x10u)  /**< <div>  )  </div>*/
+#define EQUAL_TO            (OP_BINARY | OP_TYPE_COMP   | OP_PRECED_7  | OP_ASSOC_LTR | 0x11u)  /**< <div> ==  </div>*/
+#define NOT_EQUAL_TO        (OP_BINARY | OP_TYPE_COMP   | OP_PRECED_7  | OP_ASSOC_LTR | 0x12u)  /**< <div> !=  </div>*/
+#define GREATER_THAN        (OP_BINARY | OP_TYPE_COMP   | OP_PRECED_6  | OP_ASSOC_LTR | 0x13u)  /**< <div>  >  </div>*/
+#define LESS_THAN           (OP_BINARY | OP_TYPE_COMP   | OP_PRECED_6  | OP_ASSOC_LTR | 0x14u)  /**< <div>  <  </div>*/
+#define NOT_GREATER_THAN    (OP_BINARY | OP_TYPE_COMP   | OP_PRECED_6  | OP_ASSOC_LTR | 0x15u)  /**< <div> <=  </div>*/
+#define NOT_LESS_THAN       (OP_BINARY | OP_TYPE_COMP   | OP_PRECED_6  | OP_ASSOC_LTR | 0x16u)  /**< <div> >=  </div>*/
+#define LOGICAL_AND         (OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_10 | OP_ASSOC_LTR | 0x17u)  /**< <div> and </div>*/
+#define LOGICAL_OR          (OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x18u)  /**< <div> or  </div>*/
+#define LOGICAL_XOR         (OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_11 | OP_ASSOC_LTR | 0x19u)  /**< <div> xor </div>*/
+#define LOGICAL_IMPLICATION (OP_BINARY | OP_TYPE_LOGIC  | OP_PRECED_12 | OP_ASSOC_LTR | 0x1au)  /**< <div> ->  </div>*/
+#define TERNARY_CONDITIONAL (OP_TERNARY| OP_TYPE_OTHER  | OP_PRECED_13 | OP_ASSOC_RTL | 0x1bu)  /**< <div> ? : </div>*/
+#define FUNCTION_CALL       (OP_BINARY | OP_TYPE_OTHER  | OP_PRECED_2  | OP_ASSOC_LTR | 0x1cu)  /**< <div> a() </div>*/
+#define SUBSCRIPT           (OP_BINARY | OP_TYPE_ACCESS | OP_PRECED_2  | OP_ASSOC_LTR | 0x1du)  /**< <div> a[b]</div>*/
+#define MEMBER_ACCESS       (OP_BINARY | OP_TYPE_ACCESS | OP_PRECED_2  | OP_ASSOC_LTR | 0x1eu)  /**< <div> a.b </div>*/
 
 /**
  * @brief Return unique id of given operator
  * @param oper is operator to get id of
  * @return id of @p oper
  */
-UInt16 GetOperatorId(Operator oper);
+#define OPERATOR_ID(oper) (oper & OP_ID_MASK);
 
 /**
  * @brief Check if operator is left-to-right associative
  * @param oper to check
  * @return true if operator @p oper has left-to-right associativity
  */
-bool IsLtRAssociative(Operator oper);
+#define IS_LTR_ASSOCIATIVE(oper) ((oper & OP_ASSOCIATIVITY_MASK) == OP_ASSOC_LTR ? 1 : 0 )
 
 /**
  * @brief Gets operator arity
@@ -149,99 +142,97 @@ bool IsLtRAssociative(Operator oper);
  * @return 2 if operator @p oper is binary
  * @return 3 if operator @p oper is ternary
  */
-UInt8 GetOperatorArity(Operator oper);
+#define OPERATOR_ARITY(oper) (((oper & OP_ARITY_MASK) >> OP_ARITY_SHIFT)+1)
 
 /**
  * @brief Checks, whether operator is unary
  * @param oper to get info about
  * @return true if operator @p oper is unary, false otherwise
  */
-bool IsUnaryOperator(Operator oper);
+ #define IF_UNARY_OPERATOR(oper) (OPERATOR_ARITY(oper)==1 ? 1 : 0)
 
 /**
  * @brief Checks, whether operator is binary
  * @param oper to get info about
  * @return true if operator @p oper is binary, false otherwise
  */
-bool IsBinaryOperator(Operator oper);
+#define IS_BINARY_OPERATOR(oper) (OPERATOR_ARITY(oper)==2 ? 1 : 0)
 
 /**
  * @brief Checks, whether operator is ternary
  * @param oper is an Operator to get info about
  * @return true if operator @p oper is ternary, false otherwise
  */
-bool IsTernaryOperator(Operator oper);
+#define IS_TERNARY_OPERATOR(oper) (OPERATOR_ARITY(oper)==3 ? 1 : 0)
 
 /**
  * @brief Get precedence of operator
  * @param oper is an Operator to get info about
  * @return uint8 with precedence [0:15]
  */
-UInt8 GetOperatorPrecedence(Operator oper);
+#define OPERATOR_PRECEDENCE(oper) (((oper & OP_PRECEDENCE_MASK) >> OP_PRECEDENCE_SHIFT) & r0x8000u)
 
 /**
  * @brief Checks if this operator is increment or decrement operator
  * @param oper is an Operator to to check
  * @return true if @p oper is increment or decrement
  */
-bool IsIncrementOrDecrementOperator(Operator oper);
+//bool IsIncrementOrDecrementOperator(Operator oper);
 
 /**
  * @brief Checks if this operator is bitwise operator
  * @param oper is an Operator to to check
  * @return true if @p oper is bitwise
  */
-bool IsBitwiseOperator(Operator oper);
+//bool IsBitwiseOperator(Operator oper);
 
 /**
  * @brief Checks if this operator is arithmetic operator
  * @param oper to check
  * @return true if @p oper is arithmetic
  */
-bool IsArithmeticOperator(Operator oper);
+//bool IsArithmeticOperator(Operator oper);
 
 /**
  * @brief Checks if this operator is priority operator
  * @param oper to check
  * @return true if @p oper is priority
  */
-bool IsPriorityOperator(Operator oper);
+//bool IsPriorityOperator(Operator oper);
 
 /**
  * @brief Checks if this operator is comparison operator
  * @param oper to check
  * @return true if @p oper is comparison
  */
-bool IsComparisonOperator(Operator oper);
+//bool IsComparisonOperator(Operator oper);
 
 /**
  * @brief Checks if this operator is logical operator
  * @param oper to check
  * @return true if @p oper is logical
  */
-bool IsLogicalOperator(Operator oper);
+//bool IsLogicalOperator(Operator oper);
 
 /**
  * @brief Converts operator code to string
  * @param oper to convert
  * @return char* name of operator
  */
-const char* OperatorToString(Operator oper);
+//const char* OperatorToString(Operator oper);
 
 /**
  * @brief Converts operator code to symbol, representing this operator
  * @param oper to convert
  * @return char* symbol of operator
  */
-const char* OperatorToSymbol(Operator oper);
-
-} //namespace psh
+//const char* OperatorToSymbol(Operator oper);
 
 /*
  *  IMPLEMENTATIONS OF INLINE FUNCTIONS ARE BELOW
  *  @formatter:on
  */
-
+/*
 inline UInt16 psh::GetOperatorId(psh::Operator oper) {
     return oper & OP_ID_MASK;
 }
@@ -358,6 +349,6 @@ inline const char *psh::OperatorToSymbol(psh::Operator oper) {
         case LOGICAL_IMPLICATION: return "->";
         default: return " ";
     }
-}
+}*/
 
-#endif //PHANTOMSHELL_OPERATOR_H
+#endif //SHELL_OPERATOR_H

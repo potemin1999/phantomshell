@@ -10,4 +10,15 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${BUILD_PATH}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${BUILD_PATH}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_PATH}/bin")
 
-add_subdirectory(src)
+project(SHELL C CXX)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_EXE_LINKER_FLAGS "-pthread -Wall -Wextra -O0")
+add_compile_definitions(__simbuild__)
+add_compile_definitions(__debug__)
+set(MODULES_ROOT "${PROJECT_SOURCE_DIR}")
+
+#shell module
+file(GLOB_RECURSE SHELL_SOURCE_FILES "src/*.c")
+set(SHELL psh)
+add_executable(${SHELL} ${SHELL_SOURCE_FILES})
+set_target_properties(${SHELL} PROPERTIES LINKER_LANGUAGE C)

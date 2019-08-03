@@ -4,4 +4,7 @@ build/
 cmake-build-debug/
 cmake-build-release/
 docs/doxydocs/html/
-src/.scannerwork
+src/y.output
+src/y.tab.c
+src/lex.yy.c
+src_cpp/*
