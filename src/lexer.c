@@ -16,6 +16,35 @@
 
 int use_newline_as_flush = 0;
 
+struct psh_lexer_state_t lexer_state = {
+        .is_interactive = 1,
+        .is_inside_func = 0,
+        .is_inside_member_func = 0,
+        .is_inside_class = 0
+};
+
+int lexer_handle_keyword_class() {
+    TRACE_TOKEN("CLASS")
+    lexer_state.is_inside_class = 1;
+    return CLASS;
+}
+
+int lexer_handle_keyword_func() {
+    TRACE_TOKEN("FUNC")
+    if (lexer_state.is_inside_class) {
+        if (lexer_state.is_inside_member_func) {
+            yyerror("enclosed member functions are not permitted");
+        }
+        lexer_state.is_inside_member_func = 1;
+    } else {
+        if (lexer_state.is_inside_func) {
+            yyerror("enclosed functions are not permitted");
+        }
+        lexer_state.is_inside_func = 1;
+    }
+    return FUNC;
+}
+
 int lexer_handle_bool(const char *text_value) {
     TRACE_TOKEN("BooleanLiteral")
     if (strcmp(text_value, "true") == 0) {

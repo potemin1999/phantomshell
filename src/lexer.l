@@ -18,8 +18,8 @@ do      {TRACE_TOKEN("DO")      return DO;}
 switch  {TRACE_TOKEN("SWITCH")  return SWITCH;}
 case    {TRACE_TOKEN("CASE")    return CASE;}
 other   {TRACE_TOKEN("OTHER")   return OTHER;}
-class   {TRACE_TOKEN("CLASS")   return CLASS;}
-func    {TRACE_TOKEN("FUNC")    return FUNC;}
+class   return lexer_handle_keyword_class();
+func    return lexer_handle_keyword_func();
 
 true|false              return lexer_handle_bool(yytext);
 [0-9]+                  return lexer_handle_int(yytext);

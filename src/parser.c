@@ -12,12 +12,14 @@
 #include <string.h>
 #include "parser.h"
 #include "operator.h"
+#include "lexer.h"
 
 #define AST_NEW_NODEnt(type_name, var_name, node_type)              \
     size_t size = AST_NODE_##type_name##_SIZE;               \
     ast_node_##type_name##_t *var_name;                          \
     var_name = (ast_node_##type_name##_t *) malloc(size);    \
     var_name->type = __AST_NODE_TYPE_##node_type;            \
+    var_name->flags = 0;                                     \
     SET_STRING_FUNC(var_name,ast_node_##type_name##_to_string)
 
 #define AST_NEW_NODEn(type_name, var_name) \
@@ -26,13 +28,9 @@
 #define AST_NEW_NODE(type) \
     AST_NEW_NODEn(type,node)
 
-#define TRACE(text) { \
-    __log(text);      \
-    }
+#define TRACE(text) //{ __log(text); }
 
-#define TRACEf(text, ...) {  \
-    __log(text,__VA_ARGS__); \
-    }
+#define TRACEf(text, ...) //{ __log(text,__VA_ARGS__); }
 
 #ifdef ENABLE_NODE_STRING_REPR
 #define SET_STRING_FUNC(node, func) node->str = func;
@@ -173,6 +171,7 @@ ast_node_t *ast_new_node_ident(const char *value) {
 ast_node_t *ast_new_node_literal_bool(bool_t value) {
     AST_NEW_NODEnt(literal, node, literal_bool)
     node->type = AST_NODE_TYPE_LITERAL_BOOL;
+    node->flags = TYPE_BOOL;
     node->bool_val = value;
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
@@ -180,6 +179,7 @@ ast_node_t *ast_new_node_literal_bool(bool_t value) {
 
 ast_node_t *ast_new_node_literal_int(int_t value) {
     AST_NEW_NODEnt(literal, node, literal_int)
+    node->flags = TYPE_INT;
     node->int_val = value;
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
@@ -187,6 +187,7 @@ ast_node_t *ast_new_node_literal_int(int_t value) {
 
 ast_node_t *ast_new_node_literal_float(float_t value) {
     AST_NEW_NODEnt(literal, node, literal_float)
+    node->flags = TYPE_FLOAT;
     node->float_val = value;
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
@@ -194,6 +195,7 @@ ast_node_t *ast_new_node_literal_float(float_t value) {
 
 ast_node_t *ast_new_node_literal_char(char_t value) {
     AST_NEW_NODEnt(literal, node, literal_char)
+    node->flags = TYPE_CHAR;
     node->char_val = value;
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
@@ -201,6 +203,7 @@ ast_node_t *ast_new_node_literal_char(char_t value) {
 
 ast_node_t *ast_new_node_literal_string(string_t value) {
     AST_NEW_NODEnt(literal, node, literal_string)
+    node->flags = TYPE_STRING;
     node->string_val = value;
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
@@ -259,6 +262,10 @@ ast_node_t *ast_new_node_stat_expr(ast_node_t *expr) {
     AST_NEW_NODE(stat_expr)
     node->expr = expr;
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    if (!lexer_state.is_inside_func && !lexer_state.is_inside_member_func) {
+        int res = compiler_compile((ast_node_t *) node);
+        printf("compilation = %d\n", res);
+    }
     return (ast_node_t *) node;
 }
 
@@ -321,15 +328,23 @@ ast_node_t *ast_new_node_stat_while(ast_node_t *expr, ast_node_t *scope) {
 }
 
 ast_node_t *ast_new_node_decl_func(string_t name, ast_node_t *args, string_t ret_type, ast_node_t *body) {
-    ast_node_func_arg_t *args_node;
-    NODE_UPCAST_FUNC_ARG(args, &args_node)
-    ASSERT_NON_NULL(args_node, "cast failed")
     AST_NEW_NODE(decl_func)
     node->name = name;
-    node->args = args_node;
     node->body = body;
     node->ret_type = ret_type;
+    node->args = 0;
+    if (args) {
+        ast_node_func_arg_t *args_node;
+        NODE_UPCAST_FUNC_ARG(args, &args_node)
+        ASSERT_NON_NULL(args_node, "cast failed")
+        node->args = args_node;
+    }
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    if (lexer_state.is_inside_class) {
+        lexer_state.is_inside_member_func = 0;
+    } else {
+        lexer_state.is_inside_func = 0;
+    }
     return (ast_node_t *) node;
 }
 

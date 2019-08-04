@@ -15,28 +15,28 @@
 #include "y.tab.h"
 
 #define AST_NODE_TYPE_EMPTY 0b00000000
-#define AST_NODE_STAT_MASK              0b10000000u
-#define AST_NODE_TYPE_STAT_EXPR         0b10000001u
-#define AST_NODE_TYPE_STAT_RET          0b10000010u
-#define AST_NODE_TYPE_STAT_IF           0b10000011u
-#define AST_NODE_TYPE_STAT_SWITCH       0b10000100u
-#define AST_NODE_TYPE_STAT_SWITCH_CASE  0b10000101u
-#define AST_NODE_TYPE_STAT_SWITCH_OTHER 0b10000110u
-#define AST_NODE_TYPE_STAT_WHILE        0b10000111u
-#define AST_NODE_TYPE_DECL_FUNC         0b00000100u
-#define AST_NODE_TYPE_FUNC_ARG          0b00000101u
-#define AST_NODE_EXPR_MASK              0b01000000u
-#define AST_NODE_TYPE_GROUP             0b00000010u
-#define AST_NODE_TYPE_SCOPE             0b00000011u
-#define AST_NODE_TYPE_IDENT             0b01000001u
-#define AST_NODE_TYPE_LITERAL_BOOL      0b01000011u
-#define AST_NODE_TYPE_LITERAL_INT       0b01000100u
-#define AST_NODE_TYPE_LITERAL_FLOAT     0b01000101u
-#define AST_NODE_TYPE_LITERAL_CHAR      0b01000110u
-#define AST_NODE_TYPE_LITERAL_STRING    0b01000111u
-#define AST_NODE_TYPE_UNARY_OP          0b01001000u
-#define AST_NODE_TYPE_BINARY_OP         0b01001001u
-#define AST_NODE_TYPE_TERNARY_OP        0b01001010u
+#define AST_NODE_STAT_MASK              0b10000000u //128
+#define AST_NODE_TYPE_STAT_EXPR         0b10000001u //129
+#define AST_NODE_TYPE_STAT_RET          0b10000010u //130
+#define AST_NODE_TYPE_STAT_IF           0b10000011u //131
+#define AST_NODE_TYPE_STAT_SWITCH       0b10000100u //132
+#define AST_NODE_TYPE_STAT_SWITCH_CASE  0b10000101u //133
+#define AST_NODE_TYPE_STAT_SWITCH_OTHER 0b10000110u //134
+#define AST_NODE_TYPE_STAT_WHILE        0b10000111u //137
+#define AST_NODE_TYPE_DECL_FUNC         0b00000100u //4
+#define AST_NODE_TYPE_FUNC_ARG          0b00000101u //5
+#define AST_NODE_EXPR_MASK              0b01000000u //64
+#define AST_NODE_TYPE_GROUP             0b00000010u //2
+#define AST_NODE_TYPE_SCOPE             0b00000011u //3
+#define AST_NODE_TYPE_IDENT             0b01000001u //65
+#define AST_NODE_TYPE_LITERAL_BOOL      0b01000011u //67
+#define AST_NODE_TYPE_LITERAL_INT       0b01000100u //68
+#define AST_NODE_TYPE_LITERAL_FLOAT     0b01000101u //69
+#define AST_NODE_TYPE_LITERAL_CHAR      0b01000110u //70
+#define AST_NODE_TYPE_LITERAL_STRING    0b01000111u //71
+#define AST_NODE_TYPE_UNARY_OP          0b01001000u //72
+#define AST_NODE_TYPE_BINARY_OP         0b01001001u //73
+#define AST_NODE_TYPE_TERNARY_OP        0b01001010u //74
 
 #define NODE_TO_STRING_FUNC(type) string_t ast_node_##type##_to_string(ast_node_t *node)
 
@@ -47,6 +47,7 @@ typedef string_t (*to_string_func)(struct ast_node_t *);
 #ifdef ENABLE_NODE_STRING_REPR
 #define AST_NODE_HEADER()   \
     unsigned char type;     \
+    unsigned char flags;    \
     to_string_func str;
 #else
 #define AST_NODE_HEADER()   \
@@ -210,6 +211,19 @@ ast_node_t *ast_new_node_decl_func(string_t name, ast_node_t *args, string_t ret
 
 ast_node_t *ast_new_node_func_arg(string_t type, string_t name, ast_node_t *prev);
 
+/**
+ * Executes ready statement/function declaration/class definition
+ * Implemented by compiler.c
+ * @param node
+ * @return execution code
+ */
+int compiler_pop_and_compile(ast_node_t *node);
+
+int compiler_push(ast_node_t *node);
+
+int compiler_compile(ast_node_t *node);
+
+int compiler_finish(ast_node_t *node);
 
 void yyerror(const char *str);
 

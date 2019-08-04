@@ -13,11 +13,23 @@
 #include "types.h"
 #include "operator.h"
 
-#define TRACE_TOKEN(x) printf("%s\n",x);
+#define TRACE_TOKEN(x) //printf("%s\n",x);
 
+struct psh_lexer_state_t {
+    bool_t is_interactive;
+    bool_t is_inside_func;
+    bool_t is_inside_member_func;
+    bool_t is_inside_class;
+};
+
+extern struct psh_lexer_state_t lexer_state;
 extern int use_newline_as_flush;
 
 int lexer_handle_operator(unsigned oper);
+
+int lexer_handle_keyword_class();
+
+int lexer_handle_keyword_func();
 
 int lexer_handle_bool(const char *text_value);
 
