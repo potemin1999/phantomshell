@@ -62,6 +62,13 @@
 #define NODE_UPCAST_UNARY_OP(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_UNARY_OP)
 #define NODE_UPCAST_BINARY_OP(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_BINARY_OP)
 #define NODE_UPCAST_TERNARY_OP(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_TERNARY_OP)
+#define NODE_UPCAST_STAT_EXPR(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_STAT_EXPR)
+#define NODE_UPCAST_STAT_RET(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_STAT_RET)
+#define NODE_UPCAST_STAT_IF(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_STAT_IF)
+#define NODE_UPCAST_STAT_SWITCH(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_STAT_SWITCH)
+#define NODE_UPCAST_STAT_WHILE(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_STAT_WHILE)
+#define NODE_UPCAST_DECL_FUNC(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_DECL_FUNC)
+#define NODE_UPCAST_FUNC_ARG(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_FUNC_ARG)
 
 #define NODE_UPCAST_EXPR(node_in, node_out){ \
     void **node_out_p = (void**) node_out;  \
@@ -72,20 +79,6 @@
     } else {                                \
         *node_out_p = 0;                    \
     }}
-
-#define NODE_UPCAST_STAT(node_in, node_out)  \
-    void **node_out_p = (void**) node_out;  \
-    switch (node_in->type) {                \
-        case AST_NODE_TYPE_STAT_EXPR:       \
-        case AST_NODE_TYPE_STAT_IF:         \
-        case AST_NODE_TYPE_STAT_RET:        \
-        case AST_NODE_TYPE_STAT_WHILE:      \
-        case AST_NODE_TYPE_STAT_SWITCH:     \
-            *node_out_p = node_in;          \
-            break;                          \
-        default:                            \
-            *node_out_p = 0;                \
-    }
 
 void __log(const char *format, ...) {
     printf("->");
@@ -144,6 +137,7 @@ string_t ast_node_to_string(ast_node_t *node) {
     if (node->str) {
         return node->str(node);
     }
+    return "stringify error: null";
     #else
     return "node stringify mode disabled, add ENABLE_NODE_STRING_REPR to parser.h";
     #endif
@@ -303,7 +297,6 @@ ast_node_t *ast_new_node_stat_switch(ast_node_t *expr, ast_node_t *choice) {
 }
 
 ast_node_t *ast_new_node_stat_switch_choice(ast_node_t *expr, ast_node_t *scope, ast_node_t *prev_choice) {
-    //AST NEW NODE
     AST_NEW_NODEnt(stat_switch_choice, node, stat_switch_case)
     if (!expr) {
         node->type = AST_NODE_TYPE_STAT_SWITCH_OTHER;
@@ -311,7 +304,10 @@ ast_node_t *ast_new_node_stat_switch_choice(ast_node_t *expr, ast_node_t *scope,
     node->expr = expr;
     node->scope = scope;
     node->next = 0;
-    //TODO: chain previous
+    if (prev_choice) {
+        ast_node_stat_switch_choice_t *prev_node = (ast_node_stat_switch_choice_t *) prev_choice;
+        prev_node->next = node;
+    }
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
@@ -325,9 +321,12 @@ ast_node_t *ast_new_node_stat_while(ast_node_t *expr, ast_node_t *scope) {
 }
 
 ast_node_t *ast_new_node_decl_func(string_t name, ast_node_t *args, string_t ret_type, ast_node_t *body) {
+    ast_node_func_arg_t *args_node;
+    NODE_UPCAST_FUNC_ARG(args, &args_node)
+    ASSERT_NON_NULL(args_node, "cast failed")
     AST_NEW_NODE(decl_func)
     node->name = name;
-    node->args = args;
+    node->args = args_node;
     node->body = body;
     node->ret_type = ret_type;
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
@@ -339,6 +338,12 @@ ast_node_t *ast_new_node_func_arg(string_t type, string_t name, ast_node_t *prev
     node->arg_name = name;
     node->arg_type = type;
     node->next = 0;
+    if (prev) {
+        ast_node_func_arg_t *prev_arg_node;
+        NODE_UPCAST_FUNC_ARG(prev, &prev_arg_node)
+        ASSERT_NON_NULL(prev_arg_node, "prev arg cast failed")
+        prev_arg_node->next = node;
+    }
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
@@ -352,13 +357,21 @@ NODE_TO_STRING_FUNC(stub) {
 }
 
 NODE_TO_STRING_FUNC(group) {
-    return 0;
+    ast_node_group_t *group_node;
+    NODE_UPCAST_GROUP(node, &group_node)
+    ASSERT_NON_NULL(group_node, "cast failed")
+    string_t expr_str = ast_node_to_string((ast_node_t *) group_node->expr);
+    size_t expr_len = strlen(expr_str);
+    char *buffer = (char *) malloc(expr_len + 8);
+    sprintf(buffer, "( %s )", expr_str);
+    free(expr_str);
+    return buffer;
 }
 
 NODE_TO_STRING_FUNC(ident) {
     ast_node_ident_t *ident_node;
-    NODE_UPCAST_IDENT(node, &ident_node);
-    ASSERT_NON_NULL(ident_node, "cast failed");
+    NODE_UPCAST_IDENT(node, &ident_node)
+    ASSERT_NON_NULL(ident_node, "cast failed")
     char *buffer = (char *) malloc(128);
     sprintf(buffer, "(ident=%s)", ident_node->value);
     return buffer;
@@ -366,8 +379,8 @@ NODE_TO_STRING_FUNC(ident) {
 
 NODE_TO_STRING_FUNC(unary_op) {
     ast_node_unary_op_t *op_node;
-    NODE_UPCAST_UNARY_OP(node, &op_node);
-    ASSERT_NON_NULL(op_node, "cast failed");
+    NODE_UPCAST_UNARY_OP(node, &op_node)
+    ASSERT_NON_NULL(op_node, "cast failed")
     ast_node_t *operand = (ast_node_t *) op_node->operand;
     string_t operand_str = ast_node_to_string(operand);
     size_t operand_len = strlen(operand_str);
@@ -379,8 +392,8 @@ NODE_TO_STRING_FUNC(unary_op) {
 
 NODE_TO_STRING_FUNC(binary_op) {
     ast_node_binary_op_t *op_node;
-    NODE_UPCAST_BINARY_OP(node, &op_node);
-    ASSERT_NON_NULL(op_node, "cast failed");
+    NODE_UPCAST_BINARY_OP(node, &op_node)
+    ASSERT_NON_NULL(op_node, "cast failed")
     ast_node_t *left = (ast_node_t *) op_node->left;
     ast_node_t *right = (ast_node_t *) op_node->right;
     string_t left_str = ast_node_to_string(left);
@@ -396,8 +409,8 @@ NODE_TO_STRING_FUNC(binary_op) {
 
 NODE_TO_STRING_FUNC(ternary_op) {
     ast_node_ternary_op_t *op_node;
-    NODE_UPCAST_TERNARY_OP(node, &op_node);
-    ASSERT_NON_NULL(op_node, "cast failed");
+    NODE_UPCAST_TERNARY_OP(node, &op_node)
+    ASSERT_NON_NULL(op_node, "cast failed")
     ast_node_t *op1 = (ast_node_t *) op_node->operand1;
     ast_node_t *op2 = (ast_node_t *) op_node->operand2;
     ast_node_t *op3 = (ast_node_t *) op_node->operand3;
@@ -417,15 +430,19 @@ NODE_TO_STRING_FUNC(ternary_op) {
 
 NODE_TO_STRING_FUNC(scope) {
     ast_node_scope_t *scope_node;
-    NODE_UPCAST_SCOPE(node, &scope_node);
-    ASSERT_NON_NULL(scope_node, "cast failed");
-    ast_node_t *stats = scope_node->stats;
-    string_t stats_str = ast_node_to_string(stats);
-    size_t stats_len = strlen(stats_str);
-    char *buffer = (char *) malloc(stats_len + 8);
-    sprintf(buffer, "({%s})", stats_str);
-    free(stats_str);
-    return buffer;
+    NODE_UPCAST_SCOPE(node, &scope_node)
+    ASSERT_NON_NULL(scope_node, "cast failed")
+    if (scope_node->stats) {
+        ast_node_t *stats = scope_node->stats;
+        string_t stats_str = ast_node_to_string(stats);
+        size_t stats_len = strlen(stats_str);
+        char *buffer = (char *) malloc(stats_len + 8);
+        sprintf(buffer, "{%s}", stats_str);
+        free(stats_str);
+        return buffer;
+    } else {
+        return strdup("{empty}");
+    }
 }
 
 NODE_TO_STRING_FUNC(literal) {
@@ -464,35 +481,178 @@ NODE_TO_STRING_FUNC(literal) {
 }
 
 NODE_TO_STRING_FUNC(stat_expr) {
-    return strdup("stat_expr");
+    ast_node_stat_expr_t *stat_node;
+    NODE_UPCAST_STAT_EXPR(node, &stat_node)
+    ASSERT_NON_NULL(stat_node, "cast failed")
+    string_t expr_str = ast_node_to_string(stat_node->expr);
+    size_t expr_len = strlen(expr_str);
+    char *buffer = (char *) malloc(expr_len + 8);
+    sprintf(buffer, "(%s ;)", expr_str);
+    free(expr_str);
+    return buffer;
 }
 
 NODE_TO_STRING_FUNC(stat_ret) {
-    return strdup("stat_ret");
+    ast_node_stat_ret_t *stat_node;
+    NODE_UPCAST_STAT_RET(node, &stat_node)
+    ASSERT_NON_NULL(stat_node, "cast failed")
+    string_t expr_str = ast_node_to_string(stat_node->expr);
+    size_t expr_len = strlen(expr_str);
+    char *buffer = (char *) malloc(expr_len + 8);
+    sprintf(buffer, "(ret %s ;)", expr_str);
+    free(expr_str);
+    return buffer;
 }
 
 NODE_TO_STRING_FUNC(stat_if) {
-    return strdup("stat_if");
+    ast_node_stat_if_t *stat_node;
+    NODE_UPCAST_STAT_IF(node, &stat_node)
+    ASSERT_NON_NULL(stat_node, "cast failed")
+    string_t expr_str = ast_node_to_string(stat_node->expr);
+    string_t true_str = ast_node_to_string((ast_node_t *) stat_node->false_scope);
+    string_t false_str = ast_node_to_string((ast_node_t *) stat_node->false_scope);
+    size_t expr_len = strlen(expr_str);
+    size_t true_len = strlen(true_str);
+    size_t false_len = strlen(false_str);
+    char *buffer = (char *) malloc(expr_len + true_len + false_len + 16);
+    sprintf(buffer, "(if %s then \n %s else %s)", expr_str, true_str, false_str);
+    free(expr_str);
+    free(true_str);
+    free(false_str);
+    return buffer;
 }
 
 NODE_TO_STRING_FUNC(stat_switch) {
-    return strdup("stat_switch");
+    ast_node_stat_switch_t *switch_node;
+    NODE_UPCAST_STAT_SWITCH(node, &switch_node)
+    ASSERT_NON_NULL(switch_node, "cast failed")
+    string_t expr_str = ast_node_to_string((ast_node_t *) switch_node->expr);
+    size_t expr_len = strlen(expr_str);
+
+    ast_node_stat_switch_choice_t *cur_choice;
+    size_t choices_len = 0;
+    cur_choice = (ast_node_stat_switch_choice_t *) switch_node->choice;
+    for (; cur_choice; cur_choice = cur_choice->next, choices_len++);
+    char *choices_str[choices_len];
+    size_t choices_str_len[choices_len];
+    size_t choices_sum_len = 0;
+    cur_choice = (ast_node_stat_switch_choice_t *) switch_node->choice;
+    for (int i = 0; cur_choice; cur_choice = cur_choice->next, i++) {
+        choices_str[i] = ast_node_to_string((ast_node_t *) cur_choice);
+        choices_str_len[i] = strlen(choices_str[i]);
+        choices_sum_len += choices_str_len[i];
+    }
+    char *choices_buffer = (char *) malloc(choices_sum_len + choices_len + 1);
+    for (size_t i = 0, ptr = 0; i < choices_len; i++) {
+        strcpy(choices_buffer + ptr, choices_str[i]);
+        free(choices_str[i]);
+        ptr += choices_str_len[i];
+        strcpy(choices_buffer + ptr, "\n");
+        ptr += 1;
+    }
+    choices_buffer[choices_sum_len + choices_len] = '\0';
+    size_t choices_buffer_len = choices_sum_len + choices_len;
+
+    char *buffer = (char *) malloc(choices_buffer_len + expr_len + 16);
+    sprintf(buffer, "( %s switch to %s)", expr_str, choices_buffer);
+    free(expr_str);
+    free(choices_buffer);
+    return buffer;
 }
 
 NODE_TO_STRING_FUNC(stat_switch_choice) {
-    return strdup("stat_switch");
+    ast_node_stat_switch_choice_t *choice_node = 0;
+    if (node->type == AST_NODE_TYPE_STAT_SWITCH_CASE ||
+        node->type == AST_NODE_TYPE_STAT_SWITCH_OTHER) {
+        choice_node = (ast_node_stat_switch_choice_t *) node;
+    }
+    ASSERT_NON_NULL(choice_node, "cast failed")
+    ast_node_t *expr = choice_node->expr;
+    string_t expr_str = expr ? ast_node_to_string(expr) : strdup("other");
+    size_t expr_len = strlen(expr_str);
+    string_t scope_str = ast_node_to_string(choice_node->scope);
+    size_t scope_len = strlen(scope_str);
+
+    char *buffer = (char *) malloc(expr_len + scope_len + 16);
+    sprintf(buffer, "case %s -> %s", expr_str, scope_str);
+    free(expr_str);
+    free(scope_str);
+    return buffer;
 }
 
 NODE_TO_STRING_FUNC(stat_while) {
-    return strdup("stat_while");
+    ast_node_stat_while_t *stat_node;
+    NODE_UPCAST_STAT_WHILE(node, &stat_node)
+    string_t expr_str = ast_node_to_string((ast_node_t *) stat_node->expr);
+    size_t expr_len = strlen(expr_str);
+    string_t body_str = ast_node_to_string((ast_node_t *) stat_node->loop_scope);
+    size_t body_len = strlen(body_str);
+    char *buffer = (char *) malloc(body_len + expr_len + 16);
+    sprintf(buffer, "(while %s do %s)", expr_str, body_str);
+    free(expr_str);
+    free(body_str);
+    return buffer;
 }
 
 NODE_TO_STRING_FUNC(decl_func) {
-    return strdup("decl_func");
+    ast_node_decl_func_t *func_node;
+    NODE_UPCAST_DECL_FUNC(node, &func_node)
+    ASSERT_NON_NULL(func_node, "cast failed")
+    int func_arg_count = 0;
+    if (func_node->args) {
+        ast_node_func_arg_t *arg = func_node->args;
+        while (arg) {
+            func_arg_count++;
+            arg = arg->next;
+        }
+    }
+    string_t func_args_str = 0;
+    if (func_arg_count != 0) {
+        char *args[func_arg_count];
+        ast_node_func_arg_t *arg = func_node->args;
+        for (int i = 0; arg; i++, arg = arg->next) {
+            args[i] = ast_node_to_string((ast_node_t *) arg);
+        }
+        size_t args_str_len = 0;
+        size_t args_len[func_arg_count];
+        for (int i = 0; i < func_arg_count; i++) {
+            args_len[i] = strlen(args[i]);
+            args_str_len += args_len[i];
+        }
+        func_args_str = (char *) malloc(args_str_len + func_arg_count + 1);
+        size_t current_ptr = 0;
+        for (int i = 0; i < func_arg_count; i++) {
+            strcpy(func_args_str + current_ptr, args[i]);
+            free(args[i]);
+            strcpy(func_args_str + current_ptr + args_len[i], ",");
+            current_ptr += (args_len[i] + 1);
+        }
+        func_args_str[args_str_len + func_arg_count] = '\0';
+    } else {
+        func_args_str = strdup("");
+    }
+    string_t body_str = ast_node_to_string((ast_node_t *) func_node->body);
+    size_t body_len = strlen(body_str);
+    size_t name_len = strlen(func_node->name);
+    string_t ret_str = func_node->ret_type ? func_node->ret_type : "";
+    size_t ret_len = strlen(ret_str);
+    size_t args_len = strlen(func_args_str);
+    char *buffer = (char *) malloc(name_len + args_len + ret_len + body_len + 16);
+    sprintf(buffer, "(func %s (%s) %s %s)", func_node->name, func_args_str, func_node->ret_type, body_str);
+    free(body_str);
+    free(func_args_str);
+    return buffer;
 }
 
 NODE_TO_STRING_FUNC(func_arg) {
-    return strdup("func_args");
+    ast_node_func_arg_t *arg_node;
+    NODE_UPCAST_FUNC_ARG(node, &arg_node);
+    ASSERT_NON_NULL(arg_node, "cast failed");
+    size_t type_len = strlen(arg_node->arg_type);
+    size_t name_len = strlen(arg_node->arg_name);
+    char *buffer = (char *) malloc(type_len + name_len + 16);
+    sprintf(buffer, "(arg %s of type %s)", arg_node->arg_name, arg_node->arg_type);
+    return buffer;
 }
 
 #endif

@@ -27,7 +27,7 @@ true|false              return lexer_handle_bool(yytext);
 \'[a-zA-Z0-9]\'         return lexer_handle_char(yytext);
 ["][^"]*["]             return lexer_handle_string(yytext);
 
-[a-zA-Z][a-zA-Z0-9]*    return lexer_handle_identifier(yytext);
+[_a-zA-Z][_a-zA-Z0-9]*    return lexer_handle_identifier(yytext);
 
 "+"     return *yytext;
 "-"     return *yytext;

@@ -47,7 +47,7 @@
 %type <ast> TernaryExpression BinaryExpression UnaryExpression Expression ConstantExpression
 %type <ast> Statements Statement SelectionStatement IterationStatement JumpStatement Declaration
 %type <ast> switchSelectionBlock elifSelectionBlock
-%type <ast> FuncDeclaration FunctionArgument FunctionArgs
+%type <ast> FuncDeclaration FunctionArgs
 %%
 
 //BASIC
@@ -91,7 +91,8 @@ _FLUSH 	: FLUSH
 	|
 	;
 
-Scope : BRACE_OPEN _FLUSH Statements BRACE_CLOSE { $$ = ast_new_node_scope($3); }
+Scope 	: BRACE_OPEN _FLUSH Statements BRACE_CLOSE 	{ $$ = ast_new_node_scope($3); }
+	| BRACE_OPEN BRACE_CLOSE 			{ $$ = ast_new_node_scope(0);  }
 
 Statement : Expression FLUSH	{ $$ = ast_new_node_stat_expr($1); }
 	| Scope 		{ $$ = $1; }
@@ -121,10 +122,10 @@ JumpStatement : RETURN Expression 	{ $$ = ast_new_node_stat_ret($2); }
 
 switchSelectionBlock
 	: switchSelectionBlock
-	  OTHER Scope _FLUSH 			{ $$ = ast_new_node_stat_switch_choice(0,$3,$1); }
+	  OTHER Scope _FLUSH 			{ ast_new_node_stat_switch_choice(0,$3,$1); $$ = $1; }
 	| OTHER Scope _FLUSH 			{ $$ = ast_new_node_stat_switch_choice(0,$2,0); }
 	| switchSelectionBlock
-	  CASE ConstantExpression Scope _FLUSH 	{ $$ = ast_new_node_stat_switch_choice($3,$4,$1); }
+	  CASE ConstantExpression Scope _FLUSH 	{ ast_new_node_stat_switch_choice($3,$4,$1); $$ = $1; }
 	| CASE ConstantExpression Scope _FLUSH	{ $$ = ast_new_node_stat_switch_choice($2,$3,0); }
 
 elifSelectionBlock
@@ -133,11 +134,9 @@ elifSelectionBlock
 	| ELIF Expression Scope ELSE Scope		{ $$ = ast_new_node_stat_if($2,$3,$5); }
 
 //STRUCTURE
-FunctionArgument : Identifier Identifier 	{ $$ = ast_new_node_func_arg($1,$2,0); }
-
-FunctionArgs : FunctionArgument 		{ $$ = $1; }
-	| FunctionArgs ',' FunctionArgument 	{ $$ = $1; }
-	| 					{ $$ = 0; }
+FunctionArgs : Identifier Identifier 			{ $$ = ast_new_node_func_arg($1,$2,0); }
+	| FunctionArgs ',' Identifier Identifier 	{ ast_new_node_func_arg($3,$4,$1); $$ = $1; }
+	| 						{ $$ = 0; }
 	;
 
 FuncDeclaration

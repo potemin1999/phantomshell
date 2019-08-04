@@ -139,7 +139,7 @@ DEF_AST_NODE(stat_switch, {
 DEF_AST_NODE(stat_switch_choice, {
     ast_node_t *expr;
     ast_node_t *scope;
-    ast_node_t *next;
+    struct ast_node_stat_switch_choice_t *next;
 })
 
 DEF_AST_NODE(stat_while, {
@@ -147,17 +147,17 @@ DEF_AST_NODE(stat_while, {
     ast_node_t *loop_scope;
 })
 
-DEF_AST_NODE(decl_func, {
-    string_t name;
-    string_t ret_type;
-    ast_node_t *args;
-    ast_node_t *body;
-})
-
 DEF_AST_NODE(func_arg, {
     string_t arg_type;
     string_t arg_name;
-    ast_node_t *next;
+    struct ast_node_func_arg_t *next;
+})
+
+DEF_AST_NODE(decl_func, {
+    string_t name;
+    string_t ret_type;
+    ast_node_func_arg_t *args;
+    ast_node_t *body;
 })
 
 NODE_TO_STRING_FUNC(literal_bool);
