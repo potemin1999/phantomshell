@@ -1,7 +1,7 @@
 %{
-#include "parser.h"
-#include "types.h"
-#include "operator.h"
+#include "../parser.h"
+#include "../types.h"
+#include "../operator.h"
 #include <stdio.h>
 #include <string.h>
 %}
@@ -38,10 +38,12 @@
 %token <string_value>	StringLiteral
 
 //OPERATORS
+%right RETURN
 %right '='  //prec 14
 %left '+' '-' //prec 4
 %left '*' '/' //prec 3
 %right '!' //prec 2
+%left UNARY_MINUS_PREC
 
 %type <ast> Scope
 %type <ast> TernaryExpression BinaryExpression UnaryExpression Expression ConstantExpression
@@ -62,9 +64,11 @@ ConstantExpression
 
 UnaryExpression
 	: '!' Expression  { $$ = ast_new_node_unary_op(LOGICAL_NOT, $2); }
+	| '-' Expression  { $$ = ast_new_node_unary_op(UNARY_MINUS, $2); } %prec UNARY_MINUS_PREC
 
 BinaryExpression
 	: Expression '=' Expression	{ $$ = ast_new_node_binary_op(ASSIGNMENT, $1, $3); }
+	| Expression '=''=' Expression 	{ $$ = ast_new_node_binary_op(EQUAL_TO, $1, $4); }
 	| Expression '+' Expression 	{ $$ = ast_new_node_binary_op(ADDITION, $1, $3); }
 	| Expression '-' Expression 	{ $$ = ast_new_node_binary_op(SUBTRACTION, $1, $3); }
 	| Expression '*' Expression 	{ $$ = ast_new_node_binary_op(MULTIPLICATION, $1, $3); }
@@ -92,7 +96,7 @@ _FLUSH 	: FLUSH
 	;
 
 Scope 	: BRACE_OPEN _FLUSH Statements BRACE_CLOSE 	{ $$ = ast_new_node_scope($3); }
-	| BRACE_OPEN BRACE_CLOSE 			{ $$ = ast_new_node_scope(0);  }
+	| BRACE_OPEN _FLUSH BRACE_CLOSE 		{ $$ = ast_new_node_scope(0);  }
 
 Statement : Expression FLUSH	{ $$ = ast_new_node_stat_expr($1); }
 	| Scope 		{ $$ = $1; }
@@ -103,10 +107,8 @@ Statement : Expression FLUSH	{ $$ = ast_new_node_stat_expr($1); }
 	| Statement FLUSH 	{ $$ = $1; }
 
 Statements
-	: Statements Statement {
-		printf("Statement finished\n");
-	}
-	| Statement
+	: 			{ $$ = ast_new_node_stat_list(0);	}
+	| Statements Statement	{ $$ = ast_link_node_stat_list($1,$2); 	}
 
 SelectionStatement
 	: IF Expression Scope 				{ $$ = ast_new_node_stat_if($2,$3,0); }
@@ -150,8 +152,11 @@ Declaration : FuncDeclaration {
 	}
 
 
-Program : Statements {
-        	printf("Defined statement in program root\n");
+Program : Program Statement {
+        	//printf("Defined statement in program root\n");
+        }
+        | Statement {
+        	//printf("Defined statement in program root\n");
         }
 
 %%

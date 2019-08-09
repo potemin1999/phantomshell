@@ -15,23 +15,34 @@
 
 #define TYPE_UNKNWN 0b0000
 #define TYPE_NONE   0b1111
-#define TYPE_BOOL   0b0010
-#define TYPE_INT    0b0100
-#define TYPE_FLOAT  0b0110
-#define TYPE_CHAR   0b1000
-#define TYPE_STRING 0b1010
+#define TYPE_BOOL   0b0001
+#define TYPE_INT    0b0010
+#define TYPE_FLOAT  0b0011
+#define TYPE_CHAR   0b0100
+#define TYPE_STRING 0b0101
 #define TYPE_ARRAY  0b1110
 #define TYPE_OBJ    0b0001
+
+#if __x86_64__
+typedef uint64_t address_t;
+#endif
+
+typedef uint64_t static_type_t;
+typedef uint64_t runtime_type_t;
 
 //@formatter:off
 typedef unsigned char   ubyte_t;
 typedef unsigned char   bool_t;
 typedef int32_t         int_t;
 typedef float           float_t;
-typedef char16_t        char_t;
+typedef char            char_t;
 typedef char*           string_t;
+typedef struct {
+    int64_t type;
+} objref_t;
 //@formatter:on
 
-#define EXPR_NODE_TYPE(node) (((ast_node_expr_t*) node)->flags & 0x0Fu)
+#define UNUSED(expr) ((void)(expr));
+#define EXPR_NODE_STATIC_TYPE(node) (((ast_node_expr_t*) (node))->static_type)
 
 #endif //SHELL_TYPES_H

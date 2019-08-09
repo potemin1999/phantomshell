@@ -120,20 +120,21 @@
 #define FUNCTION_CALL       (OP_BINARY | OP_TYPE_OTHER  | OP_PRECED_2  | OP_ASSOC_LTR | 0x1cu)  /**< <div> a() </div>*/
 #define SUBSCRIPT           (OP_BINARY | OP_TYPE_ACCESS | OP_PRECED_2  | OP_ASSOC_LTR | 0x1du)  /**< <div> a[b]</div>*/
 #define MEMBER_ACCESS       (OP_BINARY | OP_TYPE_ACCESS | OP_PRECED_2  | OP_ASSOC_LTR | 0x1eu)  /**< <div> a.b </div>*/
+#define UNARY_MINUS         (OP_UNARY  | OP_TYPE_ARITHM | OP_PRECED_2  | OP_ASSOC_LTR | 0x1fu ) /**< <div> -a  </div>*/
 
 /**
  * @brief Return unique id of given operator
  * @param oper is operator to get id of
  * @return id of @p oper
  */
-#define OPERATOR_ID(oper) (oper & OP_ID_MASK);
+#define OPERATOR_ID(oper) ((oper) & OP_ID_MASK);
 
 /**
  * @brief Check if operator is left-to-right associative
  * @param oper to check
  * @return true if operator @p oper has left-to-right associativity
  */
-#define IS_LTR_ASSOCIATIVE(oper) ((oper & OP_ASSOCIATIVITY_MASK) == OP_ASSOC_LTR ? 1 : 0 )
+#define IS_LTR_ASSOCIATIVE(oper) (((oper) & OP_ASSOCIATIVITY_MASK) == OP_ASSOC_LTR ? 1 : 0 )
 
 /**
  * @brief Gets operator arity
@@ -142,7 +143,7 @@
  * @return 2 if operator @p oper is binary
  * @return 3 if operator @p oper is ternary
  */
-#define OPERATOR_ARITY(oper) (((oper & OP_ARITY_MASK) >> OP_ARITY_SHIFT)+1)
+#define OPERATOR_ARITY(oper) ((((oper) & OP_ARITY_MASK) >> OP_ARITY_SHIFT)+1)
 
 /**
  * @brief Checks, whether operator is unary
@@ -170,7 +171,7 @@
  * @param oper is an Operator to get info about
  * @return uint8 with precedence [0:15]
  */
-#define OPERATOR_PRECEDENCE(oper) (((oper & OP_PRECEDENCE_MASK) >> OP_PRECEDENCE_SHIFT) & r0x8000u)
+#define OPERATOR_PRECEDENCE(oper) ((((oper) & OP_PRECEDENCE_MASK) >> OP_PRECEDENCE_SHIFT) & r0x8000u)
 
 /**
  * @brief Checks if this operator is increment or decrement operator
@@ -191,6 +192,7 @@
  * @param oper to check
  * @return true if @p oper is arithmetic
  */
+#define IS_ARITHMETIC_OPERATOR(oper) (((oper) & OP_TYPE_MASK) == OP_TYPE_ARITHM)
 //bool IsArithmeticOperator(Operator oper);
 
 /**
@@ -205,6 +207,7 @@
  * @param oper to check
  * @return true if @p oper is comparison
  */
+ #define IS_COMPARISON_OPERATOR(oper) (((oper) & OP_TYPE_MASK) == OP_TYPE_COMP)
 //bool IsComparisonOperator(Operator oper);
 
 /**

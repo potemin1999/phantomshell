@@ -76,7 +76,8 @@ extern int yydebug;
     IntegerLiteral = 282,
     FloatLiteral = 283,
     CharLiteral = 284,
-    StringLiteral = 285
+    StringLiteral = 285,
+    UNARY_MINUS_PREC = 286
   };
 #endif
 /* Tokens.  */
@@ -108,13 +109,14 @@ extern int yydebug;
 #define FloatLiteral 283
 #define CharLiteral 284
 #define StringLiteral 285
+#define UNARY_MINUS_PREC 286
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 9 "parser.y" /* yacc.c:1921  */
+#line 9 "../parser.y" /* yacc.c:1921  */
 
 	struct ast_node_t *ast;
 	bool_t bool_value;
@@ -123,7 +125,7 @@ union YYSTYPE
 	char_t char_value;
 	string_t string_value;
 
-#line 127 "y.tab.h" /* yacc.c:1921  */
+#line 129 "y.tab.h" /* yacc.c:1921  */
 };
 
 typedef union YYSTYPE YYSTYPE;

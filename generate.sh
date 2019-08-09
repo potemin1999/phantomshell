@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-cd src || exit
-lex lexer.l
-yacc -v -d parser.y
+cd src/generated || exit
+lex ../lexer.l
+yacc -v -d ../parser.y
+cd .. || exit
 cd .. || exit

@@ -8,9 +8,10 @@
  */
 
 #include <stdlib.h>
+#include <stdarg.h>
+#include <sys/time.h>
 #include "parser.h"
-#include "lexer.h"
-#include "opcodes.h"
+#include "vm/opcodes.h"
 #include "compiler.h"
 
 struct execution_queue_t node_queue = {
@@ -47,50 +48,60 @@ int compiler_push(ast_node_t *node) {
     return COMPILE_SUCCESS;
 }
 
-int compile_root_statement(ast_node_stat_t *node) {
+int compile_global_statement(ast_node_stat_t *node) {
     if (node->type == AST_NODE_TYPE_STAT_EXPR) {
         ast_node_stat_expr_t *stat_node = (ast_node_stat_expr_t *) node;
-        return compile_expression(compiler_get_root_scope(), (ast_node_expr_t *) stat_node->expr);
+        return compile_expression(compiler_get_root_frame(), stat_node->expr);
     }
-    return 2;
+    if (node->type == AST_NODE_TYPE_STAT_IF) {
+        //ast_node_stat_if_t *if_node = (ast_node_stat_if_t *) node;
+        return compile_statement(compiler_get_root_frame(), node);
+    }
+    compiler_panic("unable to compile global statement node");
 }
 
-int compile_root_func(ast_node_decl_func_t *node) {
-    return 3;
+int compile_global_func(ast_node_decl_func_t *node) {
+    if (node->type == AST_NODE_TYPE_DECL_FUNC) {
+
+    }
+    compiler_panic("unable to compile global func node");
 }
 
-int compiler_compile(ast_node_t *node) {
+int compiler_compile_impl(ast_node_t *node) {
     // root statement pushed within global scope
     if ((node->type & AST_NODE_STAT_MASK) >> 6u == 0b10u) {
-        return compile_root_statement((ast_node_stat_t *) node);
+        return compile_global_statement((ast_node_stat_t *) node);
     }
     // function declaration in global scope
     if (node->type == AST_NODE_TYPE_DECL_FUNC) {
-        return compile_root_func((ast_node_decl_func_t *) node);
+        return compile_global_func((ast_node_decl_func_t *) node);
     }
     return COMPILE_UNEXPECTED_NODE;
 }
 
+int compiler_compile(ast_node_t *node) {
+    struct timeval interval_1;
+    struct timeval interval_2;
+    gettimeofday(&interval_1, 0);
+    int res = compiler_compile_impl(node);
+    gettimeofday(&interval_2, 0);
+    long start_time = interval_1.tv_sec * (int) 1e6 + interval_1.tv_usec;
+    long end_time = interval_2.tv_sec * (int) 1e6 + interval_2.tv_usec;
+    printf("compilation finished in %ld microseconds : %d\n", (end_time - start_time), res);
+    return res;
+}
+
 int compiler_finish(ast_node_t *node) {
+    UNUSED(node)
     return compile_queue();
 }
 
-int compiler_emit_0(opcode_t opcode) {
-    printf(" op[0] : %s;\n", get_opcode_name(opcode));
-    return 0;
-}
-
-int compiler_emit_1(opcode_t opcode, ubyte_t byte1) {
-    printf(" op[1] : %s %u;\n", get_opcode_name(opcode), byte1);
-    return 0;
-}
-
-int compiler_emit_2(opcode_t opcode, ubyte_t byte1, ubyte_t byte2) {
-    printf(" op[2] : %s %u %u;\n", get_opcode_name(opcode), byte1, byte2);
-    return 0;
-}
-
-int compiler_emit_n(opcode_t opcode, size_t len, void *data) {
-    printf(" op[%zu] : %s;\n", len, get_opcode_name(opcode));
-    return 0;
+void compiler_panic(const char *format, ...) {
+    printf("Compiler error: ");
+    va_list list;
+    va_start(list, format);
+    vprintf(format, list);
+    va_end(list);
+    printf("\n");
+    exit(255);
 }

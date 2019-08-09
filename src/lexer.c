@@ -11,10 +11,10 @@
 #include "lexer.h"
 #include <string.h>
 #include <stdlib.h>
-#include "y.tab.h"
+#include "generated/y.tab.h"
 #include "parser.h"
 
-int use_newline_as_flush = 0;
+int use_newline_as_flush = 1;
 
 struct psh_lexer_state_t lexer_state = {
         .is_interactive = 1,
@@ -45,6 +45,24 @@ int lexer_handle_keyword_func() {
     return FUNC;
 }
 
+int lexer_handle_keyword_if() {
+    TRACE_TOKEN("IF")
+    lexer_state.is_inside_selection_stat++;
+    return IF;
+}
+
+int lexer_handle_keyword_switch() {
+    TRACE_TOKEN("SWITCH")
+    lexer_state.is_inside_selection_stat++;
+    return SWITCH;
+}
+
+int lexer_handle_keyword_while() {
+    TRACE_TOKEN("WHILE")
+    lexer_state.is_inside_iteration_stat++;
+    return WHILE;
+}
+
 int lexer_handle_bool(const char *text_value) {
     TRACE_TOKEN("BooleanLiteral")
     if (strcmp(text_value, "true") == 0) {
@@ -57,14 +75,20 @@ int lexer_handle_bool(const char *text_value) {
 
 int lexer_handle_int(const char *text_value) {
     TRACE_TOKEN("IntegerLiteral")
-    int value = atoi(text_value);
+    size_t len = strlen(text_value);
+    char start[len], *end;
+    strcpy(start, text_value);
+    int value = (int) strtol(text_value, &end, 10);
     yylval.int_value = value;
     return IntegerLiteral;
 }
 
 int lexer_handle_float(const char *text_value) {
     TRACE_TOKEN("FloatLiteral")
-    yylval.float_value = atof(text_value);
+    size_t len = strlen(text_value);
+    char start[len], *end;
+    strcpy(start, text_value);
+    yylval.float_value = (float) strtod(start, &end);
     return FloatLiteral;
 }
 
@@ -76,8 +100,11 @@ int lexer_handle_char(const char *text_value) {
 
 int lexer_handle_string(const char *text_value) {
     TRACE_TOKEN("StringLiteral")
-    //TODO: remove ''
-    yylval.string_value = strdup(text_value);
+    size_t len = strlen(text_value);
+    char *str_dup = (char *) malloc(len - 1);
+    memcpy(str_dup, text_value + 1, len - 2);
+    str_dup[len - 2] = '\0';
+    yylval.string_value = str_dup;
     return StringLiteral;
 }
 
@@ -91,4 +118,24 @@ int lexer_unknown_token(const char *value) {
     TRACE_TOKEN("Unexpected Token")
     printf("token %s is unexpected\n", value);
     return 0;
+}
+
+void yyset_in(FILE *_in_str);
+
+void yyset_out(FILE *_out_str);
+
+int yyget_debug(void);
+
+void yyset_debug(int _bdebug);
+
+void lexer_set_in(FILE *in) {
+    yyset_in(in);
+}
+
+void lexer_set_out(FILE *out) {
+    yyset_out(out);
+}
+
+void lexer_parse() {
+    yyparse();
 }

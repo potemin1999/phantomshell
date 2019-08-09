@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
-#include "parser.h"
-#include "lexer.h"
+#include "../parser.h"
+#include "../lexer.h"
 #include "y.tab.h"
 %}
 
@@ -9,13 +9,13 @@
 
 def     {TRACE_TOKEN("DEF")     return DEF;}
 return  {TRACE_TOKEN("RETURN")  return RETURN;}
-if      {TRACE_TOKEN("IF")      return IF;}
+if      return lexer_handle_keyword_if(); //{TRACE_TOKEN("IF")      return IF;}
 elif    {TRACE_TOKEN("ELIF")    return ELIF;}
 else    {TRACE_TOKEN("ELSE")    return ELSE;}
 for     {TRACE_TOKEN("FOR")     return FOR;}
-while   {TRACE_TOKEN("WHILE")   return WHILE;}
+while   return lexer_handle_keyword_while();//{TRACE_TOKEN("WHILE")   return WHILE;}
 do      {TRACE_TOKEN("DO")      return DO;}
-switch  {TRACE_TOKEN("SWITCH")  return SWITCH;}
+switch  return lexer_handle_keyword_switch();//{TRACE_TOKEN("SWITCH")  return SWITCH;}
 case    {TRACE_TOKEN("CASE")    return CASE;}
 other   {TRACE_TOKEN("OTHER")   return OTHER;}
 class   return lexer_handle_keyword_class();
@@ -38,6 +38,8 @@ true|false              return lexer_handle_bool(yytext);
 "}"     {TRACE_TOKEN("BRACE CLOSE")     return BRACE_CLOSE;}
 "["     {TRACE_TOKEN("BRACKET OPEN")    return BRACKET_OPEN;}
 "]"     {TRACE_TOKEN("BRACKET CLOSE")   return BRACKET_CLOSE;}
+
+"//".*[\n]          {}
 
 \n      {if (use_newline_as_flush) return *yytext; else return yylex();}
 [ \t]+
