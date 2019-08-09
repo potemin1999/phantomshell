@@ -45,6 +45,10 @@ typedef unsigned char opcode_t;
 #define OPCODE_I2F      0x47 // 71 // ( value -> result ) : transforms integer to the float
 #define OPCODE_IEQ      0x4a // 74 // ( v_1, v_2 -> r_3) : if value_1==value_2, puts 1 on stack, else 0
 #define OPCODE_INEQ     0x4b // 75 // ( v_1, v_2 -> r_3) : if value_1!=value_2, puts 1 on stack, else 0
+#define OPCODE_ILT      0x4c // 76 // ( v_1, v_2 -> r_3) : if value_1< value_2, puts 1 on stack, else 0
+#define OPCODE_INGT     0x4d // 77 // ( v_1, v_2 -> r_3) : if value_1<=value_2, puts 1 on stack, else 0
+#define OPCODE_IGT      0x4e // 76 // ( v_1, v_2 -> r_3) : if value_1> value_2, puts 1 on stack, else 0
+#define OPCODE_INLT     0x4f // 77 // ( v_1, v_2 -> r_3) : if value_1>=value_2, puts 1 on stack, else 0
 
 #define OPCODE_FADD     0x50 // 80 // ( value_1,value_2 -> value_3) : value_1 + value_2 = value_3, floats
 #define OPCODE_FSUB     0x51 // 81 // ( value_1,value_2 -> value_3) : value_1 - value_2 = value_3, floats
@@ -54,6 +58,7 @@ typedef unsigned char opcode_t;
 
 // (v_1 -> ) : int operand on the stack, moves pc by offset written in two next bytes
 #define OPCODE_JMP      0x60 // 96 // moves pc always
+#define OPCODE_RJMP     0x61 // 96 // moves pc on the other side
 #define OPCODE_LJMP     0x61 // 97 // moves pc, offset written if 4 bytes
 #define OPCODE_JEZ      0x62 // 98 // moves pc if operand==0
 #define OPCODE_JNEZ     0x63 // 99 // moves pc if operand!=0

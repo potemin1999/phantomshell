@@ -137,14 +137,14 @@ NODE_SIZEs(literal_char, sizeof(ast_node_literal_t))
 NODE_SIZEs(literal_string, sizeof(ast_node_literal_t))
 
 string_t ast_node_to_string(ast_node_t *node) {
-    #ifdef ENABLE_NODE_STRING_REPR
+#ifdef ENABLE_NODE_STRING_REPR
     if (node->str) {
         return node->str(node);
     }
     return "stringify error: null";
-    #else
+#else
     return "node stringify mode disabled, add ENABLE_NODE_STRING_REPR to parser.h";
-    #endif
+#endif
 }
 
 ast_node_t *ast_new_node_group(ast_node_t *expr) {
@@ -350,11 +350,10 @@ ast_node_t *ast_new_node_stat_if(ast_node_t *expr, ast_node_t *true_scope, ast_n
     node->true_scope = n_true_scope;
     node->false_scope = n_false_scope;
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
-    struct psh_lexer_state_t lexer_state_c = lexer_state;
-    if (!lexer_state_c.is_inside_func
-        && !lexer_state_c.is_inside_member_func
-        && !(lexer_state_c.is_inside_selection_stat - 1)
-        && !lexer_state_c.is_inside_iteration_stat) {
+    if (!lexer_state.is_inside_func
+        && !lexer_state.is_inside_member_func
+        && !(lexer_state.is_inside_selection_stat - 1)
+        && !lexer_state.is_inside_iteration_stat) {
         int res = compiler_compile((ast_node_t *) node);
         UNUSED(res)
         ast_free_node_stat_if(node);
@@ -396,6 +395,16 @@ ast_node_t *ast_new_node_stat_while(ast_node_t *expr, ast_node_t *scope) {
     node->expr = expr;
     node->loop_scope = scope;
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    if (!lexer_state.is_inside_func
+        && !lexer_state.is_inside_member_func
+        && !lexer_state.is_inside_selection_stat
+        && !(lexer_state.is_inside_iteration_stat - 1)) {
+        int res = compiler_compile((ast_node_t *) node);
+        UNUSED(res)
+        ast_free_node_stat_while(node);
+        node = 0;
+    }
+    --lexer_state.is_inside_iteration_stat;
     return (ast_node_t *) node;
 }
 
@@ -961,7 +970,7 @@ NODE_TO_STRING_FUNC(func_arg) {
 }
 
 NODE_TO_STRING_FUNC(special_cast) {
-    char *buffer = (char *) malloc(8);
+    char *buffer = (char *) malloc(16);
     sprintf(buffer, "(cast %s)", "operand");
     return buffer;
 }

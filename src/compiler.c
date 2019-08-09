@@ -49,15 +49,7 @@ int compiler_push(ast_node_t *node) {
 }
 
 int compile_global_statement(ast_node_stat_t *node) {
-    if (node->type == AST_NODE_TYPE_STAT_EXPR) {
-        ast_node_stat_expr_t *stat_node = (ast_node_stat_expr_t *) node;
-        return compile_expression(compiler_get_root_frame(), stat_node->expr);
-    }
-    if (node->type == AST_NODE_TYPE_STAT_IF) {
-        //ast_node_stat_if_t *if_node = (ast_node_stat_if_t *) node;
-        return compile_statement(compiler_get_root_frame(), node);
-    }
-    compiler_panic("unable to compile global statement node");
+    return compile_statement(compiler_get_root_frame(), node);
 }
 
 int compile_global_func(ast_node_decl_func_t *node) {

@@ -12,7 +12,7 @@
 #include "vm/runtime.h"
 
 struct cast_request_t type_select_cast_method(static_type_t type_1, static_type_t type_2) {
-    #define TYPES_EQ(var1, var2, t1, t2) ((((var1) == (t1))&&((var2)==(t2))) || (((var2)==(t1))&&((var1)==(t2))))
+#define TYPES_EQ(var1, var2, t1, t2) ((((var1) == (t1))&&((var2)==(t2))) || (((var2)==(t1))&&((var1)==(t2))))
     if (TYPES_EQ(type_1, type_2, RUNTIME_TYPE_INT, RUNTIME_TYPE_FLOAT)) {
         struct cast_request_t cr;
         cr.opcode = OPCODE_I2F;
@@ -110,6 +110,10 @@ opcode_t int_operator_to_opcode(int oper) {
             // invert next operations for if instructions
         case EQUAL_TO: return OPCODE_IEQ;
         case NOT_EQUAL_TO: return OPCODE_INEQ;
+        case LESS_THAN: return OPCODE_ILT;
+        case NOT_GREATER_THAN: return OPCODE_INGT;
+        case GREATER_THAN: return OPCODE_IGT;
+        case NOT_LESS_THAN: return OPCODE_INLT;
         default: return 0;
     }
 }

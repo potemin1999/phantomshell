@@ -54,7 +54,7 @@ void frame_init_scope(struct scope_handler_t *scope) {
 
 void frame_destroy_scope(struct scope_handler_t *scope) {
     if (scope->vars) {
-        for (size_t i = scope->vars_off; i < scope->vars_off + scope->vars_size; i++) {
+        for (size_t i = 0; i < scope->vars_size; i++) {
             struct scope_var_t *var = (scope->vars + i);
             free(var->name);
         }
@@ -67,7 +67,7 @@ ubyte_t stack_top_type(struct scope_handler_t *scope) {
 
 const struct scope_var_t *frame_lookup_var_by_name(struct scope_handler_t *scope,
                                                    const char *name, bool_t use_parents) {
-    for (size_t i = scope->vars_off; i < scope->vars_size + scope->vars_off; i++) {
+    for (size_t i = 0; i < scope->vars_size; i++) {
         struct scope_var_t *var = &(scope->vars[i]);
         if (strcmp(var->name, name) == 0) {
             return &(scope->vars[i]);
@@ -84,7 +84,7 @@ const struct scope_var_t *frame_define_var(struct scope_handler_t *scope, static
         compiler_panic("no free space left for new scope variables");
     }
     ubyte_t index = (ubyte_t) (scope->vars_size + scope->vars_off);
-    struct scope_var_t *var = &(scope->vars[index]);
+    struct scope_var_t *var = &(scope->vars[scope->vars_size]);
     var->name = strdup(name);
     var->static_type = type_id;
     var->index = index;

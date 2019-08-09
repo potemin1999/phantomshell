@@ -28,6 +28,10 @@ const char *get_opcode_name(opcode_t opcode) {
 
         case OPCODE_IEQ: return "ieq";
         case OPCODE_INEQ: return "ineq";
+        case OPCODE_INLT: return "inlt";
+        case OPCODE_INGT: return "ingt";
+        case OPCODE_ILT: return "ilt";
+        case OPCODE_IGT: return "igt";
 
         case OPCODE_FCONST: return "fconst";
         case OPCODE_FLOAD: return "fload";

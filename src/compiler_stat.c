@@ -18,8 +18,8 @@ int compile_ret_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_
 }
 
 int compile_if_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_node) {
-    struct bytecode_emitter_t true_emitter = compiler_emitter_buffered_new(32);
-    struct bytecode_emitter_t false_emitter = compiler_emitter_buffered_new(32);
+    struct bytecode_emitter_t true_emitter = compiler_emitter_buffered_new(512);
+    struct bytecode_emitter_t false_emitter = compiler_emitter_buffered_new(512);
     compile_expression(scope, (ast_node_expr_t *) if_node->expr);
     struct scope_handler_t true_scope;
     struct scope_var_t true_scope_vars[128];
@@ -54,7 +54,7 @@ int compile_if_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_n
         uint16_t offset_be = htobe16(offset_raw);
         true_emitter.emitter_func(&true_emitter, OPCODE_JMP, 2, &offset_be);
     }
-    if (true_scope.emitter->size > 65536) {
+    if (true_scope.emitter->size > UINT16_MAX) {
         //TODO: handle long jump
     } else {
         size_t true_size = true_emitter.size;
@@ -78,10 +78,70 @@ int compile_if_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_n
     return 0;
 }
 
+int compile_while_statement(struct scope_handler_t *scope, ast_node_stat_while_t *while_stat) {
+    struct bytecode_emitter_t expr_emitter = compiler_emitter_buffered_new(256);
+    struct bytecode_emitter_t body_emitter = compiler_emitter_buffered_new(512);
+    struct bytecode_emitter_t *saved_expr_emitter = scope->emitter;
+    //TODO: while condition can affect body variables, make new scope
+    scope->emitter = &expr_emitter;
+    size_t expr_vars_size = scope->vars_size;
+    //TODO: make while expr of type expr_t
+    compile_expression(scope, (ast_node_expr_t *) while_stat->expr);
+    scope->vars_size = expr_vars_size;
+    struct scope_handler_t body_scope;
+    struct scope_var_t body_vars[128];
+    body_scope.vars = body_vars;
+    body_scope.vars_cap = scope->vars_cap;
+    body_scope.vars_off = scope->vars_size + scope->vars_off;
+    body_scope.vars_max_size = 0;
+    body_scope.vars_size = 0;
+    body_scope.parent = scope;
+    body_scope.emitter = &body_emitter;
+    body_scope.is_function_scope = 0;
+    //TODO: save scope in while_stat_t
+    compile_scope(&body_scope, (ast_node_scope_t *) while_stat->loop_scope);
+
+    scope->emitter = saved_expr_emitter;
+    if (body_emitter.size > UINT16_MAX) {
+        //TODO: handle long jump
+        compiler_panic("while: long jump not implemented");
+    } else {
+        size_t expr_size = expr_emitter.size;
+        size_t body_size = body_emitter.size;
+        // jmp size + jez size + expr size + body size;
+        size_t sum_size = expr_size + body_size + 3 + 3;
+        ubyte_t backjump_hi = (ubyte_t) ((uint32_t) sum_size) >> 8u;
+        ubyte_t backjump_lo = (ubyte_t) ((uint32_t) sum_size);
+        ubyte_t overjump_hi = (ubyte_t) ((uint32_t) body_size + 3) >> 8u;
+        ubyte_t overjump_lo = (ubyte_t) ((uint32_t) body_size + 3);
+        ubyte_t *exec_data = (ubyte_t *) malloc(sum_size);
+
+        compiler_emitter_sink(&expr_emitter, exec_data, expr_size);
+        size_t offset = expr_size;
+        exec_data[offset++] = OPCODE_JEZ;
+        exec_data[offset++] = overjump_hi;
+        exec_data[offset++] = overjump_lo;
+        compiler_emitter_sink(&body_emitter, exec_data + offset, body_size);
+        offset = body_size + expr_size + 3;
+        exec_data[offset++] = OPCODE_RJMP;
+        exec_data[offset++] = backjump_hi;
+        exec_data[offset] = backjump_lo;
+
+        scope->emitter->raw_emitter_func(scope->emitter, sum_size, exec_data);
+        free(exec_data);
+    }
+    //TODO: remove real future expr scope
+    frame_destroy_scope(&body_scope);
+    compiler_emitter_buffered_free(&expr_emitter);
+    compiler_emitter_buffered_free(&body_emitter);
+    return 0;
+}
+
 int compile_statement(struct scope_handler_t *scope, ast_node_stat_t *stat_node) {
     switch (stat_node->type) {
         case AST_NODE_TYPE_STAT_EXPR: return compile_expression(scope, ((ast_node_stat_expr_t *) stat_node)->expr);
         case AST_NODE_TYPE_STAT_IF: return compile_if_statement(scope, (ast_node_stat_if_t *) stat_node);
+        case AST_NODE_TYPE_STAT_WHILE: return compile_while_statement(scope, (ast_node_stat_while_t *) stat_node);
         default: compiler_panic("uncompilable type of statement");
     }
 }

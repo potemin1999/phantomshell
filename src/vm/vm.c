@@ -169,6 +169,51 @@ vm_pc_t vm_execute_opcode_ineq(vm_frame_context_t *frame, void *data) {
     return 1;
 }
 
+
+vm_pc_t vm_execute_opcode_ilt(vm_frame_context_t *frame, void *data) {
+    UNUSED(data)
+    int32_t *int_stack_ptr = (int32_t *) frame->stack_ptr;
+    int32_t value_2 = *(int_stack_ptr - 1);
+    int32_t value_1 = *(int_stack_ptr - 2);
+    *(int_stack_ptr - 2) = (value_1 < value_2 ? 1 : 0);
+    vm_execution_trace("ilt       : %d < %d", value_1, value_2);
+    frame->stack_ptr -= 4;
+    return 1;
+}
+
+vm_pc_t vm_execute_opcode_ingt(vm_frame_context_t *frame, void *data) {
+    UNUSED(data)
+    int32_t *int_stack_ptr = (int32_t *) frame->stack_ptr;
+    int32_t value_2 = *(int_stack_ptr - 1);
+    int32_t value_1 = *(int_stack_ptr - 2);
+    *(int_stack_ptr - 2) = (value_1 <= value_2 ? 1 : 0);
+    vm_execution_trace("ingt      : %d <= %d", value_1, value_2);
+    frame->stack_ptr -= 4;
+    return 1;
+}
+
+vm_pc_t vm_execute_opcode_igt(vm_frame_context_t *frame, void *data) {
+    UNUSED(data)
+    int32_t *int_stack_ptr = (int32_t *) frame->stack_ptr;
+    int32_t value_2 = *(int_stack_ptr - 1);
+    int32_t value_1 = *(int_stack_ptr - 2);
+    *(int_stack_ptr - 2) = (value_1 > value_2 ? 1 : 0);
+    vm_execution_trace("igt       : %d > %d", value_1, value_2);
+    frame->stack_ptr -= 4;
+    return 1;
+}
+
+vm_pc_t vm_execute_opcode_inlt(vm_frame_context_t *frame, void *data) {
+    UNUSED(data)
+    int32_t *int_stack_ptr = (int32_t *) frame->stack_ptr;
+    int32_t value_2 = *(int_stack_ptr - 1);
+    int32_t value_1 = *(int_stack_ptr - 2);
+    *(int_stack_ptr - 2) = (value_1 >= value_2 ? 1 : 0);
+    vm_execution_trace("inlt      : %d >= %d", value_1, value_2);
+    frame->stack_ptr -= 4;
+    return 1;
+}
+
 vm_pc_t vm_execute_opcode_i2f(vm_frame_context_t *frame, void *data) {
     UNUSED(data)
     int32_t *int_stack_ptr = (int32_t *) frame->stack_ptr;
@@ -286,6 +331,14 @@ vm_pc_t vm_execute_opcode_jmp(vm_frame_context_t *frame, void *data) {
     return 3 + jmp_offset;
 }
 
+vm_pc_t vm_execute_opcode_rjmp(vm_frame_context_t *frame, void *data) {
+    UNUSED(frame)
+    uint16_t jmp_offset = *((uint16_t *) data);
+    jmp_offset = be16toh(jmp_offset);
+    vm_execution_trace("jmp       : %d", jmp_offset);
+    return 3 - jmp_offset;
+}
+
 vm_pc_t vm_execute_opcode_panic(vm_frame_context_t *frame, void *data) {
     setvbuf(stdout, 0, _IOLBF, 0);
     const char *format_text = "\033[91m"\
@@ -324,6 +377,10 @@ int vm_static_init() {
     opcode_execute_funcs[OPCODE_IDIV] = &vm_execute_opcode_idiv;
     opcode_execute_funcs[OPCODE_IEQ] = &vm_execute_opcode_ieq;
     opcode_execute_funcs[OPCODE_INEQ] = &vm_execute_opcode_ineq;
+    opcode_execute_funcs[OPCODE_ILT] = &vm_execute_opcode_ilt;
+    opcode_execute_funcs[OPCODE_IGT] = &vm_execute_opcode_igt;
+    opcode_execute_funcs[OPCODE_INLT] = &vm_execute_opcode_inlt;
+    opcode_execute_funcs[OPCODE_INGT] = &vm_execute_opcode_ingt;
     opcode_execute_funcs[OPCODE_I2F] = &vm_execute_opcode_i2f;
 
     opcode_execute_funcs[OPCODE_FSAVE] = &vm_execute_opcode_fsave;
@@ -337,5 +394,6 @@ int vm_static_init() {
     opcode_execute_funcs[OPCODE_JEZ] = &vm_execute_opcode_jez;
     opcode_execute_funcs[OPCODE_JNEZ] = &vm_execute_opcode_jnez;
     opcode_execute_funcs[OPCODE_JMP] = &vm_execute_opcode_jmp;
+    opcode_execute_funcs[OPCODE_RJMP] = &vm_execute_opcode_rjmp;
     return 0;
 }

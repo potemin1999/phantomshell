@@ -29,15 +29,17 @@ true|false              return lexer_handle_bool(yytext);
 
 [_a-zA-Z][_a-zA-Z0-9]*    return lexer_handle_identifier(yytext);
 
-"+"     return *yytext;
-"-"     return *yytext;
+"=="    return yy_EQUAL_TO;
+"!="    return yy_NOT_EQUAL_TO;
+">="    return yy_NOT_LESS_THAN;
+"<"     return yy_LESS_THAN;
+">"     return yy_GREATER_THAN;
+"<="    return yy_NOT_GREATER_THAN;
 
 "("     {TRACE_TOKEN("PAREN OPEN")      return PAREN_OPEN;}
 ")"     {TRACE_TOKEN("PAREN CLOSE")     return PAREN_CLOSE;}
 "{"     {TRACE_TOKEN("BRACE OPEN")      return BRACE_OPEN;}
 "}"     {TRACE_TOKEN("BRACE CLOSE")     return BRACE_CLOSE;}
-"["     {TRACE_TOKEN("BRACKET OPEN")    return BRACKET_OPEN;}
-"]"     {TRACE_TOKEN("BRACKET CLOSE")   return BRACKET_CLOSE;}
 
 "//".*[\n]          {}
 

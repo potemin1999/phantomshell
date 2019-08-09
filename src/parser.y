@@ -21,14 +21,15 @@
 // paren ()
 // brace {}
 // bracket []
-%token PAREN_OPEN PAREN_CLOSE BRACE_OPEN BRACE_CLOSE BRACKET_OPEN BRACKET_CLOSE
+%token PAREN_OPEN PAREN_CLOSE BRACE_OPEN BRACE_CLOSE
+%token yy_EQUAL_TO yy_NOT_EQUAL_TO
+%token yy_NOT_LESS_THAN yy_LESS_THAN yy_GREATER_THAN yy_NOT_GREATER_THAN
 
 //KEYWORD TOKENS
 %token DEF RETURN IF ELIF ELSE FOR WHILE DO SWITCH CASE OTHER CLASS FUNC
 
 //BASIC TOKENS
-%token DigitSequence CharSequence
-%token <string_value> 	Identifier TypeSpecifier
+%token <string_value> 	Identifier
 
 //LITERAL TOKENS
 %token <bool_value>	BooleanLiteral
@@ -40,6 +41,8 @@
 //OPERATORS
 %right RETURN
 %right '='  //prec 14
+%left yy_EQUAL_TO yy_NOT_EQUAL_TO //prec 7
+%left yy_NOT_LESS_THAN yy_LESS_THAN yy_GREATER_THAN yy_NOT_GREATER_THAN // prec 6
 %left '+' '-' //prec 4
 %left '*' '/' //prec 3
 %right '!' //prec 2
@@ -68,11 +71,16 @@ UnaryExpression
 
 BinaryExpression
 	: Expression '=' Expression	{ $$ = ast_new_node_binary_op(ASSIGNMENT, $1, $3); }
-	| Expression '=''=' Expression 	{ $$ = ast_new_node_binary_op(EQUAL_TO, $1, $4); }
 	| Expression '+' Expression 	{ $$ = ast_new_node_binary_op(ADDITION, $1, $3); }
 	| Expression '-' Expression 	{ $$ = ast_new_node_binary_op(SUBTRACTION, $1, $3); }
 	| Expression '*' Expression 	{ $$ = ast_new_node_binary_op(MULTIPLICATION, $1, $3); }
 	| Expression '/' Expression 	{ $$ = ast_new_node_binary_op(DIVISION, $1, $3); }
+	| Expression yy_EQUAL_TO 	 Expression	{ $$ = ast_new_node_binary_op(EQUAL_TO, $1, $3); }
+        | Expression yy_NOT_EQUAL_TO 	 Expression 	{ $$ = ast_new_node_binary_op(NOT_EQUAL_TO, $1, $3); }
+        | Expression yy_LESS_THAN 	 Expression	{ $$ = ast_new_node_binary_op(LESS_THAN, $1, $3); 	}
+        | Expression yy_NOT_GREATER_THAN Expression 	{ $$ = ast_new_node_binary_op(NOT_GREATER_THAN, $1, $3);}
+        | Expression yy_GREATER_THAN 	 Expression 	{ $$ = ast_new_node_binary_op(GREATER_THAN, $1, $3); 	}
+        | Expression yy_NOT_LESS_THAN 	 Expression 	{ $$ = ast_new_node_binary_op(NOT_LESS_THAN, $1, $3); 	}
 
 TernaryExpression
 	: PAREN_OPEN Expression '?' Expression ':' Expression PAREN_CLOSE {
@@ -95,8 +103,7 @@ _FLUSH 	: FLUSH
 	|
 	;
 
-Scope 	: BRACE_OPEN _FLUSH Statements BRACE_CLOSE 	{ $$ = ast_new_node_scope($3); }
-	| BRACE_OPEN _FLUSH BRACE_CLOSE 		{ $$ = ast_new_node_scope(0);  }
+Scope 	: BRACE_OPEN _FLUSH Statements BRACE_CLOSE	{ $$ = ast_new_node_scope($3); }
 
 Statement : Expression FLUSH	{ $$ = ast_new_node_stat_expr($1); }
 	| Scope 		{ $$ = $1; }
@@ -111,8 +118,8 @@ Statements
 	| Statements Statement	{ $$ = ast_link_node_stat_list($1,$2); 	}
 
 SelectionStatement
-	: IF Expression Scope 				{ $$ = ast_new_node_stat_if($2,$3,0); }
-	| IF Expression Scope ELSE Scope	 	{ $$ = ast_new_node_stat_if($2,$3,$5); }
+	: IF Expression Scope  				{ $$ = ast_new_node_stat_if($2,$3,0); }
+	| IF Expression Scope ELSE Scope 	 	{ $$ = ast_new_node_stat_if($2,$3,$5); }
 	| IF Expression Scope elifSelectionBlock 	{ $$ = ast_new_node_stat_if($2,$3,$4); }
 	| SWITCH Expression BRACE_OPEN _FLUSH
 		switchSelectionBlock
@@ -124,11 +131,11 @@ JumpStatement : RETURN Expression 	{ $$ = ast_new_node_stat_ret($2); }
 
 switchSelectionBlock
 	: switchSelectionBlock
-	  OTHER Scope _FLUSH 			{ ast_new_node_stat_switch_choice(0,$3,$1); $$ = $1; }
-	| OTHER Scope _FLUSH 			{ $$ = ast_new_node_stat_switch_choice(0,$2,0); }
+	  OTHER Scope  			{ ast_new_node_stat_switch_choice(0,$3,$1); $$ = $1; }
+	| OTHER Scope  			{ $$ = ast_new_node_stat_switch_choice(0,$2,0); }
 	| switchSelectionBlock
-	  CASE ConstantExpression Scope _FLUSH 	{ ast_new_node_stat_switch_choice($3,$4,$1); $$ = $1; }
-	| CASE ConstantExpression Scope _FLUSH	{ $$ = ast_new_node_stat_switch_choice($2,$3,0); }
+	  CASE ConstantExpression Scope { ast_new_node_stat_switch_choice($3,$4,$1); $$ = $1; }
+	| CASE ConstantExpression Scope { $$ = ast_new_node_stat_switch_choice($2,$3,0); }
 
 elifSelectionBlock
 	: ELIF Expression Scope				{ $$ = ast_new_node_stat_if($2,$3,0); }
