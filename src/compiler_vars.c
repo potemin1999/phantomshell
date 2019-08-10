@@ -31,6 +31,10 @@ struct cast_request_t type_select_cast_method(static_type_t type_1, static_type_
 int ast_node_trace_binary_op_data_type(struct scope_handler_t *scope, ast_node_binary_op_t *binary_op) {
     ast_node_expr_t *left = binary_op->left;
     ast_node_expr_t *right = binary_op->right;
+    if (binary_op->operator == FUNCTION_CALL) {
+        //TODO: trace function return value type
+        compiler_panic("unable to trace function return value static type");
+    }
     if (EXPR_NODE_STATIC_TYPE(left) == TYPE_UNKNWN) {
         ast_node_trace_data_type(scope, left);
     }

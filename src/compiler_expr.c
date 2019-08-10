@@ -83,6 +83,7 @@ int compile_binary_op_assignment(struct scope_handler_t *scope, ast_node_binary_
         // var vas defined and cast is required
         struct cast_request_t cr = type_select_cast_method(var->static_type, r_type);
         if (cr.var_index == 0) {
+            //TODO: make explicit casting
             compiler_panic("assignment error: cast request requires explicit casting");
         }
         cast_opcode = cr.opcode;
@@ -115,7 +116,10 @@ int compile_binary_op(struct scope_handler_t *scope, ast_node_binary_op_t *expr_
     if (expr_node->operator == ASSIGNMENT) {
         return compile_binary_op_assignment(scope, expr_node, l, r);
     }
-
+    if (expr_node->operator == FUNCTION_CALL) {
+        //TODO: build function call
+        compiler_panic("dont know how to build function call yet");
+    }
     unsigned char opcode = 0;
     ast_node_trace_data_type(scope, (ast_node_expr_t *) expr_node);
     switch (expr_node->static_type) {

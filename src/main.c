@@ -12,6 +12,7 @@
 #include "lexer.h"
 
 int main(int argc, const char **argv) {
+    setvbuf(stdout, 0, _IOLBF, 0);
     vm_static_init();
     if (argc > 1) {
         FILE *fd;

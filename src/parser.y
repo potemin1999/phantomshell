@@ -39,20 +39,22 @@
 %token <string_value>	StringLiteral
 
 //OPERATORS
-%right RETURN
+%left RETURN
+%left ',' // prec 15
 %right '='  //prec 14
 %left yy_EQUAL_TO yy_NOT_EQUAL_TO //prec 7
 %left yy_NOT_LESS_THAN yy_LESS_THAN yy_GREATER_THAN yy_NOT_GREATER_THAN // prec 6
 %left '+' '-' //prec 4
 %left '*' '/' //prec 3
-%right '!' //prec 2
+%right '!' CALL_PREC //prec 2
+%nonassoc PAREN_OPEN PAREN_CLOSE
 %left UNARY_MINUS_PREC
 
-%type <ast> Scope
-%type <ast> TernaryExpression BinaryExpression UnaryExpression Expression ConstantExpression
+%type <ast> Scope GroupExpression
+%type <ast> TernaryExpression CommaBinaryExpression BinaryExpression UnaryExpression Expression ConstantExpression
 %type <ast> Statements Statement SelectionStatement IterationStatement JumpStatement Declaration
 %type <ast> switchSelectionBlock elifSelectionBlock
-%type <ast> FuncDeclaration FunctionArgs
+%type <ast> VarDeclaration VarDeclarations FuncDeclaration
 %%
 
 //BASIC
@@ -69,12 +71,16 @@ UnaryExpression
 	: '!' Expression  { $$ = ast_new_node_unary_op(LOGICAL_NOT, $2); }
 	| '-' Expression  { $$ = ast_new_node_unary_op(UNARY_MINUS, $2); } %prec UNARY_MINUS_PREC
 
+CommaBinaryExpression
+	: Expression ',' Expression 	{ $$ = ast_new_node_binary_op(COMMA,$1,$3); }
+
 BinaryExpression
 	: Expression '=' Expression	{ $$ = ast_new_node_binary_op(ASSIGNMENT, $1, $3); }
 	| Expression '+' Expression 	{ $$ = ast_new_node_binary_op(ADDITION, $1, $3); }
 	| Expression '-' Expression 	{ $$ = ast_new_node_binary_op(SUBTRACTION, $1, $3); }
 	| Expression '*' Expression 	{ $$ = ast_new_node_binary_op(MULTIPLICATION, $1, $3); }
 	| Expression '/' Expression 	{ $$ = ast_new_node_binary_op(DIVISION, $1, $3); }
+	| Expression GroupExpression	{ $$ = ast_new_node_binary_op(FUNCTION_CALL, $1, $2);	} %prec CALL_PREC
 	| Expression yy_EQUAL_TO 	 Expression	{ $$ = ast_new_node_binary_op(EQUAL_TO, $1, $3); }
         | Expression yy_NOT_EQUAL_TO 	 Expression 	{ $$ = ast_new_node_binary_op(NOT_EQUAL_TO, $1, $3); }
         | Expression yy_LESS_THAN 	 Expression	{ $$ = ast_new_node_binary_op(LESS_THAN, $1, $3); 	}
@@ -87,13 +93,24 @@ TernaryExpression
 		$$ = ast_new_node_ternary_op(TERNARY_CONDITIONAL, $2, $4, $6);
 	}
 
+GroupExpression
+	: PAREN_OPEN Expression PAREN_CLOSE 	{ $$ = ast_new_node_group($2); }
+
+
+VarDeclaration : Identifier Identifier	{ $$ = ast_new_node_decl_var($2,$1);	}
+
+VarDeclarations
+	: VarDeclaration 	{ $$ = $1; }
+	| CommaBinaryExpression { $$ = $1; }
+
 Expression
 	: Identifier 		{ $$ = ast_new_node_ident($1); }
 	| UnaryExpression 	{ $$ = $1; }
 	| BinaryExpression 	{ $$ = $1; }
 	| TernaryExpression 	{ $$ = $1; }
 	| ConstantExpression 	{ $$ = $1; }
-	| PAREN_OPEN Expression PAREN_CLOSE { $$ = ast_new_node_group($2); }
+	| GroupExpression	{ $$ = $1; }
+	| VarDeclaration	{ $$ = $1; }
 
 //STATEMENTS
 FLUSH	: ';'
@@ -127,7 +144,7 @@ SelectionStatement
 
 IterationStatement : WHILE Expression Scope 	{ $$ = ast_new_node_stat_while($2,$3); }
 
-JumpStatement : RETURN Expression 	{ $$ = ast_new_node_stat_ret($2); }
+JumpStatement : RETURN Expression 	{ $$ = ast_new_node_stat_ret($2); } %prec RETURN
 
 switchSelectionBlock
 	: switchSelectionBlock
@@ -143,15 +160,11 @@ elifSelectionBlock
 	| ELIF Expression Scope ELSE Scope		{ $$ = ast_new_node_stat_if($2,$3,$5); }
 
 //STRUCTURE
-FunctionArgs : Identifier Identifier 			{ $$ = ast_new_node_func_arg($1,$2,0); }
-	| FunctionArgs ',' Identifier Identifier 	{ ast_new_node_func_arg($3,$4,$1); $$ = $1; }
-	| 						{ $$ = 0; }
-	;
 
 FuncDeclaration
-	: FUNC Identifier PAREN_OPEN FunctionArgs PAREN_CLOSE Scope
+	: FUNC Identifier PAREN_OPEN VarDeclarations PAREN_CLOSE Scope
 		{ $$ = ast_new_node_decl_func($2,$4,0,$6); }
-	| FUNC Identifier PAREN_OPEN FunctionArgs PAREN_CLOSE Identifier Scope
+	| FUNC Identifier PAREN_OPEN VarDeclarations PAREN_CLOSE Identifier Scope
 		{ $$ = ast_new_node_decl_func($2,$4,$6,$7); }
 
 Declaration : FuncDeclaration {

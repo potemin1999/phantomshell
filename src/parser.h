@@ -25,6 +25,7 @@
 #define AST_NODE_TYPE_STAT_SWITCH_OTHER 0b10000110u //134
 #define AST_NODE_TYPE_STAT_WHILE        0b10000111u //137
 #define AST_NODE_TYPE_STAT_LIST         0b10001111u //145
+#define AST_NODE_TYPE_DECL_VAR          0b00000010u //2
 #define AST_NODE_TYPE_DECL_FUNC         0b00000100u //4
 #define AST_NODE_TYPE_FUNC_ARG          0b00000101u //5
 #define AST_NODE_EXPR_MASK              0b01000000u //64
@@ -59,10 +60,12 @@ typedef string_t (*to_string_func)(struct ast_node_t *);
 #endif
 
 #define AST_EXPR_HEADER()           \
-    static_type_t static_type;
+    static_type_t static_type;      \
+    struct ast_node_expr_t *next;
 
-#define AST_STAT_HEADER()           \
+#define AST_STAT_HEADER()     \
     struct ast_node_stat_t *next;
+
 
 #define DEF_AST_NODE(name, body) \
     typedef                     \
@@ -111,7 +114,7 @@ DEF_AST_NODEs(stat_list, {
 })
 
 DEF_AST_NODEe(group, {
-    ast_node_t *expr;
+    ast_node_expr_t *expr;
 })
 
 DEF_AST_NODE(scope, {
@@ -180,16 +183,22 @@ DEF_AST_NODEs(stat_while, {
     ast_node_t *loop_scope;
 })
 
-DEF_AST_NODE(func_arg, {
-    string_t arg_type;
-    string_t arg_name;
-    struct ast_node_func_arg_t *next;
+DEF_AST_NODE(decl_var, {
+    string_t var_type;
+    string_t var_name;
+    // used in function declaration
+    struct ast_node_decl_var_t *next;
+})
+
+DEF_AST_NODE(func_arg_list, {
+    ast_node_decl_var_t *first;
+    ast_node_decl_var_t *last;
 })
 
 DEF_AST_NODE(decl_func, {
     string_t name;
     string_t ret_type;
-    ast_node_func_arg_t *args;
+    ast_node_t *args;
     ast_node_t *body;
 })
 
@@ -286,13 +295,13 @@ void ast_free_node_stat_while(ast_node_stat_while_t *stat_while);
 
 // Declaration nodes
 
+ast_node_t *ast_new_node_decl_var(string_t name,string_t type);
+
+void ast_free_node_decl_var(ast_node_decl_var_t *var_decl);
+
 ast_node_t *ast_new_node_decl_func(string_t name, ast_node_t *args, string_t ret_type, ast_node_t *body);
 
 void ast_free_node_decl_func(ast_node_decl_func_t *decl_func);
-
-ast_node_t *ast_new_node_func_arg(string_t type, string_t name, ast_node_t *prev);
-
-void ast_free_node_func_arg(ast_node_func_arg_t *func_arg);
 
 void yyerror(const char *str);
 

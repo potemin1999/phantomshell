@@ -120,7 +120,8 @@
 #define FUNCTION_CALL       (OP_BINARY | OP_TYPE_OTHER  | OP_PRECED_2  | OP_ASSOC_LTR | 0x1cu)  /**< <div> a() </div>*/
 #define SUBSCRIPT           (OP_BINARY | OP_TYPE_ACCESS | OP_PRECED_2  | OP_ASSOC_LTR | 0x1du)  /**< <div> a[b]</div>*/
 #define MEMBER_ACCESS       (OP_BINARY | OP_TYPE_ACCESS | OP_PRECED_2  | OP_ASSOC_LTR | 0x1eu)  /**< <div> a.b </div>*/
-#define UNARY_MINUS         (OP_UNARY  | OP_TYPE_ARITHM | OP_PRECED_2  | OP_ASSOC_LTR | 0x1fu ) /**< <div> -a  </div>*/
+#define UNARY_MINUS         (OP_UNARY  | OP_TYPE_ARITHM | OP_PRECED_2  | OP_ASSOC_LTR | 0x1fu)  /**< <div> -a  </div>*/
+#define COMMA               (OP_BINARY | OP_TYPE_OTHER  | OP_PRECED_15 | OP_ASSOC_LTR | 0x20u)  /**< <div> ,   </div>*/
 
 /**
  * @brief Return unique id of given operator

@@ -78,7 +78,8 @@ extern int yydebug;
     FloatLiteral = 284,
     CharLiteral = 285,
     StringLiteral = 286,
-    UNARY_MINUS_PREC = 287
+    CALL_PREC = 287,
+    UNARY_MINUS_PREC = 288
   };
 #endif
 /* Tokens.  */
@@ -111,7 +112,8 @@ extern int yydebug;
 #define FloatLiteral 284
 #define CharLiteral 285
 #define StringLiteral 286
-#define UNARY_MINUS_PREC 287
+#define CALL_PREC 287
+#define UNARY_MINUS_PREC 288
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -127,7 +129,7 @@ union YYSTYPE
 	char_t char_value;
 	string_t string_value;
 
-#line 131 "y.tab.h" /* yacc.c:1921  */
+#line 133 "y.tab.h" /* yacc.c:1921  */
 };
 
 typedef union YYSTYPE YYSTYPE;
