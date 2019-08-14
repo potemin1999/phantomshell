@@ -12,8 +12,6 @@
 #include <sys/time.h>
 #include "vm.h"
 
-//#define VM_EXECUTION_TRACE
-
 vm_opcode_execute_func_t opcode_execute_funcs[256];
 vm_frame_context_t *root_context = 0;
 

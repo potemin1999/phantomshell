@@ -14,8 +14,11 @@
 #include "types.h"
 #include "operator.h"
 
-#define TRACE_TOKEN(x) //printf("%s\n",x);
-
+#ifndef __LEXER_DISABLE_TOKEN_TRACING
+#define TRACE_TOKEN(x) printf("%s\n",x);
+#else
+#define TRACE_TOKEN(x)
+#endif
 struct psh_lexer_state_t {
     bool_t is_interactive: 1;
     bool_t is_inside_func: 1;
@@ -45,6 +48,8 @@ int lexer_handle_keyword_if();
 int lexer_handle_keyword_switch();
 
 int lexer_handle_keyword_while();
+
+int lexer_handle_eof();
 
 int lexer_handle_bool(const char *text_value);
 

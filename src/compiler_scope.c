@@ -8,6 +8,7 @@
  */
 #include <stdlib.h>
 #include "compiler.h"
+#include "lexer.h"
 
 struct stack_var_t root_handler_stack[512];
 struct scope_var_t root_scope_vars[64];
@@ -30,9 +31,15 @@ struct scope_handler_t root_scope_handler = {
 struct scope_handler_t *compiler_get_root_frame() {
     if (!root_scope_handler.emitter) {
         struct bytecode_emitter_t *emitter_copy;
-        struct bytecode_emitter_t emitter = compiler_emitter_unbuffered_new();
-        emitter_copy = (struct bytecode_emitter_t *) malloc(sizeof(struct bytecode_emitter_t));
-        memcpy(emitter_copy, &emitter, sizeof(struct bytecode_emitter_t));
+        if (lexer_state.is_interactive) {
+            struct bytecode_emitter_t emitter = compiler_emitter_unbuffered_new();
+            emitter_copy = (struct bytecode_emitter_t *) malloc(sizeof(struct bytecode_emitter_t));
+            memcpy(emitter_copy, &emitter, sizeof(struct bytecode_emitter_t));
+        }else {
+            struct bytecode_emitter_t emitter = compiler_emitter_buffered_new(4096);
+            emitter_copy = (struct bytecode_emitter_t *) malloc(sizeof(struct bytecode_emitter_t));
+            memcpy(emitter_copy, &emitter, sizeof(struct bytecode_emitter_t));
+        }
         root_scope_handler.emitter = emitter_copy;
     }
     return &root_scope_handler;

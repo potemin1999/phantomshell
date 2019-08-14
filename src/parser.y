@@ -21,6 +21,7 @@
 // paren ()
 // brace {}
 // bracket []
+%token END_OF_FILE
 %token PAREN_OPEN PAREN_CLOSE BRACE_OPEN BRACE_CLOSE
 %token yy_EQUAL_TO yy_NOT_EQUAL_TO
 %token yy_NOT_LESS_THAN yy_LESS_THAN yy_GREATER_THAN yy_NOT_GREATER_THAN
@@ -51,10 +52,10 @@
 %left UNARY_MINUS_PREC
 
 %type <ast> Scope GroupExpression
-%type <ast> TernaryExpression CommaBinaryExpression BinaryExpression UnaryExpression Expression ConstantExpression
+%type <ast> TernaryExpression BinaryExpression UnaryExpression Expression ConstantExpression
 %type <ast> Statements Statement SelectionStatement IterationStatement JumpStatement Declaration
 %type <ast> switchSelectionBlock elifSelectionBlock
-%type <ast> VarDeclaration VarDeclarations FuncDeclaration
+%type <ast> VarDeclaration FuncDeclaration FuncArgList
 %%
 
 //BASIC
@@ -71,11 +72,10 @@ UnaryExpression
 	: '!' Expression  { $$ = ast_new_node_unary_op(LOGICAL_NOT, $2); }
 	| '-' Expression  { $$ = ast_new_node_unary_op(UNARY_MINUS, $2); } %prec UNARY_MINUS_PREC
 
-CommaBinaryExpression
-	: Expression ',' Expression 	{ $$ = ast_new_node_binary_op(COMMA,$1,$3); }
 
 BinaryExpression
-	: Expression '=' Expression	{ $$ = ast_new_node_binary_op(ASSIGNMENT, $1, $3); }
+	: Expression ',' Expression 	{ $$ = ast_new_node_binary_op(COMMA,$1,$3); }
+	| Expression '=' Expression	{ $$ = ast_new_node_binary_op(ASSIGNMENT, $1, $3); }
 	| Expression '+' Expression 	{ $$ = ast_new_node_binary_op(ADDITION, $1, $3); }
 	| Expression '-' Expression 	{ $$ = ast_new_node_binary_op(SUBTRACTION, $1, $3); }
 	| Expression '*' Expression 	{ $$ = ast_new_node_binary_op(MULTIPLICATION, $1, $3); }
@@ -95,13 +95,6 @@ TernaryExpression
 
 GroupExpression
 	: PAREN_OPEN Expression PAREN_CLOSE 	{ $$ = ast_new_node_group($2); }
-
-
-VarDeclaration : Identifier Identifier	{ $$ = ast_new_node_decl_var($2,$1);	}
-
-VarDeclarations
-	: VarDeclaration 	{ $$ = $1; }
-	| CommaBinaryExpression { $$ = $1; }
 
 Expression
 	: Identifier 		{ $$ = ast_new_node_ident($1); }
@@ -160,11 +153,25 @@ elifSelectionBlock
 	| ELIF Expression Scope ELSE Scope		{ $$ = ast_new_node_stat_if($2,$3,$5); }
 
 //STRUCTURE
+VarDeclaration
+	: Identifier Identifier	{ $$ = ast_new_node_decl_var($2,$1);	}
+
+FuncArgList
+	: FuncArgList ',' VarDeclaration {
+		ast_node_func_arg_list_t *list = (ast_node_func_arg_list_t*) $1;
+		ast_node_decl_var_t *var_decl = (ast_node_decl_var_t *) $3;
+		list->last->next = var_decl;
+		list->last = var_decl;
+		var_decl->next = 0;
+		$$ = $1;
+	}
+	| VarDeclaration 	{ $$ = ast_new_node_func_arg_list($1); }
+	|			{ $$ = ast_new_node_func_arg_list(0);  }
 
 FuncDeclaration
-	: FUNC Identifier PAREN_OPEN VarDeclarations PAREN_CLOSE Scope
+	: FUNC Identifier PAREN_OPEN FuncArgList PAREN_CLOSE Scope
 		{ $$ = ast_new_node_decl_func($2,$4,0,$6); }
-	| FUNC Identifier PAREN_OPEN VarDeclarations PAREN_CLOSE Identifier Scope
+	| FUNC Identifier PAREN_OPEN FuncArgList PAREN_CLOSE Identifier Scope
 		{ $$ = ast_new_node_decl_func($2,$4,$6,$7); }
 
 Declaration : FuncDeclaration {

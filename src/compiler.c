@@ -83,8 +83,7 @@ int compiler_compile(ast_node_t *node) {
     return res;
 }
 
-int compiler_finish(ast_node_t *node) {
-    UNUSED(node)
+int compiler_finish() {
     return compile_queue();
 }
 

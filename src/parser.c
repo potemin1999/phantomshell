@@ -30,31 +30,46 @@
 #define AST_NEW_NODE(type) \
     AST_NEW_NODEn(type,node)
 
+#ifdef ENABLE_NODE_STRING_REPR
 #define TRACE(text) { __log(text); }
 
 #define TRACEf(text, ...) { __log(text,__VA_ARGS__); }
+#else
+#define TRACE(text)
+#define TRACEf(text, ...)
+#endif
 
 #ifdef ENABLE_NODE_STRING_REPR
 #define SET_STRING_FUNC(node, func) node->str = func;
 #else
-#define SET_STRING_FUNC(node,func)
+#define SET_STRING_FUNC(node, func)
 #endif
 
 #define NODE_TYPE(hi_name, lo_name) const unsigned char __AST_NODE_TYPE_##lo_name = AST_NODE_TYPE_##hi_name;
 #define NODE_SIZEs(name, size) const int AST_NODE_##name##_SIZE = size;
 #define NODE_SIZE(name) NODE_SIZEs(name,sizeof(ast_node_##name##_t));
 
+#ifndef __PARSER_DISABLE_TYPE_CHECK
 #define ASSERT_NON_NULL(ptr, text)              \
     if (!(ptr)) {                                 \
     char buffer[256];                           \
     sprintf(buffer,"%s: %s",__FUNCTION__,text); \
     yyerror(text);                              \
     }
+#else
+#define ASSERT_NON_NULL(ptr, text)
+#endif
 
+#ifndef __PARSER_DISABLE_TYPE_CHECK
 #define NODE_UPCAST(node, node_out_p, type_id) {        \
     void **node_out_pp = (void**) (node_out_p);           \
     *node_out_pp = ( (node)->type == (type_id) ? (node) : 0 );\
     }
+#else
+#define NODE_UPCAST(node, node_out, type_id)    \
+     void **node_out_p = (void**) (node_out);   \
+    *node_out_p = (node);
+#endif
 
 #define NODE_UPCAST_GROUP(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_GROUP)
 #define NODE_UPCAST_SCOPE(node, node_out) NODE_UPCAST(node,node_out,AST_NODE_TYPE_SCOPE)
@@ -98,6 +113,7 @@ NODE_TYPE(STAT_SWITCH_OTHER, stat_switch_other)
 NODE_TYPE(STAT_WHILE, stat_while)
 NODE_TYPE(DECL_VAR, decl_var)
 NODE_TYPE(DECL_FUNC, decl_func)
+NODE_TYPE(FUNC_ARG_LIST, func_arg_list)
 NODE_TYPE(GROUP, group)
 NODE_TYPE(SCOPE, scope)
 NODE_TYPE(IDENT, ident)
@@ -120,6 +136,7 @@ NODE_SIZE(binary_op)
 NODE_SIZE(ternary_op)
 NODE_SIZE(decl_var)
 NODE_SIZE(decl_func)
+NODE_SIZE(func_arg_list)
 NODE_SIZE(stat_list)
 NODE_SIZE(stat_expr)
 NODE_SIZE(stat_ret)
@@ -408,12 +425,12 @@ ast_node_t *ast_new_node_stat_while(ast_node_t *expr, ast_node_t *scope) {
     return (ast_node_t *) node;
 }
 
-ast_node_t *ast_new_node_decl_var(string_t name,string_t type){
+ast_node_t *ast_new_node_decl_var(string_t name, string_t type) {
     AST_NEW_NODE(decl_var)
     node->var_type = type;
     node->var_name = name;
     node->next = 0;
-    return (ast_node_t*) node;
+    return (ast_node_t *) node;
 }
 
 ast_node_t *ast_new_node_decl_func(string_t name, ast_node_t *args, string_t ret_type, ast_node_t *body) {
@@ -422,53 +439,27 @@ ast_node_t *ast_new_node_decl_func(string_t name, ast_node_t *args, string_t ret
     node->body = body;
     node->ret_type = ret_type;
     node->args = 0;
-    ast_node_decl_var_t *start_arg_node = 0;
-    ast_node_decl_var_t *cur_arg_node = 0;
-    ast_node_expr_t *func_arg = (ast_node_expr_t*) args;
-    while (func_arg){
-        if (func_arg->type == AST_NODE_TYPE_DECL_VAR) {
-            ast_node_decl_var_t *decl = (ast_node_decl_var_t*) func_arg;
-            if (!start_arg_node){
-                start_arg_node = decl;
-                cur_arg_node = decl;
-            }else{
-                cur_arg_node->next = decl;
-                cur_arg_node = decl;
-            }
-            break;
-        }
-        if (func_arg->type == AST_NODE_TYPE_BINARY_OP) {
-            ast_node_binary_op_t *comma_op = (ast_node_binary_op_t *) func_arg;
-            if (comma_op->operator != COMMA) {
-                yyerror("only comma binary operators are allowed in function declaration");
-            }
-            ast_node_decl_var_t *left_decl = (ast_node_decl_var_t*) comma_op->left;
-            //ast_node_decl_var_t *right_decl = (ast_node_decl_var_t*) comma_op->right;
-            if (!start_arg_node){
-                start_arg_node = left_decl;
-                cur_arg_node = left_decl;
-            }else{
-                cur_arg_node->next = left_decl;
-                cur_arg_node = left_decl;
-            }
-            func_arg = (ast_node_expr_t *) comma_op->right;
-        } else {
-            yyerror("unexpected token if function arg declaration");
-        }
-    }
     //TODO: fixxxxxx
-    /*if (args) {
-        ast_node_func_arg_t *args_node;
-        NODE_UPCAST_FUNC_ARG(args, &args_node)
+    if (args) {
+        ast_node_func_arg_list_t *args_node;
+        NODE_UPCAST(args, &args_node, AST_NODE_TYPE_FUNC_ARG_LIST)
         ASSERT_NON_NULL(args_node, "cast failed")
         node->args = args_node;
-    }*/
+    }
     TRACEf("%s", ast_node_to_string((ast_node_t *) node))
     if (lexer_state.is_inside_class) {
         lexer_state.is_inside_member_func = 0;
     } else {
         lexer_state.is_inside_func = 0;
     }
+    return (ast_node_t *) node;
+}
+
+ast_node_t *ast_new_node_func_arg_list(ast_node_t *decl_var) {
+    AST_NEW_NODE(func_arg_list)
+    //TODO: upcast
+    node->first = (ast_node_decl_var_t *) decl_var;
+    node->last = (ast_node_decl_var_t *) decl_var;
     return (ast_node_t *) node;
 }
 
@@ -479,7 +470,6 @@ ast_node_special_cast_t *ast_new_node_cast(ast_node_expr_t *expr, static_type_t 
     node->opcode = opcode;
     return node;
 }
-
 
 
 static inline void ast_free_node(ast_node_t *node) {
@@ -560,7 +550,7 @@ static inline void ast_free_node(ast_node_t *node) {
 }
 
 void ast_free_node_group(ast_node_group_t *group) {
-    ast_free_node((ast_node_t*)group->expr);
+    ast_free_node((ast_node_t *) group->expr);
     free(group);
 }
 
@@ -660,19 +650,19 @@ void ast_free_node_stat_while(ast_node_stat_while_t *stat_while) {
     free(stat_while);
 }
 
-void ast_free_node_decl_var(ast_node_decl_var_t *var_decl){
+void ast_free_node_decl_var(ast_node_decl_var_t *var_decl) {
 
 }
 
 void ast_free_node_decl_func(ast_node_decl_func_t *decl_func) {
     ast_free_node(decl_func->body);
     //TODO: fixxxxxx
-   /* ast_node_func_arg_t *arg = decl_func->args;
-    while (arg) {
-        ast_node_func_arg_t *next = arg->next;
-        ast_free_node_func_arg(arg);
-        arg = next;
-    }*/
+    /* ast_node_func_arg_t *arg = decl_func->args;
+     while (arg) {
+         ast_node_func_arg_t *next = arg->next;
+         ast_free_node_func_arg(arg);
+         arg = next;
+     }*/
     free(decl_func->name);
     if (decl_func->ret_type) {
         free(decl_func->ret_type);
@@ -680,6 +670,9 @@ void ast_free_node_decl_func(ast_node_decl_func_t *decl_func) {
     free(decl_func);
 }
 
+void ast_free_node_func_arg_list(ast_node_func_arg_list_t *func_arg_list) {
+
+}
 
 
 #ifdef ENABLE_NODE_STRING_REPR
@@ -694,7 +687,7 @@ NODE_TO_STRING_FUNC(group) {
     ast_node_group_t *group_node;
     NODE_UPCAST_GROUP(node, &group_node)
     ASSERT_NON_NULL(group_node, "cast failed")
-    string_t expr_str = ast_node_to_string((ast_node_t *)group_node->expr);
+    string_t expr_str = ast_node_to_string((ast_node_t *) group_node->expr);
     size_t expr_len = strlen(expr_str);
     char *buffer = (char *) malloc(expr_len + 8);
     sprintf(buffer, "( %s )", expr_str);
@@ -853,7 +846,7 @@ NODE_TO_STRING_FUNC(stat_if) {
     string_t false_str = 0;
     if (stat_node->false_scope) {
         false_str = ast_node_to_string((ast_node_t *) stat_node->false_scope);
-    }else{
+    } else {
         false_str = strdup("{none}");
     }
     size_t expr_len = strlen(expr_str);
@@ -941,69 +934,48 @@ NODE_TO_STRING_FUNC(stat_while) {
 
 NODE_TO_STRING_FUNC(decl_var) {
     //TODO: implement
-    return strdup("decl var");
+    ast_node_decl_var_t *decl_node;
+    NODE_UPCAST(node, &decl_node, AST_NODE_TYPE_DECL_VAR)
+    ASSERT_NON_NULL(decl_node, "cast failed")
+    string_t name = decl_node->var_name;
+    string_t type = decl_node->var_type;
+    size_t name_size = strlen(name);
+    size_t type_size = strlen(type);
+    char *buffer = (char *) malloc(name_size + type_size + 16);
+    sprintf(buffer, "%s of type %s", name, type);
+    return buffer;
 }
 
 NODE_TO_STRING_FUNC(decl_func) {
     ast_node_decl_func_t *func_node;
     NODE_UPCAST_DECL_FUNC(node, &func_node)
     ASSERT_NON_NULL(func_node, "cast failed")
-    int func_arg_count = 0;
-    ast_node_t *func_arg = func_node->args;
-    while (func_arg) {
-        func_arg_count++;
-        if (func_arg->type == AST_NODE_TYPE_DECL_VAR) {
-            continue;
-        }
-        if (func_arg->type == AST_NODE_TYPE_BINARY_OP) {
-            ast_node_binary_op_t *comma_op = (ast_node_binary_op_t *) func_arg;
-            if (comma_op->operator != COMMA) {
-                yyerror("only comma binary operators are allowed in function declaration");
-            }
-            func_arg = (ast_node_t *) comma_op->right;
-        } else {
-            yyerror("unexpected token if function arg declaration");
-        }
-    }
-    /*char *arg_to_string[func_arg_count];
-    for (int i = 0; i < func_arg_count; i++) {
-        if (func_arg->type == AST_NODE_TYPE_DECL_VAR) {
-            continue;
-        }
-        if (func_arg->type == AST_NODE_TYPE_BINARY_OP) {
-            ast_node_binary_op_t *comma_op = (ast_node_binary_op_t *) func_arg;
-            if (comma_op->operator != COMMA) {
-                yyerror("only comma binary operators are allowed in function declaration");
-            }
-            func_arg = (ast_node_t *) comma_op->right;
-        } else {
-            yyerror("unexpected token if function arg declaration");
-        }
-    }*/
-    //TODO: FIXXXXXX
-    /*if (func_node->args) {
-        ast_node_func_arg_t *arg = func_node->args;
-        while (arg) {
+    size_t func_arg_count = 0;
+    if (func_node->args) {
+        ast_node_func_arg_list_t *arg = func_node->args;
+        ast_node_decl_var_t *current = arg->first;
+        while (current) {
             func_arg_count++;
-            arg = arg->next;
+            current = current->next;
         }
     }
     string_t func_args_str = 0;
     if (func_arg_count != 0) {
         char *args[func_arg_count];
-        ast_node_func_arg_t *arg = func_node->args;
-        for (int i = 0; arg; i++, arg = arg->next) {
+        ast_node_func_arg_list_t *args_list = func_node->args;
+        ast_node_decl_var_t *arg = args_list->first;
+        for (size_t i = 0; arg; i++, arg = arg->next) {
             args[i] = ast_node_to_string((ast_node_t *) arg);
         }
         size_t args_str_len = 0;
         size_t args_len[func_arg_count];
-        for (int i = 0; i < func_arg_count; i++) {
+        for (size_t i = 0; i < func_arg_count; i++) {
             args_len[i] = strlen(args[i]);
             args_str_len += args_len[i];
         }
         func_args_str = (char *) malloc(args_str_len + func_arg_count + 1);
         size_t current_ptr = 0;
-        for (int i = 0; i < func_arg_count; i++) {
+        for (size_t i = 0; i < func_arg_count; i++) {
             strcpy(func_args_str + current_ptr, args[i]);
             free(args[i]);
             strcpy(func_args_str + current_ptr + args_len[i], ",");
@@ -1022,10 +994,12 @@ NODE_TO_STRING_FUNC(decl_func) {
     char *buffer = (char *) malloc(name_len + args_len + ret_len + body_len + 16);
     sprintf(buffer, "(func %s (%s) %s %s)", func_node->name, func_args_str, func_node->ret_type, body_str);
     free(body_str);
-    free(func_args_str);*/
-    char *buffer = (char *) malloc(64);
-    sprintf("func %s with %d args",func_node->name,func_arg_count);
+    free(func_args_str);
     return buffer;
+}
+
+NODE_TO_STRING_FUNC(func_arg_list) {
+    return strdup("delegate to decl func");
 }
 
 NODE_TO_STRING_FUNC(special_cast) {

@@ -43,8 +43,8 @@ true|false              return lexer_handle_bool(yytext);
 
 "//".*[\n]          {}
 
-\n      {if (use_newline_as_flush) return *yytext; else return yylex();}
+\n      {if (use_newline_as_flush) return *yytext; else return yylex();  }
 [ \t]+
 .       return *yytext;
-
+<<EOF>> return lexer_handle_eof();
 %%

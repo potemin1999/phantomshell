@@ -70,6 +70,10 @@ struct cast_request_t {
     static_type_t static_type;
 };
 
+struct program_file_t {
+    const char *package;
+};
+
 /**
  * Executes ready statement/function declaration/class definition
  * @param node
@@ -86,7 +90,7 @@ int compiler_push(ast_node_t *node);
 
 int compiler_compile(ast_node_t *node);
 
-int compiler_finish(ast_node_t *node);
+int compiler_finish();
 
 void compiler_add_commentf(struct scope_handler_t *scope, const char *format, ...);
 

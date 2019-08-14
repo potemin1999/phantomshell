@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include "generated/y.tab.h"
 #include "parser.h"
+#include "compiler.h"
 
 int use_newline_as_flush = 1;
 
@@ -22,6 +23,11 @@ struct psh_lexer_state_t lexer_state = {
         .is_inside_member_func = 0,
         .is_inside_class = 0
 };
+
+int lexer_handle_eof() {
+    compiler_finish();
+    return 0;
+}
 
 int lexer_handle_keyword_class() {
     TRACE_TOKEN("CLASS")

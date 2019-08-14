@@ -27,7 +27,7 @@
 #define AST_NODE_TYPE_STAT_LIST         0b10001111u //145
 #define AST_NODE_TYPE_DECL_VAR          0b00000010u //2
 #define AST_NODE_TYPE_DECL_FUNC         0b00000100u //4
-#define AST_NODE_TYPE_FUNC_ARG          0b00000101u //5
+#define AST_NODE_TYPE_FUNC_ARG_LIST     0b00000101u //5
 #define AST_NODE_EXPR_MASK              0b01000000u //64
 #define AST_NODE_TYPE_SCOPE             0b00000011u //3
 #define AST_NODE_TYPE_IDENT             0b01000001u //65
@@ -44,7 +44,9 @@
 
 #define NODE_TO_STRING_FUNC(type) string_t ast_node_##type##_to_string(ast_node_t *node)
 
+#ifndef __PARSER_DISABLE_STRINGIFY
 #define ENABLE_NODE_STRING_REPR 1
+#endif
 
 typedef string_t (*to_string_func)(struct ast_node_t *);
 
@@ -198,7 +200,7 @@ DEF_AST_NODE(func_arg_list, {
 DEF_AST_NODE(decl_func, {
     string_t name;
     string_t ret_type;
-    ast_node_t *args;
+    ast_node_func_arg_list_t *args;
     ast_node_t *body;
 })
 
@@ -295,13 +297,17 @@ void ast_free_node_stat_while(ast_node_stat_while_t *stat_while);
 
 // Declaration nodes
 
-ast_node_t *ast_new_node_decl_var(string_t name,string_t type);
+ast_node_t *ast_new_node_decl_var(string_t name, string_t type);
 
 void ast_free_node_decl_var(ast_node_decl_var_t *var_decl);
 
 ast_node_t *ast_new_node_decl_func(string_t name, ast_node_t *args, string_t ret_type, ast_node_t *body);
 
 void ast_free_node_decl_func(ast_node_decl_func_t *decl_func);
+
+ast_node_t *ast_new_node_func_arg_list(ast_node_t *decl_var);
+
+void ast_free_node_func_arg_list(ast_node_func_arg_list_t *func_arg_list);
 
 void yyerror(const char *str);
 
