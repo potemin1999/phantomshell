@@ -11,7 +11,7 @@
 #include "vm/opcodes.h"
 
 
-const char *get_opcode_name(opcode_t opcode) {
+const char *get_opcode_mnemonic(opcode_t opcode) {
     switch (opcode) {
         case OPCODE_NOP: return "nop";
         case OPCODE_EXSTK: return "exstk";
@@ -45,8 +45,10 @@ const char *get_opcode_name(opcode_t opcode) {
         case OPCODE_JMP: return "jmp";
         case OPCODE_JEZ: return "jez";
         case OPCODE_JNEZ: return "jnez";
+
+        case OPCODE_CALL: return "call";
         default: {
-            printf("invalid opcode %hhu\n", opcode);
+            printf("opcode mnemonic str: invalid opcode %hhu\n", opcode);
             return "!invalid opcode!";
         }
     }

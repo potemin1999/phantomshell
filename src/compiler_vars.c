@@ -11,13 +11,77 @@
 #include "vm/opcodes.h"
 #include "vm/runtime.h"
 
+uint16_t const_pool_map_size = 0;
+map_t const_pool_map;
+
+static_type_t static_type_by_name(const char *type_name) {
+    if (strcmp(type_name, "int") == 0) {
+        return TYPE_INT;
+    }
+    if (strcmp(type_name, "float") == 0) {
+        return TYPE_FLOAT;
+    }
+    if (strcmp(type_name, "void") == 0) {
+        return TYPE_NONE;
+    }
+    compiler_panic("unknown static name type %s", type_name);
+}
+
+char *type_signature_by_name(const char *type_name) {
+    if (strcmp(type_name, "int") == 0) {
+        return strdup("I");
+    }
+    if (strcmp(type_name, "float") == 0) {
+        return strdup("F");
+    }
+    if (strcmp(type_name, "void") == 0) {
+        return strdup("V");
+    }
+    compiler_panic("unknown static name type %s", type_name);
+}
+
+int const_pool_index_by_value(const char *value, uint16_t *out_index) {
+    if (!const_pool_map) {
+        const_pool_map = hashmap_new();
+    }
+    void *void_value;
+    int ret = hashmap_get(const_pool_map, value, &void_value);
+    if (ret == 0) {
+        memcpy(out_index, &void_value, 2);
+        return 0;
+    } else {
+        return ret;
+    }
+}
+
+int const_pool_register_value(const char *value, uint16_t *out_index) {
+    if (!const_pool_map) {
+        const_pool_map = hashmap_new();
+    }
+    //TODO: fix
+    any_t void_value = 0;
+    hashmap_get(const_pool_map, value, &void_value);
+    if (void_value) {
+        *out_index = *((uint16_t *) void_value);
+        return 1;
+    }
+    memcpy(&void_value, &const_pool_map_size, 2);
+    hashmap_put(const_pool_map, value, void_value);
+    *out_index = const_pool_map_size;
+    ++const_pool_map_size;
+    return 0;
+}
+
 struct cast_request_t type_select_cast_method(static_type_t type_1, static_type_t type_2) {
-#define TYPES_EQ(var1, var2, t1, t2) ((((var1) == (t1))&&((var2)==(t2))) || (((var2)==(t1))&&((var1)==(t2))))
+#define TYPES_EQ(var1, var2, t1, t2) \
+    ((((var1) == (t1))&&((var2)==(t2))) || (((var2)==(t1))&&((var1)==(t2))))
+
     if (TYPES_EQ(type_1, type_2, RUNTIME_TYPE_INT, RUNTIME_TYPE_FLOAT)) {
-        struct cast_request_t cr;
-        cr.opcode = OPCODE_I2F;
-        cr.static_type = RUNTIME_TYPE_FLOAT;
-        cr.var_index = (ubyte_t) (type_1 == RUNTIME_TYPE_INT ? 0 : 1);
+        struct cast_request_t cr = {
+                .opcode = OPCODE_I2F,
+                .static_type = RUNTIME_TYPE_FLOAT,
+                .var_index = (ubyte_t) (type_1 == RUNTIME_TYPE_INT ? 0 : 1),
+        };
         return cr;
     }
     struct cast_request_t cr = {

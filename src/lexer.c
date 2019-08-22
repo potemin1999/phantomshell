@@ -18,7 +18,7 @@
 int use_newline_as_flush = 1;
 
 struct psh_lexer_state_t lexer_state = {
-        .is_interactive = 1,
+        .is_interactive = 0,
         .is_inside_func = 0,
         .is_inside_member_func = 0,
         .is_inside_class = 0

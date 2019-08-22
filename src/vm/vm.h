@@ -12,23 +12,55 @@
 
 #include "opcodes.h"
 
+typedef uint16_t vm_pool_const_t;
 typedef uint64_t vm_pc_t;
 
 typedef struct {
+    // current program counter
     vm_pc_t frame_pc;
+    // pointer to the current stack top (free place)
     void *stack_ptr;
+    // pointer to the stack beginning
     void *stack_start;
+    // pointer to the stack end
     void *stack_end;
+    // pointer to the local variables start
     void *local_start;
+    // pointer to the local variables end
     void *local_end;
 } vm_frame_context_t;
+
+typedef struct {
+    // constant reference to the method signature name
+    uint16_t signature_index;
+    // size of arguments which should be copied from the stack top
+    uint16_t arg_size;
+    // count of local variables
+    uint32_t vars_size;
+    // stack size to allocate
+    uint32_t stack_size;
+    // function bytecode size
+    size_t bytecode_size;
+    // function bytecode
+    void *bytecode_data;
+} vm_func_handle_t;
 
 typedef vm_pc_t (*vm_opcode_execute_func_t)(vm_frame_context_t *frame, void *data);
 
 int vm_static_init();
 
+__attribute((noreturn))
+__attribute((noinline))
+int vm_do_panic(vm_frame_context_t *frame, void *data, const char *format, ...);
+
 int vm_execute_opcode(opcode_t opcode, void *data);
 
 int vm_execute_opcodes(size_t data_len, void *data);
+
+int vm_register_constant(size_t const_size, const char *constant, vm_pool_const_t *out_index);
+
+int vm_register_function(vm_pool_const_t signature_index, size_t data_len, void *data, vm_func_handle_t **out_handle);
+
+int vm_register_class(vm_pool_const_t name_index, size_t data_len, void *data);
 
 #endif //SHELL_VM_H

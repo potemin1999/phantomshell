@@ -14,6 +14,7 @@
 #include "parser.h"
 #include "types.h"
 #include "vm/opcodes.h"
+#include "util/hashmap.h"
 
 #define NODE_COMPILED(node) (( (node)->flags & 0b10000000u ) >> 6u == 1)
 
@@ -45,6 +46,20 @@ struct stack_var_t {
     };
 };
 
+struct func_arg_t {
+    char *name;
+    char *type;
+};
+
+struct func_desc_t {
+    char *name;
+    size_t args_count;
+    size_t args_size;
+    struct func_arg_t *args;
+    char *ret_type;
+    char *signature;
+};
+
 struct bytecode_emitter_t;
 
 struct scope_handler_t {
@@ -72,6 +87,7 @@ struct cast_request_t {
 
 struct program_file_t {
     const char *package;
+    map_t functions_map;
 };
 
 /**
@@ -114,6 +130,7 @@ int compile_statement(struct scope_handler_t *scope, ast_node_stat_t *stat_node)
 
 int compile_func(struct scope_handler_t *scope, ast_node_decl_func_t *func_node);
 
+struct program_file_t *compiler_get_current_file();
 
 struct scope_handler_t *compiler_get_root_frame();
 
@@ -127,10 +144,24 @@ void frame_init_scope(struct scope_handler_t *scope);
 
 void frame_destroy_scope(struct scope_handler_t *scope);
 
+// Funcs
+
+const struct func_desc_t *compiler_define_func(ast_node_decl_func_t *func_node);
+
+const struct func_desc_t *compiler_lookup_func_by_name(const char *name);
+
 // Vars
 struct cast_request_t type_select_cast_method(static_type_t type_1, static_type_t type_2);
 
 int ast_node_trace_data_type(struct scope_handler_t *scope, ast_node_expr_t *node);
+
+static_type_t static_type_by_name(const char *type_name);
+
+char *type_signature_by_name(const char *type_name);
+
+int const_pool_index_by_value(const char *value, uint16_t *out_index);
+
+int const_pool_register_value(const char *value, uint16_t *out_index);
 
 // Emitters
 
@@ -150,7 +181,7 @@ struct bytecode_emitter_t compiler_emitter_unbuffered_new();
 
 struct bytecode_emitter_t compiler_emitter_buffered_new(size_t page_size);
 
-void compiler_emitter_buffered_free(struct bytecode_emitter_t *emitter);
+void compiler_emitter_buffered_destroy(struct bytecode_emitter_t *emitter);
 
 size_t compiler_emitter_sink(struct bytecode_emitter_t *emitter, void *dst, size_t max_size);
 

@@ -201,7 +201,7 @@ DEF_AST_NODE(decl_func, {
     string_t name;
     string_t ret_type;
     ast_node_func_arg_list_t *args;
-    ast_node_t *body;
+    ast_node_scope_t *body;
 })
 
 DEF_AST_NODEe(special_cast, {

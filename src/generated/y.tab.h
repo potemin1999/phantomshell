@@ -49,71 +49,73 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    PAREN_OPEN = 258,
-    PAREN_CLOSE = 259,
-    BRACE_OPEN = 260,
-    BRACE_CLOSE = 261,
-    yy_EQUAL_TO = 262,
-    yy_NOT_EQUAL_TO = 263,
-    yy_NOT_LESS_THAN = 264,
-    yy_LESS_THAN = 265,
-    yy_GREATER_THAN = 266,
-    yy_NOT_GREATER_THAN = 267,
-    DEF = 268,
-    RETURN = 269,
-    IF = 270,
-    ELIF = 271,
-    ELSE = 272,
-    FOR = 273,
-    WHILE = 274,
-    DO = 275,
-    SWITCH = 276,
-    CASE = 277,
-    OTHER = 278,
-    CLASS = 279,
-    FUNC = 280,
-    Identifier = 281,
-    BooleanLiteral = 282,
-    IntegerLiteral = 283,
-    FloatLiteral = 284,
-    CharLiteral = 285,
-    StringLiteral = 286,
-    CALL_PREC = 287,
-    UNARY_MINUS_PREC = 288
+    END_OF_FILE = 258,
+    PAREN_OPEN = 259,
+    PAREN_CLOSE = 260,
+    BRACE_OPEN = 261,
+    BRACE_CLOSE = 262,
+    yy_EQUAL_TO = 263,
+    yy_NOT_EQUAL_TO = 264,
+    yy_NOT_LESS_THAN = 265,
+    yy_LESS_THAN = 266,
+    yy_GREATER_THAN = 267,
+    yy_NOT_GREATER_THAN = 268,
+    DEF = 269,
+    RETURN = 270,
+    IF = 271,
+    ELIF = 272,
+    ELSE = 273,
+    FOR = 274,
+    WHILE = 275,
+    DO = 276,
+    SWITCH = 277,
+    CASE = 278,
+    OTHER = 279,
+    CLASS = 280,
+    FUNC = 281,
+    Identifier = 282,
+    BooleanLiteral = 283,
+    IntegerLiteral = 284,
+    FloatLiteral = 285,
+    CharLiteral = 286,
+    StringLiteral = 287,
+    CALL_PREC = 288,
+    UNARY_MINUS_PREC = 289
   };
 #endif
 /* Tokens.  */
-#define PAREN_OPEN 258
-#define PAREN_CLOSE 259
-#define BRACE_OPEN 260
-#define BRACE_CLOSE 261
-#define yy_EQUAL_TO 262
-#define yy_NOT_EQUAL_TO 263
-#define yy_NOT_LESS_THAN 264
-#define yy_LESS_THAN 265
-#define yy_GREATER_THAN 266
-#define yy_NOT_GREATER_THAN 267
-#define DEF 268
-#define RETURN 269
-#define IF 270
-#define ELIF 271
-#define ELSE 272
-#define FOR 273
-#define WHILE 274
-#define DO 275
-#define SWITCH 276
-#define CASE 277
-#define OTHER 278
-#define CLASS 279
-#define FUNC 280
-#define Identifier 281
-#define BooleanLiteral 282
-#define IntegerLiteral 283
-#define FloatLiteral 284
-#define CharLiteral 285
-#define StringLiteral 286
-#define CALL_PREC 287
-#define UNARY_MINUS_PREC 288
+#define END_OF_FILE 258
+#define PAREN_OPEN 259
+#define PAREN_CLOSE 260
+#define BRACE_OPEN 261
+#define BRACE_CLOSE 262
+#define yy_EQUAL_TO 263
+#define yy_NOT_EQUAL_TO 264
+#define yy_NOT_LESS_THAN 265
+#define yy_LESS_THAN 266
+#define yy_GREATER_THAN 267
+#define yy_NOT_GREATER_THAN 268
+#define DEF 269
+#define RETURN 270
+#define IF 271
+#define ELIF 272
+#define ELSE 273
+#define FOR 274
+#define WHILE 275
+#define DO 276
+#define SWITCH 277
+#define CASE 278
+#define OTHER 279
+#define CLASS 280
+#define FUNC 281
+#define Identifier 282
+#define BooleanLiteral 283
+#define IntegerLiteral 284
+#define FloatLiteral 285
+#define CharLiteral 286
+#define StringLiteral 287
+#define CALL_PREC 288
+#define UNARY_MINUS_PREC 289
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -129,7 +131,7 @@ union YYSTYPE
 	char_t char_value;
 	string_t string_value;
 
-#line 133 "y.tab.h" /* yacc.c:1921  */
+#line 135 "y.tab.h" /* yacc.c:1921  */
 };
 
 typedef union YYSTYPE YYSTYPE;

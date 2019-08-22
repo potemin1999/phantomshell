@@ -19,54 +19,22 @@ struct execution_queue_t node_queue = {
         .size = 0
 };
 
-int compile_queue() {
-    for (size_t i = 0; i < node_queue.size; i++) {
-        int ret = compiler_compile(node_queue.q[node_queue.execution]);
-        if (ret) {
-            return ret;
-        }
-        node_queue.execution = (node_queue.execution + 1) % node_queue.cap;
-    }
-    return COMPILE_SUCCESS;
+struct program_file_t *current_file;
+
+struct program_file_t *complier_get_current_file() {
+    return current_file;
 }
 
-
-int compiler_pop_and_compile(ast_node_t *node) {
-    if (node_queue.size != 0) {
-        compile_queue();
-    }
-    return compiler_compile(node);
-}
-
-int compiler_push(ast_node_t *node) {
-    if (node_queue.size == node_queue.cap) {
-        return COMPILE_NODE_QUEUE_OVERFLOW;
-    }
-    node_queue.q[node_queue.free] = node;
-    node_queue.free = (node_queue.free + 1) % node_queue.cap;
-    ++node_queue.size;
-    return COMPILE_SUCCESS;
-}
-
-int compile_global_statement(ast_node_stat_t *node) {
-    return compile_statement(compiler_get_root_frame(), node);
-}
-
-int compile_global_func(ast_node_decl_func_t *node) {
-    if (node->type == AST_NODE_TYPE_DECL_FUNC) {
-
-    }
-    compiler_panic("unable to compile global func node");
-}
 
 int compiler_compile_impl(ast_node_t *node) {
-    // root statement pushed within global scope
+    struct scope_handler_t *scope = compiler_get_root_frame();
     if ((node->type & AST_NODE_STAT_MASK) >> 6u == 0b10u) {
-        return compile_global_statement((ast_node_stat_t *) node);
+        // root statement pushed within global scope
+        return compile_statement(scope, (ast_node_stat_t *) node);
     }
-    // function declaration in global scope
     if (node->type == AST_NODE_TYPE_DECL_FUNC) {
-        return compile_global_func((ast_node_decl_func_t *) node);
+        // function declaration in global scope
+        return compile_func(scope, (ast_node_decl_func_t *) node);
     }
     return COMPILE_UNEXPECTED_NODE;
 }
@@ -83,8 +51,15 @@ int compiler_compile(ast_node_t *node) {
     return res;
 }
 
+int compiler_init() {
+    current_file = malloc(sizeof(struct program_file_t));
+    current_file->package = "";
+    current_file->functions_map = hashmap_new();
+    return 0;
+}
+
 int compiler_finish() {
-    return compile_queue();
+    return 0;
 }
 
 void compiler_panic(const char *format, ...) {

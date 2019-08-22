@@ -17,7 +17,8 @@ size_t emitter_emit_raw(struct bytecode_emitter_t *emitter, size_t n, void *data
 size_t emitter_emit_unbuffered(struct bytecode_emitter_t *emitter, opcode_t opcode, size_t n, void *data) {
     UNUSED(emitter)
     UNUSED(n)
-    //printf("emit [%d] %s\n", n, get_opcode_name(opcode));
+    //printf("emit [%d] %s\n", n, get_opcode_mnemonic(opcode));
+
     vm_execute_opcode(opcode, data);
     return 0;
 }
@@ -129,7 +130,7 @@ size_t emitter_emit_raw(struct bytecode_emitter_t *emitter, size_t n, void *data
     return n;
 }
 
-void compiler_emitter_buffered_free(struct bytecode_emitter_t *emitter) {
+void compiler_emitter_buffered_destroy(struct bytecode_emitter_t *emitter) {
     size_t page_size = emitter->page_size;
     void *current_page = emitter->first_page;
     while (current_page) {
@@ -187,23 +188,24 @@ struct bytecode_emitter_t compiler_emitter_buffered_new(size_t page_size) {
 
 
 int compiler_emit_n_impl(struct scope_handler_t *scope, opcode_t opcode, size_t len, void *data) {
+    printf("%s:%d: emit impl \n", __FILE__, __LINE__);
     return (int) scope->emitter->emitter_func(scope->emitter, opcode, len, data);
 }
 
 int compiler_emit_0(struct scope_handler_t *scope, opcode_t opcode) {
-    compiler_add_commentf(scope, "\033[32m op[0] : %s;\033[0m\n", get_opcode_name(opcode));
+    compiler_add_commentf(scope, "\033[32m op[0] : %s;\033[0m\n", get_opcode_mnemonic(opcode));
     compiler_emit_n_impl(scope, opcode, 0, 0);
     return 0;
 }
 
 int compiler_emit_1(struct scope_handler_t *scope, opcode_t opcode, ubyte_t byte1) {
-    compiler_add_commentf(scope, "\033[32m op[1] : %s %u;\033[0m\n", get_opcode_name(opcode), byte1);
+    compiler_add_commentf(scope, "\033[32m op[1] : %s %u;\033[0m\n", get_opcode_mnemonic(opcode), byte1);
     compiler_emit_n_impl(scope, opcode, 1, &byte1);
     return 0;
 }
 
 int compiler_emit_2(struct scope_handler_t *scope, opcode_t opcode, ubyte_t byte1, ubyte_t byte2) {
-    compiler_add_commentf(scope, "\033[32m op[2] : %s %u %u;\033[0m\n", get_opcode_name(opcode), byte1, byte2);
+    compiler_add_commentf(scope, "\033[32m op[2] : %s %u %u;\033[0m\n", get_opcode_mnemonic(opcode), byte1, byte2);
     ubyte_t data[2];
     data[0] = byte1;
     data[1] = byte2;
@@ -212,6 +214,6 @@ int compiler_emit_2(struct scope_handler_t *scope, opcode_t opcode, ubyte_t byte
 }
 
 int compiler_emit_n(struct scope_handler_t *scope, opcode_t opcode, size_t len, void *data) {
-    compiler_add_commentf(scope, "\033[32m op[%zu] : %s;\033[0m\n", len, get_opcode_name(opcode));
+    compiler_add_commentf(scope, "\033[32m op[%zu] : %s;\033[0m\n", len, get_opcode_mnemonic(opcode));
     return compiler_emit_n_impl(scope, opcode, len, data);
 }

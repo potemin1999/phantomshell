@@ -34,9 +34,11 @@
 #define TRACE(text) { __log(text); }
 
 #define TRACEf(text, ...) { __log(text,__VA_ARGS__); }
+#define TRACE_AND_FREE(text) { char* text_ptr = (text); __log(text_ptr); free(text_ptr); }
 #else
 #define TRACE(text)
 #define TRACEf(text, ...)
+#define TRACE_AND_FREE(text)
 #endif
 
 #ifdef ENABLE_NODE_STRING_REPR
@@ -159,7 +161,7 @@ string_t ast_node_to_string(ast_node_t *node) {
     }
     return "stringify error: null";
 #else
-    return "node stringify mode disabled, add ENABLE_NODE_STRING_REPR to parser.h";
+    return "(node str: define ENABLE_NODE_STRING_REPR to parser.h)";
 #endif
 }
 
@@ -170,7 +172,7 @@ ast_node_t *ast_new_node_group(ast_node_t *expr) {
     AST_NEW_NODE(group)
     node->type = AST_NODE_TYPE_GROUP;
     node->expr = expr_node;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -179,7 +181,7 @@ ast_node_t *ast_new_node_scope(ast_node_t *statements) {
     node->type = AST_NODE_TYPE_SCOPE;
     //TODO: upcast
     node->stats = (ast_node_stat_list_t *) statements;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -188,7 +190,7 @@ ast_node_t *ast_new_node_ident(char *value) {
     AST_NEW_NODE(ident)
     node->static_type = TYPE_UNKNWN;
     node->value = value;
-    TRACEf("%s", node->str((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -197,7 +199,7 @@ ast_node_t *ast_new_node_literal_bool(bool_t value) {
     node->flags = TYPE_BOOL;
     node->static_type = RUNTIME_TYPE_BOOL;
     node->bool_val = value;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -206,7 +208,7 @@ ast_node_t *ast_new_node_literal_int(int_t value) {
     node->flags = TYPE_INT;
     node->static_type = RUNTIME_TYPE_INT;
     node->int_val = value;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -215,7 +217,7 @@ ast_node_t *ast_new_node_literal_float(float_t value) {
     node->flags = TYPE_FLOAT;
     node->static_type = RUNTIME_TYPE_FLOAT;
     node->float_val = value;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -224,7 +226,7 @@ ast_node_t *ast_new_node_literal_char(char_t value) {
     node->flags = TYPE_CHAR;
     node->static_type = RUNTIME_TYPE_CHAR;
     node->char_val = value;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -233,7 +235,7 @@ ast_node_t *ast_new_node_literal_string(string_t value) {
     node->flags = TYPE_STRING;
     node->static_type = RUNTIME_TYPE_STRING;
     node->string_val = value;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -246,7 +248,7 @@ ast_node_t *ast_new_node_unary_op(uint32_t operator, ast_node_t *operand) {
     node->static_type = TYPE_UNKNWN;
     node->operator = operator;
     node->operand = e_operand;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -263,7 +265,7 @@ ast_node_t *ast_new_node_binary_op(uint32_t operator, ast_node_t *left, ast_node
     node->operator = operator;
     node->left = e_left;
     node->right = e_right;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -283,7 +285,7 @@ ast_node_t *ast_new_node_ternary_op(uint32_t operator, ast_node_t *op1, ast_node
     node->operand1 = e_op1;
     node->operand2 = e_op2;
     node->operand3 = e_op3;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -327,7 +329,7 @@ ast_node_t *ast_new_node_stat_expr(ast_node_t *expr) {
     AST_NEW_NODE(stat_expr)
     node->next = 0;
     node->expr = expr_node;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     if (!lexer_state.is_inside_func
         && !lexer_state.is_inside_member_func
         && !lexer_state.is_inside_selection_stat
@@ -346,7 +348,7 @@ ast_node_t *ast_new_node_stat_ret(ast_node_t *expr) {
     AST_NEW_NODE(stat_ret)
     node->next = 0;
     node->expr = expr;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -366,7 +368,7 @@ ast_node_t *ast_new_node_stat_if(ast_node_t *expr, ast_node_t *true_scope, ast_n
     node->expr = expr;
     node->true_scope = n_true_scope;
     node->false_scope = n_false_scope;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     if (!lexer_state.is_inside_func
         && !lexer_state.is_inside_member_func
         && !(lexer_state.is_inside_selection_stat - 1)
@@ -385,7 +387,7 @@ ast_node_t *ast_new_node_stat_switch(ast_node_t *expr, ast_node_t *choice) {
     node->next = 0;
     node->expr = expr;
     node->choice = choice;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -402,7 +404,7 @@ ast_node_t *ast_new_node_stat_switch_choice(ast_node_t *expr, ast_node_t *scope,
         ast_node_stat_switch_choice_t *prev_node = (ast_node_stat_switch_choice_t *) prev_choice;
         prev_node->next = node;
     }
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     return (ast_node_t *) node;
 }
 
@@ -411,7 +413,7 @@ ast_node_t *ast_new_node_stat_while(ast_node_t *expr, ast_node_t *scope) {
     node->next = 0;
     node->expr = expr;
     node->loop_scope = scope;
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     if (!lexer_state.is_inside_func
         && !lexer_state.is_inside_member_func
         && !lexer_state.is_inside_selection_stat
@@ -435,8 +437,10 @@ ast_node_t *ast_new_node_decl_var(string_t name, string_t type) {
 
 ast_node_t *ast_new_node_decl_func(string_t name, ast_node_t *args, string_t ret_type, ast_node_t *body) {
     AST_NEW_NODE(decl_func)
+    ast_node_scope_t *body_node = 0;
+    NODE_UPCAST_SCOPE(body, &body_node)
     node->name = name;
-    node->body = body;
+    node->body = body_node;
     node->ret_type = ret_type;
     node->args = 0;
     //TODO: fixxxxxx
@@ -446,11 +450,17 @@ ast_node_t *ast_new_node_decl_func(string_t name, ast_node_t *args, string_t ret
         ASSERT_NON_NULL(args_node, "cast failed")
         node->args = args_node;
     }
-    TRACEf("%s", ast_node_to_string((ast_node_t *) node))
+    TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
     if (lexer_state.is_inside_class) {
         lexer_state.is_inside_member_func = 0;
     } else {
         lexer_state.is_inside_func = 0;
+    }
+    if (!lexer_state.is_inside_class) {
+        int res = compiler_compile((ast_node_t *) node);
+        UNUSED(res)
+        ast_free_node_decl_func(node);
+        node = 0;
     }
     return (ast_node_t *) node;
 }
@@ -651,19 +661,15 @@ void ast_free_node_stat_while(ast_node_stat_while_t *stat_while) {
 }
 
 void ast_free_node_decl_var(ast_node_decl_var_t *var_decl) {
-
+    free(var_decl->var_name);
+    free(var_decl->var_type);
+    free(var_decl);
 }
 
 void ast_free_node_decl_func(ast_node_decl_func_t *decl_func) {
-    ast_free_node(decl_func->body);
-    //TODO: fixxxxxx
-    /* ast_node_func_arg_t *arg = decl_func->args;
-     while (arg) {
-         ast_node_func_arg_t *next = arg->next;
-         ast_free_node_func_arg(arg);
-         arg = next;
-     }*/
+    ast_free_node((ast_node_t *) decl_func->body);
     free(decl_func->name);
+    ast_free_node_func_arg_list(decl_func->args);
     if (decl_func->ret_type) {
         free(decl_func->ret_type);
     }
@@ -671,7 +677,13 @@ void ast_free_node_decl_func(ast_node_decl_func_t *decl_func) {
 }
 
 void ast_free_node_func_arg_list(ast_node_func_arg_list_t *func_arg_list) {
-
+    ast_node_decl_var_t *current_decl = func_arg_list->first;
+    while (current_decl) {
+        ast_node_decl_var_t *next = current_decl->next;
+        ast_free_node_decl_var(current_decl);
+        current_decl = next;
+    }
+    free(func_arg_list);
 }
 
 
@@ -985,7 +997,7 @@ NODE_TO_STRING_FUNC(decl_func) {
     } else {
         func_args_str = strdup("");
     }
-    string_t body_str = ast_node_to_string(func_node->body);
+    string_t body_str = ast_node_to_string((ast_node_t *) func_node->body);
     size_t body_len = strlen(body_str);
     size_t name_len = strlen(func_node->name);
     string_t ret_str = func_node->ret_type ? func_node->ret_type : "";

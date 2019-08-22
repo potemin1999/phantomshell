@@ -73,8 +73,8 @@ int compile_if_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_n
     }
     frame_destroy_scope(&true_scope);
     frame_destroy_scope(&false_scope);
-    compiler_emitter_buffered_free(&true_emitter);
-    compiler_emitter_buffered_free(&false_emitter);
+    compiler_emitter_buffered_destroy(&true_emitter);
+    compiler_emitter_buffered_destroy(&false_emitter);
     return 0;
 }
 
@@ -132,8 +132,8 @@ int compile_while_statement(struct scope_handler_t *scope, ast_node_stat_while_t
     }
     //TODO: remove real future expr scope
     frame_destroy_scope(&body_scope);
-    compiler_emitter_buffered_free(&expr_emitter);
-    compiler_emitter_buffered_free(&body_emitter);
+    compiler_emitter_buffered_destroy(&expr_emitter);
+    compiler_emitter_buffered_destroy(&body_emitter);
     return 0;
 }
 

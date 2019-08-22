@@ -10,13 +10,14 @@
 #ifndef SHELL_OPCODES_H
 #define SHELL_OPCODES_H
 
-#include "../operator.h"
+#include "operator.h"
 
 typedef unsigned char opcode_t;
 
 /** Does nothing */
 #define OPCODE_NOP      0x00
 #define OPCODE_EXSTK    0x10 // 16 // expands stack capacity
+#define OPCODE_LDC      0x20 // 32 // loads constant from index saved in two next bytes
 
 /** LOAD or SAVE
  * puts/loads something from/to local variable storage
@@ -63,9 +64,12 @@ typedef unsigned char opcode_t;
 #define OPCODE_JEZ      0x62 // 98 // moves pc if operand==0
 #define OPCODE_JNEZ     0x63 // 99 // moves pc if operand!=0
 
-#define OPCODE_PANIC    0xff // stops execution
+#define OPCODE_CALL     0x80 // 128 // calls non-member function, name should be saved in root constant pool, its
+//                                      index passed as indexbyte1 << 8 + indexbyte2 and function arguments should lay
+//                                      on the top of the stack (lastest at the top)
+#define OPCODE_PANIC    0xff // 255 // stops execution
 
-const char *get_opcode_name(opcode_t opcode);
+const char *get_opcode_mnemonic(opcode_t opcode);
 
 opcode_t int_operator_to_opcode(int oper);
 
