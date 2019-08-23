@@ -9,6 +9,9 @@ Variable creation
     // creates float variable and assign to it result
     // of explicit casting of variable a (floating-point value 10.0)  
     b = (float) a 
+    
+    // assigns value to the existing variable b via implicit casting
+    b = a*5
 
 Operators
 
