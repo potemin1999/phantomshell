@@ -119,7 +119,7 @@ int compiler_emit_1(struct scope_handler_t *scope, opcode_t opcode, ubyte_t byte
 
 int compiler_emit_2(struct scope_handler_t *scope, opcode_t opcode, ubyte_t byte1, ubyte_t byte2);
 
-int compiler_emit_n(struct scope_handler_t *scope, opcode_t opcode, size_t len, void *data);
+int compiler_emit_n(struct scope_handler_t *scope, size_t len, void *data);
 
 
 int compile_expression(struct scope_handler_t *scope, ast_node_expr_t *expr_node);
@@ -166,9 +166,9 @@ int const_pool_register_value(const char *value, uint16_t *out_index);
 // Emitters
 
 struct bytecode_emitter_t {
-    size_t (*raw_emitter_func)(struct bytecode_emitter_t *emitter, size_t n, void *data);
+    //size_t (*raw_emitter_func)(struct bytecode_emitter_t *emitter, size_t n, void *data);
 
-    size_t (*emitter_func)(struct bytecode_emitter_t *emitter, opcode_t opcode, size_t n, void *data);
+    size_t (*emitter_func)(struct bytecode_emitter_t *emitter, /*opcode_t opcode,*/ size_t n, void *data);
 
     ubyte_t *first_page;
     ubyte_t *last_page;

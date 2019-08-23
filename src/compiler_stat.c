@@ -50,9 +50,13 @@ int compile_if_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_n
         //uint32_t offset = false_scope.emitter->size;
         //true_emitter.emitter_func(&true_emitter, OPCODE_LJMP, 4, &offset);
     } else {
+        opcode_t opcode = OPCODE_JMP;
         uint16_t offset_raw = (uint16_t) false_scope.emitter->size;
         uint16_t offset_be = htobe16(offset_raw);
-        true_emitter.emitter_func(&true_emitter, OPCODE_JMP, 2, &offset_be);
+        uint8_t data[3];
+        memcpy(&data[0], &opcode, 1);
+        memcpy(&data[1], &offset_be, 1);
+        true_emitter.emitter_func(&true_emitter, 3, &data);
     }
     if (true_scope.emitter->size > UINT16_MAX) {
         //TODO: handle long jump
@@ -68,7 +72,7 @@ int compile_if_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_n
         compiler_emitter_sink(&true_emitter, exec_data + 3, true_size);
         compiler_emitter_sink(&false_emitter, exec_data + 3 + true_size, false_size);
         //compiler_emit_2(scope, OPCODE_JEZ, hi,lo);
-        scope->emitter->raw_emitter_func(scope->emitter, true_size + false_size + 3, exec_data);
+        scope->emitter->emitter_func(scope->emitter, true_size + false_size + 3, exec_data);
         free(exec_data);
     }
     frame_destroy_scope(&true_scope);
@@ -127,7 +131,7 @@ int compile_while_statement(struct scope_handler_t *scope, ast_node_stat_while_t
         exec_data[offset++] = backjump_hi;
         exec_data[offset] = backjump_lo;
 
-        scope->emitter->raw_emitter_func(scope->emitter, sum_size, exec_data);
+        scope->emitter->emitter_func(scope->emitter, sum_size, exec_data);
         free(exec_data);
     }
     //TODO: remove real future expr scope

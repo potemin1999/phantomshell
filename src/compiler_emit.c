@@ -14,18 +14,19 @@
 
 size_t emitter_emit_raw(struct bytecode_emitter_t *emitter, size_t n, void *data);
 
-size_t emitter_emit_unbuffered(struct bytecode_emitter_t *emitter, opcode_t opcode, size_t n, void *data) {
+size_t emitter_emit_unbuffered(struct bytecode_emitter_t *emitter, /*opcode_t opcode,*/ size_t n, void *data) {
     UNUSED(emitter)
     UNUSED(n)
     //printf("emit [%d] %s\n", n, get_opcode_mnemonic(opcode));
 
-    vm_execute_opcode(opcode, data);
+    //vm_execute_opcode(opcode, data);
+    vm_execute_opcodes(n, data);
     return 0;
 }
 
 struct bytecode_emitter_t compiler_emitter_unbuffered_new() {
     struct bytecode_emitter_t emitter;
-    emitter.raw_emitter_func = emitter_emit_raw;
+    //emitter.raw_emitter_func = emitter_emit_raw;
     emitter.emitter_func = emitter_emit_unbuffered;
     emitter.capacity = INT32_MAX;
     emitter.page_size = INT32_MAX;
@@ -47,11 +48,11 @@ void *emitter_allocate_new_page(size_t page_size, void *prev_page) {
     return new_page;
 }
 
-size_t emitter_emit_buffered(struct bytecode_emitter_t *emitter, opcode_t opcode, size_t n, void *data) {
+size_t emitter_emit_buffered(struct bytecode_emitter_t *emitter, /*opcode_t opcode,*/ size_t n, void *data) {
     // check if there is enough space to write more
     void *emitter_page;
     size_t page_size = emitter->page_size;
-    if (emitter->size + 1 + n > emitter->capacity) {
+    if (emitter->size + n > emitter->capacity) {
         // we need to allocate new page
         void *prev_emitter_page = emitter->last_page;
         emitter_page = emitter_allocate_new_page(page_size, emitter->last_page);
@@ -67,30 +68,25 @@ size_t emitter_emit_buffered(struct bytecode_emitter_t *emitter, opcode_t opcode
             goto normal_write;
         }
         size_t prev_free_space = emitter->capacity - emitter->size - page_size;
-        size_t next_free_space = (n + 1) - prev_free_space;
+        size_t next_free_space = n - prev_free_space;
         ubyte_t *prev_ptr = (ubyte_t *) (prev_emitter_page + page_size - prev_free_space);
-        *prev_ptr = opcode;
-        if (prev_free_space > 1) {
-            prev_ptr += 1;
-            memcpy(prev_ptr, data, prev_free_space - 1);
-        }
-        //printf("partial emit to page [0] %p, written %d\n", prev_emitter_page, prev_free_space);
-        memcpy(emitter_page, data + prev_free_space - 1, next_free_space);
-        //printf("partial emit to page [1] %p, written %d \n", emitter_page, next_free_space);
-        emitter->size += (1 + n);
-        return n + 1;
+        // write first part to the previous page
+        memcpy(prev_ptr, data, prev_free_space);
+        // write second part to the new page
+        memcpy(emitter_page, data + prev_free_space, next_free_space);
+        emitter->size += n;
+        return n;
     }
     normal_write:
     // lets find a place to write opcode and data
     emitter_page = emitter->last_page;
     size_t offset = emitter->size % emitter->page_size;
     ubyte_t *data_dst = (ubyte_t *) (emitter_page + offset);
-    *data_dst = opcode;
-    memcpy(data_dst + 1, data, n);
+    memcpy(data_dst, data, n);
     //printf("normal emit to page at %p \n",emitter_page);
     //printf("emitted to buffer %d bytes\n", n + 1);
-    emitter->size += (1 + n);
-    return n + 1;
+    emitter->size += n;
+    return n;
 }
 
 size_t emitter_emit_raw(struct bytecode_emitter_t *emitter, size_t n, void *data) {
@@ -176,7 +172,7 @@ void compiler_add_commentf(struct scope_handler_t *scope, const char *format, ..
 
 struct bytecode_emitter_t compiler_emitter_buffered_new(size_t page_size) {
     struct bytecode_emitter_t emitter;
-    emitter.raw_emitter_func = emitter_emit_raw;
+    //emitter.raw_emitter_func = emitter_emit_raw;
     emitter.emitter_func = emitter_emit_buffered;
     emitter.page_size = page_size;
     emitter.capacity = 0;
@@ -187,33 +183,43 @@ struct bytecode_emitter_t compiler_emitter_buffered_new(size_t page_size) {
 }
 
 
-int compiler_emit_n_impl(struct scope_handler_t *scope, opcode_t opcode, size_t len, void *data) {
-    printf("%s:%d: emit impl \n", __FILE__, __LINE__);
-    return (int) scope->emitter->emitter_func(scope->emitter, opcode, len, data);
+static inline int compiler_emit_n_impl(struct scope_handler_t *scope, /*opcode_t opcode,*/ size_t len, void *data) {
+    //printf("%s:%d: emit impl \n", __FILE__, __LINE__);
+    ubyte_t array[len];
+    memcpy(array, data, len);
+    return (int) scope->emitter->emitter_func(scope->emitter, len, data);
 }
 
 int compiler_emit_0(struct scope_handler_t *scope, opcode_t opcode) {
-    compiler_add_commentf(scope, "\033[32m op[0] : %s;\033[0m\n", get_opcode_mnemonic(opcode));
-    compiler_emit_n_impl(scope, opcode, 0, 0);
+    uint8_t data[1];
+    memcpy(data + 0, &opcode, 1);
+    //compiler_add_commentf(scope, "\033[32m op[0] : %s;\033[0m\n", get_opcode_mnemonic(opcode));
+    compiler_emit_n_impl(scope, 1, data);
     return 0;
 }
 
 int compiler_emit_1(struct scope_handler_t *scope, opcode_t opcode, ubyte_t byte1) {
-    compiler_add_commentf(scope, "\033[32m op[1] : %s %u;\033[0m\n", get_opcode_mnemonic(opcode), byte1);
-    compiler_emit_n_impl(scope, opcode, 1, &byte1);
+    uint8_t data[2];
+    memcpy(data + 0, &opcode, 1);
+    memcpy(data + 1, &byte1, 1);
+    //compiler_add_commentf(scope, "\033[32m op[1] : %s %u;\033[0m\n", get_opcode_mnemonic(opcode), byte1);
+    compiler_emit_n_impl(scope, 2, &data);
     return 0;
 }
 
 int compiler_emit_2(struct scope_handler_t *scope, opcode_t opcode, ubyte_t byte1, ubyte_t byte2) {
-    compiler_add_commentf(scope, "\033[32m op[2] : %s %u %u;\033[0m\n", get_opcode_mnemonic(opcode), byte1, byte2);
-    ubyte_t data[2];
-    data[0] = byte1;
-    data[1] = byte2;
-    compiler_emit_n_impl(scope, opcode, 2, data);
+    //compiler_add_commentf(scope, "\033[32m op[2] : %s %u %u;\033[0m\n", get_opcode_mnemonic(opcode), byte1, byte2);
+    uint8_t data[3];
+    memcpy(data + 0, &opcode, 1);
+    memcpy(data + 1, &byte1, 1);
+    memcpy(data + 2, &byte2, 1);
+    compiler_emit_n_impl(scope, 3, data);
     return 0;
 }
 
-int compiler_emit_n(struct scope_handler_t *scope, opcode_t opcode, size_t len, void *data) {
-    compiler_add_commentf(scope, "\033[32m op[%zu] : %s;\033[0m\n", len, get_opcode_mnemonic(opcode));
-    return compiler_emit_n_impl(scope, opcode, len, data);
+int compiler_emit_n(struct scope_handler_t *scope, size_t len, void *data) {
+    //compiler_add_commentf(scope, "\033[32m op[%zu] : %s;\033[0m\n", len, get_opcode_mnemonic(opcode));
+    ubyte_t array[len];
+    memcpy(array, data, len);
+    return compiler_emit_n_impl(scope, len, data);
 }

@@ -19,15 +19,20 @@ int compile_global_statement(ast_node_stat_t *node);
 int compile_global_func(ast_node_decl_func_t *node);
 
 int compile_literal_int(struct scope_handler_t *scope, ast_node_literal_t *liter_node) {
+    uint8_t data[5];
     uint32_t h_int_val = (uint32_t) liter_node->int_val;
     uint32_t be_int_val = htobe32(h_int_val);
-    compiler_emit_n(scope, OPCODE_ICONST, 4, &be_int_val);
+    data[0] = OPCODE_ICONST;
+    memcpy(data + 1, &be_int_val, 4);
+    compiler_emit_n(scope, 5, &data);
     return 0;
 }
 
 int compile_literal_float(struct scope_handler_t *scope, ast_node_literal_t *liter_node) {
-    float_t h_float_val = liter_node->float_val;
-    compiler_emit_n(scope, OPCODE_FCONST, 4, &h_float_val);
+    uint8_t data[5];
+    data[0] = OPCODE_FCONST;
+    memcpy(data + 1, &(liter_node->float_val), 4);
+    compiler_emit_n(scope, 5, &data);
     return 0;
 }
 
