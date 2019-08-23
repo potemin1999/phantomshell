@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <stdio.h>
+#include "lib.h"
 #include "vm/opcodes.h"
 
 

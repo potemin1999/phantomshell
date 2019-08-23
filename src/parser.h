@@ -10,7 +10,7 @@
 #ifndef SHELL_PARSER_H
 #define SHELL_PARSER_H
 
-#include <stdio.h>
+#include "lib.h"
 #include "vm/opcodes.h"
 #include "types.h"
 #include "generated/y.tab.h"
@@ -31,7 +31,7 @@
 #define AST_NODE_EXPR_MASK              0b01000000u //64
 #define AST_NODE_TYPE_SCOPE             0b00000011u //3
 #define AST_NODE_TYPE_IDENT             0b01000001u //65
-#define AST_NODE_TYPE_GROUP             0b01000010u //2
+#define AST_NODE_TYPE_GROUP             0b01000010u //66
 #define AST_NODE_TYPE_LITERAL_BOOL      0b01000011u //67
 #define AST_NODE_TYPE_LITERAL_INT       0b01000100u //68
 #define AST_NODE_TYPE_LITERAL_FLOAT     0b01000101u //69

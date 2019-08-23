@@ -10,7 +10,7 @@
 #ifndef SHELL_COMPILER_H
 #define SHELL_COMPILER_H
 
-#include <string.h>
+#include "lib.h"
 #include "parser.h"
 #include "types.h"
 #include "vm/opcodes.h"

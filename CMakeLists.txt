@@ -54,7 +54,7 @@ add_compile_definitions(__debug__)
 
 #shell module
 set(SHELL psh)
-include_directories("src")
 file(GLOB_RECURSE SHELL_SOURCE_FILES "src/*.c")
 add_executable(${SHELL} ${SHELL_SOURCE_FILES})
+target_include_directories(${SHELL} PRIVATE "src")
 set_target_properties(${SHELL} PROPERTIES LINKER_LANGUAGE C)

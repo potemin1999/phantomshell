@@ -7,8 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <stdlib.h>
-//#include <stdarg.h>
+#include "lib.h"
 #include "compiler.h"
 #include "vm/vm.h"
 
@@ -187,15 +186,14 @@ static inline int compiler_emit_n_impl(struct scope_handler_t *scope, /*opcode_t
     //printf("%s:%d: emit impl \n", __FILE__, __LINE__);
     ubyte_t array[len];
     memcpy(array, data, len);
-    return (int) scope->emitter->emitter_func(scope->emitter, len, data);
+    return (int) scope->emitter->emitter_func(scope->emitter, len, data) ? 0 : (len ? 1 : 0);
 }
 
 int compiler_emit_0(struct scope_handler_t *scope, opcode_t opcode) {
     uint8_t data[1];
     memcpy(data + 0, &opcode, 1);
     //compiler_add_commentf(scope, "\033[32m op[0] : %s;\033[0m\n", get_opcode_mnemonic(opcode));
-    compiler_emit_n_impl(scope, 1, data);
-    return 0;
+    return compiler_emit_n_impl(scope, 1, data);
 }
 
 int compiler_emit_1(struct scope_handler_t *scope, opcode_t opcode, ubyte_t byte1) {
@@ -203,8 +201,7 @@ int compiler_emit_1(struct scope_handler_t *scope, opcode_t opcode, ubyte_t byte
     memcpy(data + 0, &opcode, 1);
     memcpy(data + 1, &byte1, 1);
     //compiler_add_commentf(scope, "\033[32m op[1] : %s %u;\033[0m\n", get_opcode_mnemonic(opcode), byte1);
-    compiler_emit_n_impl(scope, 2, &data);
-    return 0;
+    return compiler_emit_n_impl(scope, 2, &data);
 }
 
 int compiler_emit_2(struct scope_handler_t *scope, opcode_t opcode, ubyte_t byte1, ubyte_t byte2) {
@@ -213,8 +210,7 @@ int compiler_emit_2(struct scope_handler_t *scope, opcode_t opcode, ubyte_t byte
     memcpy(data + 0, &opcode, 1);
     memcpy(data + 1, &byte1, 1);
     memcpy(data + 2, &byte2, 1);
-    compiler_emit_n_impl(scope, 3, data);
-    return 0;
+    return compiler_emit_n_impl(scope, 3, data);
 }
 
 int compiler_emit_n(struct scope_handler_t *scope, size_t len, void *data) {

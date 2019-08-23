@@ -7,9 +7,8 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <endian.h>
-#include <vm/vm.h>
-#include <malloc.h>
+#include "lib.h"
+#include "vm/vm.h"
 #include "compiler.h"
 #include "parser.h"
 #include "lexer.h"
@@ -24,16 +23,14 @@ int compile_literal_int(struct scope_handler_t *scope, ast_node_literal_t *liter
     uint32_t be_int_val = htobe32(h_int_val);
     data[0] = OPCODE_ICONST;
     memcpy(data + 1, &be_int_val, 4);
-    compiler_emit_n(scope, 5, &data);
-    return 0;
+    return compiler_emit_n(scope, 5, &data);
 }
 
 int compile_literal_float(struct scope_handler_t *scope, ast_node_literal_t *liter_node) {
     uint8_t data[5];
     data[0] = OPCODE_FCONST;
     memcpy(data + 1, &(liter_node->float_val), 4);
-    compiler_emit_n(scope, 5, &data);
-    return 0;
+    return compiler_emit_n(scope, 5, &data);
 }
 
 int compile_ident(struct scope_handler_t *scope, ast_node_ident_t *ident_node) {
@@ -41,9 +38,7 @@ int compile_ident(struct scope_handler_t *scope, ast_node_ident_t *ident_node) {
     if (var) {
         opcode_t opcode;
         OPCODE_LOAD(var->static_type, &opcode)
-        compiler_emit_1(scope, opcode, var->index);
-        ident_node->flags &= 0x80u;
-        return 0;
+        return compiler_emit_1(scope, opcode, var->index);
     } else {
         return 1;
     }
@@ -64,25 +59,23 @@ int compile_unary_op(struct scope_handler_t *scope, ast_node_unary_op_t *expr_no
         if ((ret = compile_expression(scope, operand))) {
             return ret;
         }
-        compiler_emit_0(scope, opcode);
+        return compiler_emit_0(scope, opcode);
     }
-    return 0;
 }
 
-int compile_binary_op_assignment(struct scope_handler_t *scope, ast_node_binary_op_t *expr_node,
-                                 ast_node_expr_t *l, ast_node_expr_t *r) {
+int compile_binary_op_assignment(struct scope_handler_t *scope, ast_node_binary_op_t *expr_node) {
     UNUSED(expr_node)
     int ret = 0;
     opcode_t opcode = 0;
     opcode_t cast_opcode = 0;
     static_type_t var_type = 0;
     const struct scope_var_t *var = 0;
-    int res = ast_node_trace_data_type(scope, r);
+    int res = ast_node_trace_data_type(scope, expr_node->right);
     if (res) {
         compiler_panic("unable to determine node type");
     }
-    static_type_t r_type = EXPR_NODE_STATIC_TYPE(r);
-    ast_node_ident_t *l_ident = (ast_node_ident_t *) l;
+    static_type_t r_type = EXPR_NODE_STATIC_TYPE(expr_node->right);
+    ast_node_ident_t *l_ident = (ast_node_ident_t *) expr_node->left;
     var = frame_lookup_var_by_name(scope, l_ident->value, 1);
 
     if (var && var->static_type != r_type) {
@@ -105,21 +98,21 @@ int compile_binary_op_assignment(struct scope_handler_t *scope, ast_node_binary_
 
     OPCODE_SAVE(var_type, &opcode)
     ubyte_t index = var->index;
-    if ((ret = compile_expression(scope, r)) != 0) {
+    if ((ret = compile_expression(scope, expr_node->right)) != 0) {
         return ret;
     }
     if (cast_opcode) {
-        compiler_emit_0(scope, cast_opcode);
+        if ((ret = compiler_emit_0(scope, cast_opcode)) != 0) {
+            return ret;
+        }
     }
-    compiler_emit_1(scope, opcode, index);
-    return 0;
+    return compiler_emit_1(scope, opcode, index);
 }
 
-int compile_function_call(struct scope_handler_t *scope, ast_node_binary_op_t *expr_node,
-                          ast_node_expr_t *l, ast_node_expr_t *r) {
-    if (l->type == AST_NODE_TYPE_IDENT) {
+int compile_function_call(struct scope_handler_t *scope, ast_node_binary_op_t *expr_node) {
+    if (expr_node->left->type == AST_NODE_TYPE_IDENT) {
         opcode_t opcode = OPCODE_CALL;
-        ast_node_ident_t *ident = (ast_node_ident_t *) l;
+        ast_node_ident_t *ident = (ast_node_ident_t *) expr_node->left;
         const struct func_desc_t *func_desc = 0;
         func_desc = compiler_lookup_func_by_name(ident->value);
         if (!func_desc) {
@@ -129,16 +122,15 @@ int compile_function_call(struct scope_handler_t *scope, ast_node_binary_op_t *e
         const char *func_signature = func_desc->signature;
         const_pool_index_by_value(func_signature, &func_sig_index);
 
-        if (r->type != AST_NODE_TYPE_GROUP) {
+        if (expr_node->right->type != AST_NODE_TYPE_GROUP) {
             compiler_panic("group was expected as the right part of the function call operator");
         }
-        ast_node_group_t *r_group = (ast_node_group_t *) r;
+        ast_node_group_t *r_group = (ast_node_group_t *) expr_node->right;
         ast_node_expr_t *current_arg = r_group->expr;
         while (current_arg) {
             if (current_arg->type == AST_NODE_TYPE_BINARY_OP) {
                 ast_node_binary_op_t *current_arg_bin = (ast_node_binary_op_t *) current_arg;
                 if (current_arg_bin->operator == COMMA) {
-                    printf("%s:%d : compiling comma expression\n", __FILE__, __LINE__);
                     compile_expression(scope, current_arg_bin->left);
                     current_arg = current_arg_bin->right;
                     continue;
@@ -146,29 +138,23 @@ int compile_function_call(struct scope_handler_t *scope, ast_node_binary_op_t *e
                     compiler_panic("unexpected binary operator in function args");
                 }
             }
-            printf("%s:%d : compiling expression\n", __FILE__, __LINE__);
             compile_expression(scope, current_arg);
             break;
         }
-        printf("%s:%d : call compiled, writing opcode\n", __FILE__, __LINE__);
-        compiler_emit_2(scope, opcode, func_sig_index >> 8u, (ubyte_t) func_sig_index);
-        printf("call compiled, writed opcode\n");
-        return 0;
+        return compiler_emit_2(scope, opcode, func_sig_index >> 8u, (ubyte_t) func_sig_index);
     } else {
         compiler_panic("dont know how to build member function call yet");
     }
 }
 
 int compile_binary_op(struct scope_handler_t *scope, ast_node_binary_op_t *expr_node) {
-    ast_node_expr_t *r = expr_node->right;
-    ast_node_expr_t *l = expr_node->left;
     if (expr_node->operator == ASSIGNMENT) {
         // assingment operation is opcoded differently
-        return compile_binary_op_assignment(scope, expr_node, l, r);
+        return compile_binary_op_assignment(scope, expr_node);
     }
     if (expr_node->operator == FUNCTION_CALL) {
         // call function of the object or the static one
-        return compile_function_call(scope, expr_node, l, r);
+        return compile_function_call(scope, expr_node);
     }
     unsigned char opcode = 0;
     ast_node_trace_data_type(scope, (ast_node_expr_t *) expr_node);
@@ -191,14 +177,13 @@ int compile_binary_op(struct scope_handler_t *scope, ast_node_binary_op_t *expr_
     } else {
         // typical binary operator
         int ret = 0;
-        if ((ret = compile_expression(scope, l))) {
+        if ((ret = compile_expression(scope, expr_node->left))) {
             return ret;
         }
-        if ((ret = compile_expression(scope, r))) {
+        if ((ret = compile_expression(scope, expr_node->right))) {
             return ret;
         }
-        compiler_emit_0(scope, opcode);
-        return 0;
+        return compiler_emit_0(scope, opcode);
     }
 }
 
@@ -207,8 +192,7 @@ int compile_special_cast(struct scope_handler_t *scope, ast_node_special_cast_t 
     if ((ret = compile_expression(scope, expr_node->operand))) {
         return ret;
     }
-    compiler_emit_0(scope, expr_node->opcode);
-    return 0;
+    return compiler_emit_0(scope, expr_node->opcode);
 }
 
 int compile_expression(struct scope_handler_t *scope, ast_node_expr_t *expr_node) {

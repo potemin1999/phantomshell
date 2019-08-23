@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <stdlib.h>
+#include "lib.h"
 #include "vm/vm.h"
 #include "compiler.h"
 

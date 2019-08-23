@@ -7,10 +7,8 @@
  * GNU Lesser General Public License v3.0
  */
 
-
+#include "lib.h"
 #include "lexer.h"
-#include <string.h>
-#include <stdlib.h>
 #include "generated/y.tab.h"
 #include "parser.h"
 #include "compiler.h"

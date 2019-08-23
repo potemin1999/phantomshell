@@ -7,7 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <stdlib.h>
+#include "lib.h"
 #include "compiler.h"
 #include "lexer.h"
 
@@ -55,7 +55,7 @@ int compile_if_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_n
         uint16_t offset_be = htobe16(offset_raw);
         uint8_t data[3];
         memcpy(&data[0], &opcode, 1);
-        memcpy(&data[1], &offset_be, 1);
+        memcpy(&data[1], &offset_be, 2);
         true_emitter.emitter_func(&true_emitter, 3, &data);
     }
     if (true_scope.emitter->size > UINT16_MAX) {

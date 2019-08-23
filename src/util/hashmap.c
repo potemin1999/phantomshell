@@ -7,8 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include "lib.h"
 #include "hashmap.h"
 
 #define INITIAL_MAP_CAP 128

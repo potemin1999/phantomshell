@@ -7,18 +7,16 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
+#include "lib.h"
 #include "compiler.h"
 #include "parser.h"
 #include "operator.h"
 #include "lexer.h"
 #include "vm/runtime.h"
 
-#define AST_NEW_NODEnt(type_name, var_name, node_type)              \
-    size_t size = AST_NODE_##type_name##_SIZE;               \
-    ast_node_##type_name##_t *(var_name);                          \
+#define AST_NEW_NODEnt(type_name, var_name, node_type)         \
+    size_t size = AST_NODE_##type_name##_SIZE;                 \
+    ast_node_##type_name##_t *(var_name);                      \
     (var_name) = (ast_node_##type_name##_t *) malloc(size);    \
     (var_name)->type = __AST_NODE_TYPE_##node_type;            \
     (var_name)->flags = 0;                                     \
@@ -170,6 +168,7 @@ ast_node_t *ast_new_node_group(ast_node_t *expr) {
     NODE_UPCAST_EXPR(expr, &expr_node)
     ASSERT_NON_NULL(expr_node, "group expr cast failed")
     AST_NEW_NODE(group)
+    node->static_type = 0;
     node->type = AST_NODE_TYPE_GROUP;
     node->expr = expr_node;
     TRACE_AND_FREE(ast_node_to_string((ast_node_t *) node))
@@ -1023,7 +1022,7 @@ NODE_TO_STRING_FUNC(special_cast) {
 #endif
 
 void yyerror(const char *str) {
-    fprintf(stderr, "Parsing error: %s\n", str);
+    fprintf(stdout, "Parsing error: %s\n", str);
 }
 
 int yywrap() {

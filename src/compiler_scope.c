@@ -6,7 +6,7 @@
  * which is child project of Phantom OS.
  * GNU Lesser General Public License v3.0
  */
-#include <stdlib.h>
+#include "lib.h"
 #include "compiler.h"
 #include "lexer.h"
 
@@ -35,7 +35,7 @@ struct scope_handler_t *compiler_get_root_frame() {
             struct bytecode_emitter_t emitter = compiler_emitter_unbuffered_new();
             emitter_copy = (struct bytecode_emitter_t *) malloc(sizeof(struct bytecode_emitter_t));
             memcpy(emitter_copy, &emitter, sizeof(struct bytecode_emitter_t));
-        }else {
+        } else {
             struct bytecode_emitter_t emitter = compiler_emitter_buffered_new(4096);
             emitter_copy = (struct bytecode_emitter_t *) malloc(sizeof(struct bytecode_emitter_t));
             memcpy(emitter_copy, &emitter, sizeof(struct bytecode_emitter_t));

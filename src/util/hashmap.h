@@ -10,7 +10,7 @@
 #ifndef PHANTOMSHELL_HASHMAP_H
 #define PHANTOMSHELL_HASHMAP_H
 
-#include "../types.h"
+#include "types.h"
 
 typedef void *any_t;
 

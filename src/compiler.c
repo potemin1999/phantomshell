@@ -7,9 +7,7 @@
  * GNU Lesser General Public License v3.0
  */
 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <sys/time.h>
+#include "lib.h"
 #include "parser.h"
 #include "vm/opcodes.h"
 #include "compiler.h"

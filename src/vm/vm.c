@@ -6,12 +6,7 @@
  * which is child project of Phantom OS.
  * GNU Lesser General Public License v3.0
  */
-#include <stdarg.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <endian.h>
-#include <sys/time.h>
+#include "lib.h"
 #include "vm/vm.h"
 #include "util/hashmap.h"
 
@@ -47,7 +42,6 @@ static inline void vm_execution_trace(const char *format, ...) {
     UNUSED(format)
 }
 #else
-#include <stdarg.h>
 static inline void vm_execution_trace(const char *format, ...) {
     printf("\033[34m\033[1mPSVM:\033[21m\033[24m ");
     va_list list;
@@ -69,9 +63,9 @@ int vm_execute_opcode(opcode_t opcode, void *data) {
 
 int vm_execute_opcodes(size_t data_len, void *data) {
     printf("\033[2m\033[36mPSVM: pushed %zu bytes to execution:", data_len);
-    struct timeval interval_1;
-    struct timeval interval_2;
-    gettimeofday(&interval_1, 0);
+    //struct timeval interval_1;
+    //struct timeval interval_2;
+    //gettimeofday(&interval_1, 0);
 
     ubyte_t *data_bytes = (ubyte_t *) data;
     for (size_t i = 0; i < data_len; i++) {
@@ -87,33 +81,31 @@ int vm_execute_opcodes(size_t data_len, void *data) {
         pc += res;
     }
 
-    gettimeofday(&interval_2, 0);
-    long start_time = interval_1.tv_sec * (int) 1e6 + interval_1.tv_usec;
-    long end_time = interval_2.tv_sec * (int) 1e6 + interval_2.tv_usec;
-    printf("\033[2m\033[36mPSVM: %zu bytes executed in %ld microseconds \033[0m\n",
-           data_len, (end_time - start_time));
+    //gettimeofday(&interval_2, 0);
+    //long start_time = interval_1.tv_sec * (int) 1e6 + interval_1.tv_usec;
+    //long end_time = interval_2.tv_sec * (int) 1e6 + interval_2.tv_usec;
+    //printf("\033[2m\033[36mPSVM: %zu bytes executed in %ld microseconds \033[0m\n",
+    //       data_len, (end_time - start_time));
     return (int) pc;
 }
 
 
 vm_pc_t vm_execute_opcode_isave(vm_frame_context_t *frame, void *data) {
-    ubyte_t *byte_data = (ubyte_t *) data;
-    ubyte_t index = byte_data[0];
+    ubyte_t index = ((ubyte_t *) data)[0];
     int32_t *value_ptr = (int32_t *) (frame->stack_ptr - 4);
-    *((int32_t *) (frame->local_start + index)) = *value_ptr;
+    *((int32_t *) (frame->local_start + index * 4)) = *value_ptr;
     frame->stack_ptr -= 4;
     vm_execution_trace("isave     : %d to [%u]", *value_ptr, index);
     return 2;
 }
 
 vm_pc_t vm_execute_opcode_iload(vm_frame_context_t *frame, void *data) {
-    ubyte_t *byte_data = (ubyte_t *) data;
-    ubyte_t index = byte_data[0];
-    int32_t value = *((int32_t *) (frame->local_start + index));
+    ubyte_t index = ((ubyte_t *) data)[0];
+    int32_t value = *((int32_t *) (frame->local_start + index * 4));
     int32_t *int_stack_ptr = (int32_t *) frame->stack_ptr;
     *int_stack_ptr = value;
     frame->stack_ptr += 4;
-    vm_execution_trace("iload     : %d from [%u]", value, index);
+    vm_execution_trace("iload     : %d from [%u]", *int_stack_ptr, index);
     return 2;
 }
 
@@ -253,7 +245,7 @@ vm_pc_t vm_execute_opcode_fsave(vm_frame_context_t *frame, void *data) {
     ubyte_t *byte_data = (ubyte_t *) data;
     ubyte_t index = byte_data[0];
     float_t *value_ptr = (float_t *) (frame->stack_ptr - 4);
-    *((float_t *) (frame->local_start + index)) = *value_ptr;
+    *((float_t *) (frame->local_start + index * 4)) = *value_ptr;
     frame->stack_ptr -= 4;
     vm_execution_trace("fsave     : %f to [%u]", *value_ptr, index);
     return 2;
@@ -262,7 +254,7 @@ vm_pc_t vm_execute_opcode_fsave(vm_frame_context_t *frame, void *data) {
 vm_pc_t vm_execute_opcode_fload(vm_frame_context_t *frame, void *data) {
     ubyte_t *byte_data = (ubyte_t *) data;
     ubyte_t index = byte_data[0];
-    float_t value = *((float_t *) (frame->local_start + index));
+    float_t value = *((float_t *) (frame->local_start + index * 4));
     float_t *float_stack_ptr = (float_t *) frame->stack_ptr;
     *float_stack_ptr = value;
     frame->stack_ptr += 4;
@@ -376,9 +368,8 @@ vm_pc_t vm_execute_opcode_call(vm_frame_context_t *frame, void *data) {
     }
 
     //TODO: fix stack size counter
-    char *stack = (char *) malloc(64);
-    printf("%s:%d : malloc %u \n", __FILE__, __LINE__, func_handle->vars_size);
-    char *vars = (char *) malloc(func_handle->vars_size);
+    uint8_t *stack = (uint8_t *) malloc(64);
+    uint8_t *vars = (uint8_t *) malloc(func_handle->vars_size);
     uint16_t arg_size = func_handle->arg_size;
 
     memcpy(vars, current_frame->stack_ptr - arg_size, arg_size);
@@ -394,6 +385,9 @@ vm_pc_t vm_execute_opcode_call(vm_frame_context_t *frame, void *data) {
     //TODO: make a workaround without recursion
     vm_execution_trace("call      : %d", h_index);
     vm_execute_opcodes(func_handle->bytecode_size - 4, func_handle->bytecode_data + 4);
+    free(current_frame->stack_start);
+    free(current_frame->local_start);
+    current_frame--;
     return 3;
 }
 

@@ -10,7 +10,7 @@
 #ifndef SHELL_LEXER_H
 #define SHELL_LEXER_H
 
-#include <bits/types/FILE.h>
+#include "lib.h"
 #include "types.h"
 #include "operator.h"
 

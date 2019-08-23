@@ -6,9 +6,7 @@
  * which is child project of Phantom OS.
  * GNU Lesser General Public License v3.0
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
+#include "lib.h"
 #include "vm/vm.h"
 #include "lexer.h"
 #include "compiler.h"

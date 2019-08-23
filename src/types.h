@@ -10,8 +10,7 @@
 #ifndef SHELL_TYPES_H
 #define SHELL_TYPES_H
 
-#include <stdint-gcc.h>
-#include <uchar.h>
+#include "lib.h"
 
 #define TYPE_UNKNWN 0b0000
 #define TYPE_NONE   0b1111
