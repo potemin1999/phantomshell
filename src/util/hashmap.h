@@ -16,15 +16,15 @@ typedef void *any_t;
 
 typedef void *map_t;
 
-typedef void *map_interator_t;
+typedef void *map_iterator_t;
 
 map_t hashmap_new();
 
 int hashmap_delete(map_t m);
 
-map_interator_t hashmap_iterator_new(map_t m);
+map_iterator_t hashmap_iterator_new(map_t m);
 
-int hashmap_interator_delete(map_interator_t iter);
+int hashmap_iterator_delete(map_iterator_t iter);
 
 int hashmap_put(map_t m, const char *key, any_t value);
 

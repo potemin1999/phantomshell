@@ -12,8 +12,11 @@
 
 #include "opcodes.h"
 
+#define EXIT_CODE_VM_PANIC 255
+#define CALL_STACK_MAX_SIZE 128
+
 typedef uint16_t vm_pool_const_t;
-typedef uint64_t vm_pc_t;
+typedef int64_t vm_pc_t;
 
 typedef struct {
     // current program counter
@@ -45,16 +48,12 @@ typedef struct {
     void *bytecode_data;
 } vm_func_handle_t;
 
-typedef vm_pc_t (*vm_opcode_execute_func_t)(vm_frame_context_t *frame, void *data);
-
 int vm_static_init();
 
-__attribute((noreturn))
-__attribute((noinline))
+__attribute((noreturn)) __attribute((noinline))
 int vm_do_panic(vm_frame_context_t *frame, void *data, const char *format, ...);
 
-int vm_execute_opcode(opcode_t opcode, void *data);
-
+__attribute((noinline))
 int vm_execute_opcodes(size_t data_len, void *data);
 
 int vm_register_constant(size_t const_size, const char *constant, vm_pool_const_t *out_index);

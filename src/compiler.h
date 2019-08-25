@@ -22,11 +22,7 @@
 #define COMPILE_UNEXPECTED_NODE     0x80
 #define COMPILE_NODE_QUEUE_OVERFLOW 0x81
 
-struct execution_queue_t {
-    size_t cap, size;
-    size_t execution, free;
-    struct ast_node_t *q[256];
-};
+extern const int32_t opcode_to_stack_inc_map[OPCODES_COUNT];
 
 struct scope_var_t {
     uint64_t static_type;
@@ -66,14 +62,19 @@ struct scope_handler_t {
     struct scope_handler_t *parent;
     uint8_t is_function_scope;
     struct {
+        // stack size inherited from parent scope at the initialization
         size_t stack_cap, stack_size;
+        // stack max size holds required stack depth, is this is a root scope
         size_t stack_max_size;
+        // this pointer holds and address of root scope stack_max_size
+        size_t *stack_max_size_ptr;
         struct stack_var_t *stack;
     };
     struct {
         size_t vars_off;
         size_t vars_size, vars_cap;
         size_t vars_max_size;
+        size_t *vars_max_size_ptr;
         struct scope_var_t *vars;
     };
     struct bytecode_emitter_t *emitter;
@@ -143,6 +144,10 @@ const struct scope_var_t *frame_define_var(struct scope_handler_t *scope,
 void frame_init_scope(struct scope_handler_t *scope);
 
 void frame_destroy_scope(struct scope_handler_t *scope);
+
+int32_t frame_increment_stack_size(struct scope_handler_t *scope, int32_t push_object_size);
+
+struct scope_handler_t *frame_find_root_scope(struct scope_handler_t *current_scope);
 
 // Funcs
 

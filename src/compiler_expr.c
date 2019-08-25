@@ -18,19 +18,23 @@ int compile_global_statement(ast_node_stat_t *node);
 int compile_global_func(ast_node_decl_func_t *node);
 
 int compile_literal_int(struct scope_handler_t *scope, ast_node_literal_t *liter_node) {
-    uint8_t data[5];
+    const size_t data_length = 5;
+    uint8_t data[data_length];
     uint32_t h_int_val = (uint32_t) liter_node->int_val;
     uint32_t be_int_val = htobe32(h_int_val);
     data[0] = OPCODE_ICONST;
     memcpy(data + 1, &be_int_val, 4);
-    return compiler_emit_n(scope, 5, &data);
+    frame_increment_stack_size(scope, opcode_to_stack_inc_map[OPCODE_ICONST]);
+    return compiler_emit_n(scope, data_length, &data);
 }
 
 int compile_literal_float(struct scope_handler_t *scope, ast_node_literal_t *liter_node) {
-    uint8_t data[5];
+    const size_t data_length = 5;
+    uint8_t data[data_length];
     data[0] = OPCODE_FCONST;
     memcpy(data + 1, &(liter_node->float_val), 4);
-    return compiler_emit_n(scope, 5, &data);
+    frame_increment_stack_size(scope, opcode_to_stack_inc_map[OPCODE_FCONST]);
+    return compiler_emit_n(scope, data_length, &data);
 }
 
 int compile_ident(struct scope_handler_t *scope, ast_node_ident_t *ident_node) {
@@ -38,6 +42,7 @@ int compile_ident(struct scope_handler_t *scope, ast_node_ident_t *ident_node) {
     if (var) {
         opcode_t opcode;
         OPCODE_LOAD(var->static_type, &opcode)
+        frame_increment_stack_size(scope, opcode_to_stack_inc_map[opcode]);
         return compiler_emit_1(scope, opcode, var->index);
     } else {
         return 1;
@@ -45,13 +50,14 @@ int compile_ident(struct scope_handler_t *scope, ast_node_ident_t *ident_node) {
 }
 
 int compile_group(struct scope_handler_t *scope, ast_node_group_t *group_node) {
-    return compile_expression(scope, (ast_node_expr_t *) group_node->expr);
+    return compile_expression(scope, group_node->expr);
 }
 
 int compile_unary_op(struct scope_handler_t *scope, ast_node_unary_op_t *expr_node) {
     int ret = 0;
     ast_node_expr_t *operand = expr_node->operand;
-    unsigned char opcode = int_operator_to_opcode(expr_node->operator);
+    //TODO: support other unary operands and check stack size change
+    opcode_t opcode = int_operator_to_opcode(expr_node->operator);
     if (opcode == 0) {
         compiler_panic("unable to compile unary op");
     } else {
@@ -59,6 +65,7 @@ int compile_unary_op(struct scope_handler_t *scope, ast_node_unary_op_t *expr_no
         if ((ret = compile_expression(scope, operand))) {
             return ret;
         }
+        frame_increment_stack_size(scope, opcode_to_stack_inc_map[opcode]);
         return compiler_emit_0(scope, opcode);
     }
 }
@@ -102,10 +109,12 @@ int compile_binary_op_assignment(struct scope_handler_t *scope, ast_node_binary_
         return ret;
     }
     if (cast_opcode) {
+        frame_increment_stack_size(scope, opcode_to_stack_inc_map[cast_opcode]);
         if ((ret = compiler_emit_0(scope, cast_opcode)) != 0) {
             return ret;
         }
     }
+    frame_increment_stack_size(scope, opcode_to_stack_inc_map[opcode]);
     return compiler_emit_1(scope, opcode, index);
 }
 
@@ -141,7 +150,11 @@ int compile_function_call(struct scope_handler_t *scope, ast_node_binary_op_t *e
             compile_expression(scope, current_arg);
             break;
         }
-        return compiler_emit_2(scope, opcode, func_sig_index >> 8u, (ubyte_t) func_sig_index);
+        const uint32_t hi_byte_shift = 8U;
+        const uint32_t lo_byte_shift = 0U;
+        ubyte_t index_hi = (ubyte_t) (func_sig_index >> hi_byte_shift);
+        ubyte_t index_lo = (ubyte_t) (func_sig_index >> lo_byte_shift);
+        return compiler_emit_2(scope, opcode, index_hi, index_lo);
     } else {
         compiler_panic("dont know how to build member function call yet");
     }
@@ -183,6 +196,7 @@ int compile_binary_op(struct scope_handler_t *scope, ast_node_binary_op_t *expr_
         if ((ret = compile_expression(scope, expr_node->right))) {
             return ret;
         }
+        frame_increment_stack_size(scope, opcode_to_stack_inc_map[opcode]);
         return compiler_emit_0(scope, opcode);
     }
 }
@@ -192,6 +206,7 @@ int compile_special_cast(struct scope_handler_t *scope, ast_node_special_cast_t 
     if ((ret = compile_expression(scope, expr_node->operand))) {
         return ret;
     }
+    frame_increment_stack_size(scope, opcode_to_stack_inc_map[expr_node->opcode]);
     return compiler_emit_0(scope, expr_node->opcode);
 }
 

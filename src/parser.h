@@ -78,7 +78,8 @@ typedef string_t (*to_string_func)(struct ast_node_t *);
     NODE_TO_STRING_FUNC(name);
 
 #define DEF_AST_NODEe(name, body) \
-    typedef struct {            \
+    typedef                     \
+    struct ast_node_##name##_t{ \
         AST_NODE_HEADER()       \
         AST_EXPR_HEADER()       \
         struct body;            \
@@ -86,7 +87,8 @@ typedef string_t (*to_string_func)(struct ast_node_t *);
     NODE_TO_STRING_FUNC(name);
 
 #define DEF_AST_NODEs(name, body) \
-    typedef struct {            \
+    typedef                     \
+    struct ast_node_##name##_t{ \
         AST_NODE_HEADER()       \
         AST_STAT_HEADER()       \
         struct body;            \
@@ -160,11 +162,11 @@ DEF_AST_NODEs(stat_expr, {
 })
 
 DEF_AST_NODEs(stat_ret, {
-    ast_node_t *expr;
+    ast_node_expr_t *expr;
 })
 
 DEF_AST_NODEs(stat_if, {
-    ast_node_t *expr;
+    ast_node_expr_t *expr;
     ast_node_scope_t *true_scope;
     ast_node_scope_t *false_scope;
 })
@@ -181,7 +183,7 @@ DEF_AST_NODE(stat_switch_choice, {
 })
 
 DEF_AST_NODEs(stat_while, {
-    ast_node_t *expr;
+    ast_node_expr_t *expr;
     ast_node_t *loop_scope;
 })
 

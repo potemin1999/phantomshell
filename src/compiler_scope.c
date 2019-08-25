@@ -20,10 +20,12 @@ struct scope_handler_t root_scope_handler = {
         .stack_size = 0,
         .stack_cap = 512,
         .stack_max_size = 0,
+        .stack_max_size_ptr = &root_scope_handler.stack_max_size,
         .stack = root_handler_stack,
         .vars_off = 0,
         .vars_size = 0,
         .vars_max_size = 0,
+        .vars_max_size_ptr = &root_scope_handler.vars_max_size,
         .vars_cap = 64,
         .vars = root_scope_vars
 };
@@ -52,11 +54,13 @@ void frame_init_scope(struct scope_handler_t *scope) {
     scope->stack_cap = 0;
     scope->stack_size = 0;
     scope->stack_max_size = 0;
+    scope->stack_max_size_ptr = 0;
     scope->vars = 0;
     scope->vars_off = 0;
     scope->vars_cap = 0;
     scope->vars_size = 0;
     scope->vars_max_size = 0;
+    scope->vars_max_size_ptr = 0;
 }
 
 void frame_destroy_scope(struct scope_handler_t *scope) {
@@ -92,16 +96,35 @@ const struct scope_var_t *frame_define_var(struct scope_handler_t *scope, static
     }
     ubyte_t index = (ubyte_t) (scope->vars_size + scope->vars_off);
     struct scope_var_t *var = &(scope->vars[scope->vars_size]);
+    scope->vars_size++;
     var->name = strdup(name);
     var->static_type = type_id;
     var->index = index;
-    scope->vars_size++;
-    struct scope_handler_t *holding_scope = scope;
-    while (holding_scope->parent && !holding_scope->is_function_scope) {
-        holding_scope = holding_scope->parent;
+    // propagate local vars max size to the root scope
+    if (scope->vars_size + scope->vars_off > *(scope->vars_max_size_ptr)) {
+        *(scope->vars_max_size_ptr) = scope->vars_size + scope->vars_off;
     }
-    holding_scope->vars_max_size++;
     return var;
+}
+
+int32_t frame_increment_stack_size(struct scope_handler_t *scope, int32_t push_object_size) {
+    scope->stack_size += push_object_size;
+    if (scope->stack_size > *(scope->stack_max_size_ptr)) {
+        *(scope->stack_max_size_ptr) = scope->stack_size;
+    }
+    return push_object_size;
+}
+
+struct scope_handler_t *frame_find_root_scope(struct scope_handler_t *current_scope) {
+    struct scope_handler_t *scope = current_scope;
+    while (scope) {
+        if (scope->parent && !scope->is_function_scope) {
+            scope = scope->parent;
+        } else {
+            return scope;
+        }
+    }
+    return scope;
 }
 
 int compile_scope(struct scope_handler_t *new_scope, ast_node_scope_t *scope_node) {
@@ -112,7 +135,7 @@ int compile_scope(struct scope_handler_t *new_scope, ast_node_scope_t *scope_nod
     ast_node_stat_t *current_stat = stats->first;
     while (current_stat) {
         compile_statement(new_scope, current_stat);
-        current_stat = (ast_node_stat_t *) current_stat->next;
+        current_stat = current_stat->next;
     }
     return 0;
 }

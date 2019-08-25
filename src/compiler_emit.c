@@ -184,7 +184,7 @@ struct bytecode_emitter_t compiler_emitter_buffered_new(size_t page_size) {
 
 static inline int compiler_emit_n_impl(struct scope_handler_t *scope, /*opcode_t opcode,*/ size_t len, void *data) {
     //printf("%s:%d: emit impl \n", __FILE__, __LINE__);
-    int emit_result = scope->emitter->emitter_func(scope->emitter, len, data);
+    size_t emit_result = scope->emitter->emitter_func(scope->emitter, len, data);
     return emit_result ? 0 : (len ? 1 : 0);
 }
 

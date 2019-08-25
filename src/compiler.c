@@ -9,13 +9,7 @@
 
 #include "lib.h"
 #include "parser.h"
-#include "vm/opcodes.h"
 #include "compiler.h"
-
-struct execution_queue_t node_queue = {
-        .cap = 256,
-        .size = 0
-};
 
 struct program_file_t *current_file;
 
@@ -26,7 +20,7 @@ struct program_file_t *complier_get_current_file() {
 
 int compiler_compile_impl(ast_node_t *node) {
     struct scope_handler_t *scope = compiler_get_root_frame();
-    if ((node->type & AST_NODE_STAT_MASK) >> 6u == 0b10u) {
+    if ((node->type & AST_NODE_STAT_MASK) >> 6U == 0b10U) {
         // root statement pushed within global scope
         return compile_statement(scope, (ast_node_stat_t *) node);
     }
@@ -43,8 +37,9 @@ int compiler_compile(ast_node_t *node) {
     gettimeofday(&interval_1, 0);
     int res = compiler_compile_impl(node);
     gettimeofday(&interval_2, 0);
-    long start_time = interval_1.tv_sec * (int) 1e6 + interval_1.tv_usec;
-    long end_time = interval_2.tv_sec * (int) 1e6 + interval_2.tv_usec;
+    const int usec_mult = 1000000;
+    long start_time = interval_1.tv_sec * usec_mult + interval_1.tv_usec;
+    long end_time = interval_2.tv_sec * usec_mult + interval_2.tv_usec;
     printf("compilation finished in %ld microseconds : %d\n", (end_time - start_time), res);
     return res;
 }
@@ -69,3 +64,22 @@ void compiler_panic(const char *format, ...) {
     printf("\n");
     exit(255);
 }
+
+const int32_t opcode_to_stack_inc_map[OPCODES_COUNT] = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            // [0x00 - 0x0f]
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            // [0x10 - 0x1f]
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            // [0x20 - 0x2f]
+        0, 0, 4, -4, 4, -4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0,          // [0x30 - 0x3f]
+        0, 0, -4, -4, -4, -4, 0, 0, 0, 0, -4, -4, -4, -4, -4, -4,  // [0x40 - 0x4f]
+        -4, -4, -4, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,        // [0x50 - 0x5f]
+        -2, -2, -4, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,        // [0x60 - 0x6f]
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            // [0x70 - 0x7f]
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            // [0x80 - 0x8f]
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            // [0x90 - 0x9f]
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            // [0xa0 - 0xaf]
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            // [0xb0 - 0xbf]
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            // [0xc0 - 0xcf]
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            // [0xd0 - 0xdf]
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            // [0xe0 - 0xef]
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            // [0xf0 - 0xff]
+};

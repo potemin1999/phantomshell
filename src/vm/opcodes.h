@@ -13,11 +13,12 @@
 #include "operator.h"
 
 typedef unsigned char opcode_t;
+#define OPCODES_COUNT 256
 
 /** Does nothing */
 #define OPCODE_NOP      0x00
 #define OPCODE_EXSTK    0x10 // 16 // expands stack capacity
-#define OPCODE_LDC      0x20 // 32 // loads constant from index saved in two next bytes
+//#define OPCODE_LDC      0x20 // 32 // loads constant from index saved in two next bytes
 
 /** LOAD or SAVE
  * puts/loads something from/to local variable storage
@@ -60,7 +61,7 @@ typedef unsigned char opcode_t;
 // (v_1 -> ) : int operand on the stack, moves pc by offset written in two next bytes
 #define OPCODE_JMP      0x60 // 96 // moves pc always
 #define OPCODE_RJMP     0x61 // 96 // moves pc on the other side
-#define OPCODE_LJMP     0x61 // 97 // moves pc, offset written if 4 bytes
+//#define OPCODE_LJMP     0x61 // 97 // moves pc, offset written if 4 bytes
 #define OPCODE_JEZ      0x62 // 98 // moves pc if operand==0
 #define OPCODE_JNEZ     0x63 // 99 // moves pc if operand!=0
 
@@ -97,15 +98,5 @@ opcode_t float_operator_to_opcode(int oper);
         }                                                   \
     }
 
-#define OPCODE_CONST(type_id, opcode_p)                      \
-    switch (type_id){                                        \
-        case TYPE_BOOL:\
-        case TYPE_INT: { *(opcode_p) = OPCODE_ICONST; break;}  \
-        case TYPE_FLOAT: { *(opcode_p) = OPCODE_FCONST; break;}\
-        default: {                                          \
-            printf("unable to const type %lu",type_id);     \
-            *(opcode_p) = 0;                                  \
-        }                                                   \
-    }
 
 #endif //SHELL_OPCODES_H
