@@ -20,7 +20,7 @@ size_t emitter_emit_unbuffered(struct bytecode_emitter_t *emitter, /*opcode_t op
 
     //vm_execute_opcode(opcode, data);
     vm_execute_opcodes(n, data);
-    return 0;
+    return n;
 }
 
 struct bytecode_emitter_t compiler_emitter_unbuffered_new() {
@@ -184,9 +184,8 @@ struct bytecode_emitter_t compiler_emitter_buffered_new(size_t page_size) {
 
 static inline int compiler_emit_n_impl(struct scope_handler_t *scope, /*opcode_t opcode,*/ size_t len, void *data) {
     //printf("%s:%d: emit impl \n", __FILE__, __LINE__);
-    ubyte_t array[len];
-    memcpy(array, data, len);
-    return (int) scope->emitter->emitter_func(scope->emitter, len, data) ? 0 : (len ? 1 : 0);
+    int emit_result = scope->emitter->emitter_func(scope->emitter, len, data);
+    return emit_result ? 0 : (len ? 1 : 0);
 }
 
 int compiler_emit_0(struct scope_handler_t *scope, opcode_t opcode) {
@@ -215,7 +214,5 @@ int compiler_emit_2(struct scope_handler_t *scope, opcode_t opcode, ubyte_t byte
 
 int compiler_emit_n(struct scope_handler_t *scope, size_t len, void *data) {
     //compiler_add_commentf(scope, "\033[32m op[%zu] : %s;\033[0m\n", len, get_opcode_mnemonic(opcode));
-    ubyte_t array[len];
-    memcpy(array, data, len);
     return compiler_emit_n_impl(scope, len, data);
 }
