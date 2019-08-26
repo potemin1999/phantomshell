@@ -1,5 +1,12 @@
 .idea/
+.sonar/
 build/
 cmake-build-debug/
 cmake-build-release/
 docs/doxydocs/html/
+lib/*
+src/generated/*
+!src/generated/y.tab.h
+src/util/list.h
+src/util/list_dlinked.c
+src_cpp/*
