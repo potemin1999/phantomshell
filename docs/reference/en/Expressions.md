@@ -18,4 +18,4 @@ Operators
 Expressions can be described as a sequence of [operators][1] and operands
 Operands are identifiers, literals or other expressions. 
 
-[1]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/en/Operators.md
+[1]: Operators.md

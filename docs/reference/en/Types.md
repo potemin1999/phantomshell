@@ -23,5 +23,5 @@ There is 5 basic types of data and 2 derived ones:
     * float   + char    = string 
     * сhar    + string  = string 
     
-[1]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/en/Objects.md
-[2]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/en/Arrays.md
+[1]: Objects.md
+[2]: Arrays.md

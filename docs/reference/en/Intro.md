@@ -14,8 +14,8 @@ You can use it in scripts also, to maintain common style of code, but it is not 
  * [Statements][4]
  * [Functions][5]
  
- [1]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/en/Comments.md
- [2]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/en/Types.md
- [3]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/en/Expressions.md
- [4]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/en/Statements.md
- [5]: https://github.com/potemin1999/phantomshell/tree/master/docs/reference/en/Functions.md
+ [1]: Comments.md
+ [2]: Types.md
+ [3]: Expressions.md
+ [4]: Statements.md
+ [5]: Functions.md
