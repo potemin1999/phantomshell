@@ -18,16 +18,19 @@ int compile_ret_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_
 }
 
 int compile_if_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_node) {
+    struct scope_handler_t *root_scope = frame_find_root_scope(scope);
     struct bytecode_emitter_t true_emitter = compiler_emitter_buffered_new(512);
     struct bytecode_emitter_t false_emitter = compiler_emitter_buffered_new(512);
-    compile_expression(scope, (ast_node_expr_t *) if_node->expr);
+    compile_expression(scope, if_node->expr);
     struct scope_handler_t true_scope;
     struct scope_var_t true_scope_vars[128];
+    frame_init_scope(&true_scope);
     true_scope.vars = true_scope_vars;
     true_scope.vars_cap = scope->vars_cap;
     true_scope.vars_off = scope->vars_size + scope->vars_off;
-    true_scope.vars_max_size = 0;
-    true_scope.vars_size = 0;
+    true_scope.vars_max_size_ptr = &(root_scope->vars_max_size);
+    true_scope.stack_size = scope->stack_size;
+    true_scope.stack_max_size_ptr = &(root_scope->stack_max_size);
     true_scope.parent = scope;
     true_scope.emitter = &true_emitter;
     true_scope.is_function_scope = 0;
@@ -35,17 +38,19 @@ int compile_if_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_n
     //printf("true scope was compiled : %zu\n", true_emitter.size);
     struct scope_handler_t false_scope;
     struct scope_var_t false_scope_vars[128];
+    frame_init_scope(&false_scope);
     false_scope.vars = false_scope_vars;
     false_scope.vars_cap = scope->vars_cap;
     false_scope.vars_off = scope->vars_size + scope->vars_off;
-    true_scope.vars_max_size = 0;
-    false_scope.vars_size = 0;
+    false_scope.vars_max_size_ptr = &(root_scope->vars_max_size);
+    false_scope.stack_size = scope->stack_size;
+    false_scope.stack_max_size_ptr = &(root_scope->stack_max_size);
     false_scope.parent = scope;
     false_scope.emitter = &false_emitter;
     false_scope.is_function_scope = 0;
     compile_scope(&false_scope, if_node->false_scope);
     //printf("false scope was compiled : %zu\n", false_emitter.size);
-    if (false_scope.emitter->size > 65536) {
+    if (false_scope.emitter->size > UINT16_MAX) {
         //TODO: handle long jump
         //uint32_t offset = false_scope.emitter->size;
         //true_emitter.emitter_func(&true_emitter, OPCODE_LJMP, 4, &offset);
@@ -63,7 +68,7 @@ int compile_if_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_n
     } else {
         size_t true_size = true_emitter.size;
         size_t false_size = false_emitter.size;
-        ubyte_t hi = (ubyte_t) ((uint32_t) true_size) >> 8u;
+        ubyte_t hi = (ubyte_t) ((uint32_t) true_size) >> 8U;
         ubyte_t lo = (ubyte_t) ((uint32_t) true_size);
         ubyte_t *exec_data = (ubyte_t *) malloc(true_size + false_size + 3);
         exec_data[0] = OPCODE_JEZ;
@@ -83,22 +88,23 @@ int compile_if_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_n
 }
 
 int compile_while_statement(struct scope_handler_t *scope, ast_node_stat_while_t *while_stat) {
+    struct scope_handler_t *root_scope = frame_find_root_scope(scope);
     struct bytecode_emitter_t expr_emitter = compiler_emitter_buffered_new(256);
     struct bytecode_emitter_t body_emitter = compiler_emitter_buffered_new(512);
     struct bytecode_emitter_t *saved_expr_emitter = scope->emitter;
     //TODO: while condition can affect body variables, make new scope
     scope->emitter = &expr_emitter;
     size_t expr_vars_size = scope->vars_size;
-    //TODO: make while expr of type expr_t
-    compile_expression(scope, (ast_node_expr_t *) while_stat->expr);
+    compile_expression(scope, while_stat->expr);
     scope->vars_size = expr_vars_size;
     struct scope_handler_t body_scope;
     struct scope_var_t body_vars[128];
+    frame_init_scope(&body_scope);
     body_scope.vars = body_vars;
     body_scope.vars_cap = scope->vars_cap;
     body_scope.vars_off = scope->vars_size + scope->vars_off;
-    body_scope.vars_max_size = 0;
-    body_scope.vars_size = 0;
+    body_scope.vars_max_size_ptr = &(root_scope->vars_max_size);
+    body_scope.stack_max_size_ptr = &(root_scope->stack_max_size);
     body_scope.parent = scope;
     body_scope.emitter = &body_emitter;
     body_scope.is_function_scope = 0;
@@ -114,9 +120,9 @@ int compile_while_statement(struct scope_handler_t *scope, ast_node_stat_while_t
         size_t body_size = body_emitter.size;
         // jmp size + jez size + expr size + body size;
         size_t sum_size = expr_size + body_size + 3 + 3;
-        ubyte_t backjump_hi = (ubyte_t) ((uint32_t) sum_size) >> 8u;
+        ubyte_t backjump_hi = (ubyte_t) ((uint32_t) sum_size) >> 8U;
         ubyte_t backjump_lo = (ubyte_t) ((uint32_t) sum_size);
-        ubyte_t overjump_hi = (ubyte_t) ((uint32_t) body_size + 3) >> 8u;
+        ubyte_t overjump_hi = (ubyte_t) ((uint32_t) body_size + 3) >> 8U;
         ubyte_t overjump_lo = (ubyte_t) ((uint32_t) body_size + 3);
         ubyte_t *exec_data = (ubyte_t *) malloc(sum_size);
 

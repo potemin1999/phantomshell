@@ -123,8 +123,6 @@ int ast_node_trace_binary_op_data_type(struct scope_handler_t *scope, ast_node_b
         binary_op->static_type = RUNTIME_TYPE_BOOL;
     }
     binary_op->static_type = result_type;
-    binary_op->flags &= 0b11110000u;
-    binary_op->flags |= result_type;
     return 0;
 }
 
@@ -144,7 +142,7 @@ int ast_node_trace_data_type(struct scope_handler_t *scope, ast_node_expr_t *nod
         }
         case AST_NODE_TYPE_GROUP: {
             ast_node_group_t *group_node = (ast_node_group_t *) node;
-            ast_node_expr_t *expr_node = (ast_node_expr_t *) group_node->expr;
+            ast_node_expr_t *expr_node = group_node->expr;
             if (EXPR_NODE_STATIC_TYPE(expr_node) == TYPE_UNKNWN) {
                 ast_node_trace_data_type(scope, expr_node);
             }

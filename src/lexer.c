@@ -80,9 +80,11 @@ int lexer_handle_bool(const char *text_value) {
 int lexer_handle_int(const char *text_value) {
     TRACE_TOKEN("IntegerLiteral")
     size_t len = strlen(text_value);
-    char start[len], *end;
+    char start[len + 1];
+    char *end = start;
     strcpy(start, text_value);
-    int value = (int) strtol(text_value, &end, 10);
+    const int base = 10;
+    int value = (int) strtol(text_value, &end, base);
     yylval.int_value = value;
     return IntegerLiteral;
 }
@@ -90,7 +92,8 @@ int lexer_handle_int(const char *text_value) {
 int lexer_handle_float(const char *text_value) {
     TRACE_TOKEN("FloatLiteral")
     size_t len = strlen(text_value);
-    char start[len], *end;
+    char start[len + 1];
+    char *end = start;
     strcpy(start, text_value);
     yylval.float_value = (float) strtod(start, &end);
     return FloatLiteral;

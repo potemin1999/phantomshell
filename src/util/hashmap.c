@@ -54,12 +54,12 @@ int hashmap_delete(map_t m) {
     return _MAP_OK;
 }
 
-map_interator_t hashmap_iterator_new(map_t m) {
+map_iterator_t hashmap_iterator_new(map_t m) {
     //TODO: implement
     return 0;
 }
 
-int hashmap_interator_delete(map_interator_t iter) {
+int hashmap_iterator_delete(map_iterator_t iter) {
     //TODO: implement
     return 0;
 }
@@ -114,7 +114,7 @@ int hashmap_put(map_t m, const char *key, any_t value) {
         index = hashmap_index(map, key);
     }
 
-    map->data[index].in_use = 1u;
+    map->data[index].in_use = 1U;
     map->data[index].key = key;
     map->data[index].value = value;
     ++map->size;
@@ -180,7 +180,7 @@ uint32_t string_hash(const char *str) {
     return key;
 }
 
-static uint32_t crc32_tab[] = {
+static const uint32_t crc32_tab[] = {
         0x00000000L, 0x77073096L, 0xee0e612cL, 0x990951baL, 0x076dc419L,
         0x706af48fL, 0xe963a535L, 0x9e6495a3L, 0x0edb8832L, 0x79dcb8a4L,
         0xe0d5e91eL, 0x97d2d988L, 0x09b64c2bL, 0x7eb17cbdL, 0xe7b82d07L,

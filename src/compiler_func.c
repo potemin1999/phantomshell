@@ -32,9 +32,10 @@ const struct func_desc_t *compiler_define_func(ast_node_decl_func_t *func_node) 
         func->args_count++;
         current = current->next;
     }
-    char *signature_buffer = malloc(1536);
+    const size_t buffer_size = 1536;
+    char signature_buffer[buffer_size];
     char *buffer_ptr = signature_buffer;
-    bzero(signature_buffer, 1536);
+    bzero(signature_buffer, buffer_size);
     strcpy(buffer_ptr, func_node->name);
     buffer_ptr += strlen(func_node->name);
 
@@ -61,7 +62,11 @@ const struct func_desc_t *compiler_define_func(ast_node_decl_func_t *func_node) 
         free(type_signature);
         buffer_ptr += type_signature_len;
     }
-    func->signature = signature_buffer;
+    size_t copy_size = buffer_ptr - signature_buffer + 1;
+    char *signature_buffer_copy = malloc(copy_size);
+    memcpy(signature_buffer_copy, signature_buffer, copy_size);
+    signature_buffer_copy[copy_size - 1] = '\0';
+    func->signature = signature_buffer_copy;
     ret = hashmap_put(global_func_map, func->name, func);
     if (ret != 0) {
         compiler_panic("function definition failed : %s", func->name);
@@ -86,15 +91,12 @@ int compile_func(struct scope_handler_t *scope, ast_node_decl_func_t *node) {
     struct bytecode_emitter_t body_emitter = compiler_emitter_buffered_new(256);
     struct scope_handler_t func_scope;
     struct scope_var_t func_local_vars[128];
+    frame_init_scope(&func_scope);
     func_scope.vars = func_local_vars;
     func_scope.vars_cap = 128;
-    func_scope.vars_off = 0;
-    func_scope.vars_max_size = 0;
-    func_scope.vars_size = 0;
-    func_scope.stack_size = 0;
+    func_scope.vars_max_size_ptr = &func_scope.vars_max_size;
     func_scope.stack_cap = INT32_MAX;
-    //TODO: calculate stack max size
-    func_scope.stack_max_size = 512;
+    func_scope.stack_max_size_ptr = &func_scope.stack_max_size;
     func_scope.parent = 0;
     func_scope.emitter = &body_emitter;
     func_scope.is_function_scope = 1;
@@ -106,8 +108,8 @@ int compile_func(struct scope_handler_t *scope, ast_node_decl_func_t *node) {
     }
     compile_scope(&func_scope, node->body);
 
-    uint16_t vars_size = func_scope.vars_max_size;
-    uint16_t stack_size = func_scope.stack_max_size;
+    uint16_t vars_size = (uint16_t) func_scope.vars_max_size;
+    uint16_t stack_size = (uint16_t) func_scope.stack_max_size;
     size_t body_size = body_emitter.size;
     ubyte_t *exec_data = (ubyte_t *) malloc(body_size + 4);
     vars_size = htobe16(vars_size);
@@ -122,8 +124,7 @@ int compile_func(struct scope_handler_t *scope, ast_node_decl_func_t *node) {
     uint16_t signature_index;
     const_pool_register_value(func_desc->signature, &signature_index);
 
-    if (scope->parent == 0) {
-        //TODO: make proper check to the root scope
+    if (scope->parent == 0 && !scope->is_function_scope) {
         vm_pool_const_t index = 0;
         vm_func_handle_t *func_handle = 0;
         vm_register_constant(signature_len, func_desc->signature, &index);
