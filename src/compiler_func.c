@@ -13,6 +13,10 @@
 
 map_t global_func_map;
 
+map_t compiler_get_global_function_map() {
+    return global_func_map;
+}
+
 const struct func_desc_t *compiler_define_func(ast_node_decl_func_t *func_node) {
     if (!global_func_map) {
         global_func_map = hashmap_new();

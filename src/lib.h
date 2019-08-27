@@ -16,6 +16,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
-#include <stdint-gcc.h>
+#include <stdint.h>
 
 #endif //PHANTOMSHELL_LIB_H

@@ -1,6 +1,7 @@
 ## Phantom Shell
 
-###[Wiki](docs/Home.md)
+### [Wiki](docs/Home.md)
+
 Language reference documents:
  [en](docs/reference/en/Intro.md) | [ru](docs/reference/ru/Intro.md)
  

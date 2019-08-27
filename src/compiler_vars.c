@@ -96,8 +96,27 @@ int ast_node_trace_binary_op_data_type(struct scope_handler_t *scope, ast_node_b
     ast_node_expr_t *left = binary_op->left;
     ast_node_expr_t *right = binary_op->right;
     if (binary_op->operator == FUNCTION_CALL) {
-        //TODO: trace function return value type
-        compiler_panic("unable to trace function return value static type");
+        // binary operator between identifier/member access operators and the group expression
+        if (left->type == AST_NODE_TYPE_IDENT) {
+            // global function call
+            ast_node_ident_t *left_ident = (ast_node_ident_t *) left;
+            map_t func_map = compiler_get_global_function_map();
+            struct func_desc_t *func;
+            int res = hashmap_get(func_map, left_ident->value, (any_t) &func);
+            if (res) {
+                //TODO: process errors
+                compiler_panic("%s:%d function not found : %s", __LINE__, __FILE__, left_ident->value);
+            }
+
+            static_type_t type = static_type_by_name(func->ret_type);
+            binary_op->left->static_type = type;
+            binary_op->right->static_type = type;
+            binary_op->static_type = type;
+            return 0;
+        } else {
+            //TODO: trace member function return value type
+            compiler_panic("unable to trace member function return value static type");
+        }
     }
     if (EXPR_NODE_STATIC_TYPE(left) == TYPE_UNKNWN) {
         ast_node_trace_data_type(scope, left);

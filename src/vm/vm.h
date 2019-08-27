@@ -34,10 +34,19 @@ typedef struct {
 } vm_frame_context_t;
 
 typedef struct {
+    // pointer to the caller activation record
+    void *caller_ar;
+    // pointer to the stack top (first free space byte)
+    void *caller_stack_top;
+} vm_activation_record_t;
+
+typedef struct {
     // constant reference to the method signature name
     uint16_t signature_index;
     // size of arguments which should be copied from the stack top
     uint16_t arg_size;
+    // size of data which should be copied back to caller stack
+    uint16_t ret_size;
     // count of local variables
     uint32_t vars_size;
     // stack size to allocate

@@ -16,6 +16,7 @@ const char *get_opcode_mnemonic(opcode_t opcode) {
         case OPCODE_NOP: return "nop";
         case OPCODE_EXSTK: return "exstk";
 
+        case OPCODE_IRETURN: return "ireturn";
         case OPCODE_ICONST: return "iconst";
         case OPCODE_ILOAD: return "iload";
         case OPCODE_ISAVE: return "isave";
@@ -33,6 +34,7 @@ const char *get_opcode_mnemonic(opcode_t opcode) {
         case OPCODE_ILT: return "ilt";
         case OPCODE_IGT: return "igt";
 
+        case OPCODE_FRETURN: return "freturn";
         case OPCODE_FCONST: return "fconst";
         case OPCODE_FLOAD: return "fload";
         case OPCODE_FSAVE: return "fsave";
@@ -48,7 +50,7 @@ const char *get_opcode_mnemonic(opcode_t opcode) {
 
         case OPCODE_CALL: return "call";
         default: {
-            printf("opcode mnemonic str: invalid opcode %hhu\n", opcode);
+            fprintf(stderr, "opcode mnemonic str: invalid opcode %hhu\n", opcode);
             return "!invalid opcode!";
         }
     }

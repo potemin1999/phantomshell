@@ -4,7 +4,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 set(CMAKE_C_FLAGS "-Wall -Wreturn-type")
-set(CMAKE_C_FLAGS_DEBUG "-g")
+set(CMAKE_C_FLAGS_DEBUG "-pg -g")
 set(CMAKE_C_FLAGS_RELEASE "-O2")
 
 project(PhantomShell)
@@ -21,9 +21,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${BUILD_PATH}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_PATH}/bin")
 set(CMAKE_RUN_CMD "$ENV{1}")
 
-set(CMAKE_C_FLAGS "-Wall")
-set(CMAKE_C_FLAGS_DEBUG "-pg")
-set(CMAKE_C_FLAGS_RELEASE "-O2")
 message("${CMAKE_RUN_CMD}")
 if ($ENV{SHELL} MATCHES "bash|csh|zsh")
     if ($ENV{AGENT} MATCHES "intellij")

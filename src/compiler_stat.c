@@ -11,10 +11,24 @@
 #include "compiler.h"
 #include "lexer.h"
 
-int compile_ret_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_node) {
-    UNUSED(scope)
-    UNUSED(if_node)
-    compiler_panic("compilation of ret statement is not yet implemented");
+int compile_ret_statement(struct scope_handler_t *scope, ast_node_stat_ret_t *ret_stat) {
+    compile_expression(scope, ret_stat->expr);
+    opcode_t opcode = 0;
+    switch (ret_stat->expr->static_type) {
+        case TYPE_INT: {
+            opcode = OPCODE_IRETURN;
+            break;
+        }
+        case TYPE_FLOAT: {
+            opcode = OPCODE_FRETURN;
+            break;
+        }
+        default: {
+            compiler_panic("%s:%d : unable to compile return statement for type %d",
+                           __FILE__, __LINE__, ret_stat->expr->static_type);
+        }
+    }
+    return compiler_emit_0(scope, opcode);
 }
 
 int compile_if_statement(struct scope_handler_t *scope, ast_node_stat_if_t *if_node) {
@@ -152,6 +166,7 @@ int compile_statement(struct scope_handler_t *scope, ast_node_stat_t *stat_node)
         case AST_NODE_TYPE_STAT_EXPR: return compile_expression(scope, ((ast_node_stat_expr_t *) stat_node)->expr);
         case AST_NODE_TYPE_STAT_IF: return compile_if_statement(scope, (ast_node_stat_if_t *) stat_node);
         case AST_NODE_TYPE_STAT_WHILE: return compile_while_statement(scope, (ast_node_stat_while_t *) stat_node);
+        case AST_NODE_TYPE_STAT_RET: return compile_ret_statement(scope, (ast_node_stat_ret_t *) stat_node);
         default: compiler_panic("uncompilable type of statement");
     }
 }

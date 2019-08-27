@@ -8,6 +8,7 @@
  */
 #include "lib.h"
 #include "vm/vm.h"
+#include "util/gdb_utils.h"
 #include "util/hashmap.h"
 
 // amount of memory allocated to constant pool
@@ -92,6 +93,56 @@ int vm_execute_opcodes(size_t data_len, void *data) {
     return (int) pc;
 }
 
+static inline
+int vm_execute_func_bytecode(size_t data_len, size_t arg_size, size_t ret_size, void *data) {
+#ifdef VM_EXECUTION_TRACE
+    printf("\033[2m\033[36mPSVM: %zu bytes is to be executed as a function:", data_len);
+    ubyte_t *data_bytes = (ubyte_t *) data;
+    for (size_t i = 0; i < data_len; i++) {
+        printf(" %#x,", data_bytes[i]);
+    }
+    printf("\033[0m\n");
+#endif
+    uint16_t *data_uint16 = (uint16_t *) data;
+    size_t activation_record_size = sizeof(vm_activation_record_t);
+    uint16_t vars_size = be16toh(data_uint16[0]);
+    uint16_t stack_size = be16toh(data_uint16[1]);
+    uint8_t vars[vars_size];
+    uint8_t stack[stack_size + activation_record_size];
+
+    current_frame->stack_ptr -= arg_size;
+    memcpy(vars, current_frame->stack_ptr, arg_size);
+
+    // put activation record
+    vm_activation_record_t *ar = (vm_activation_record_t *) &stack;
+    ar->caller_ar = current_frame->stack_start;
+    ar->caller_stack_top = current_frame->stack_ptr;
+
+    // prepare frame data
+    current_frame++;
+    current_frame->stack_ptr = stack + activation_record_size;
+    current_frame->stack_start = stack;
+    current_frame->stack_end = stack + stack_size;
+    current_frame->local_start = vars;
+    current_frame->local_end = vars + vars_size;
+    // -3 + 3 will be == to 0, and after tick the bytecode at the beginning of the function will run
+    current_frame->frame_pc = 0;
+
+    vm_pc_t pc = 0;
+    opcode_t opcode = 0;
+    data_len -= 4;
+    data += 4;
+    while (pc < data_len) {
+        opcode = *((ubyte_t *) data + pc);
+        vm_pc_t res = opcode_execute_funcs[opcode](current_frame, data + 1 + pc);
+        current_frame->frame_pc += res;
+        pc += res;
+    }
+
+    (current_frame - 1)->stack_ptr += ret_size;
+    return (int) ((current_frame--)->frame_pc);
+}
+
 
 vm_pc_t vm_execute_opcode_isave(vm_frame_context_t *frame, void *data) {
     ubyte_t index = ((ubyte_t *) data)[0];
@@ -121,6 +172,16 @@ vm_pc_t vm_execute_opcode_iconst(vm_frame_context_t *frame, void *data) {
     frame->stack_ptr += 4;
     vm_execution_trace("iconst    : %d", int_data);
     return pc_shift;
+}
+
+vm_pc_t vm_execute_opcode_ireturn(vm_frame_context_t *frame, void *data) {
+    vm_activation_record_t *ar = (vm_activation_record_t *) frame->stack_start;
+    int32_t *caller_int_stack = ar->caller_stack_top;
+    int32_t *current_int_stack = frame->stack_ptr;
+    *caller_int_stack = *(current_int_stack - 1);
+    vm_execution_trace("ireturn   : %d to caller stack at %p", *caller_int_stack, caller_int_stack);
+    // assign the pc to INT64_MAX to make it greater than the data_len and terminate execution loop
+    return (INT64_MAX - frame->frame_pc);
 }
 
 vm_pc_t vm_execute_opcode_iadd(vm_frame_context_t *frame, void *data) {
@@ -277,6 +338,16 @@ vm_pc_t vm_execute_opcode_fconst(vm_frame_context_t *frame, void *data) {
     return pc_shift;
 }
 
+vm_pc_t vm_execute_opcode_freturn(vm_frame_context_t *frame, void *data) {
+    vm_activation_record_t *ar = (vm_activation_record_t *) frame->stack_start;
+    float_t *caller_float_stack = ar->caller_stack_top;
+    float_t *current_float_stack = frame->stack_ptr;
+    *caller_float_stack = *(current_float_stack - 1);
+    vm_execution_trace("freturn   : %f to caller stack at %p", *caller_float_stack, caller_float_stack);
+    // assign the pc to INT64_MAX to make it greater than the data_len and terminate execution loop
+    return (INT64_MAX - frame->frame_pc);
+}
+
 vm_pc_t vm_execute_opcode_fadd(vm_frame_context_t *frame, void *data) {
     UNUSED(data)
     float_t *float_stack_ptr = (float_t *) frame->stack_ptr;
@@ -373,26 +444,10 @@ vm_pc_t vm_execute_opcode_call(vm_frame_context_t *frame, void *data) {
         vm_do_panic(frame, data, "Method handle not found : %s", constant);
     }
 
-    uint8_t *stack = (uint8_t *) malloc(func_handle->stack_size);
-    uint8_t *vars = (uint8_t *) malloc(func_handle->vars_size);
-    uint16_t arg_size = func_handle->arg_size;
-
-    memcpy(vars, current_frame->stack_ptr - arg_size, arg_size);
-
-    current_frame++;
-    current_frame->stack_ptr = stack;
-    current_frame->stack_start = stack;
-    current_frame->stack_end = stack + func_handle->stack_size;
-    current_frame->local_start = vars;
-    current_frame->local_end = vars + func_handle->vars_size;
-    // -3 + 3 will be == to 0, and after tick the bytecode at the beginning of the function will run
-    current_frame->frame_pc = 0;
     //TODO: make a workaround without recursion
     vm_execution_trace("call      : %d", h_index);
-    vm_execute_opcodes(func_handle->bytecode_size - 4, func_handle->bytecode_data + 4);
-    free(current_frame->stack_start);
-    free(current_frame->local_start);
-    current_frame--;
+    vm_execute_func_bytecode(func_handle->bytecode_size, func_handle->arg_size,
+                             func_handle->ret_size, func_handle->bytecode_data);
     return 3;
 }
 
@@ -454,6 +509,7 @@ int vm_register_function(vm_pool_const_t signature_index, size_t data_len, void 
     uint32_t signature_offset = global_const_pool.index[signature_index];
     void *signature_data_raw = global_const_pool.pool + signature_offset;
     uint16_t args_size = 0;
+    uint16_t ret_size = 0;
     const char *signature_str = signature_data_raw + 2;
     const char *signature_str_ptr = signature_str;
     while (*signature_str_ptr != '(') { signature_str_ptr++; }
@@ -469,10 +525,21 @@ int vm_register_function(vm_pool_const_t signature_index, size_t data_len, void 
         vm_do_panic(root_context, data, "Unknown function signature element : in %s at position %zu",
                     signature_str, (size_t) (signature_str_ptr - signature_str));
     }
+    ++signature_str_ptr;
+    if (*signature_str_ptr == 'I' ||
+        *signature_str_ptr == 'F') {
+        ret_size += 4;
+        ++signature_str_ptr;
+    } else {
+        //TODO: process return size of other data types
+        vm_do_panic(root_context, data, "Unknown function signature element : in %s at position %zu",
+                    signature_str, (size_t) (signature_str_ptr - signature_str));
+    }
     // allocate new handle
     vm_func_handle_t *handle = (vm_func_handle_t *) malloc(sizeof(vm_func_handle_t));
     handle->signature_index = signature_index;
     handle->arg_size = args_size;
+    handle->ret_size = ret_size;
     uint16_t vars_size_16 = 0;
     uint16_t stack_size_16 = 0;
     memcpy(&vars_size_16, data + 0, 2);
@@ -511,9 +578,14 @@ int vm_static_init() {
     call_stack[0].frame_pc = 0;
     call_stack[0].local_start = malloc(GLOBAL_VARIABLES_CAPACITY);
     call_stack[0].local_end = call_stack[0].local_start + GLOBAL_VARIABLES_CAPACITY;
-    call_stack[0].stack_start = malloc(GLOBAL_STACK_CAPACITY);
-    call_stack[0].stack_ptr = call_stack[0].stack_start;
-    call_stack[0].stack_end = call_stack[0].stack_start + GLOBAL_STACK_CAPACITY;
+    call_stack[0].stack_start = malloc(GLOBAL_STACK_CAPACITY + sizeof(vm_activation_record_t));
+    call_stack[0].stack_ptr = call_stack[0].stack_start + sizeof(vm_activation_record_t);
+    call_stack[0].stack_end = call_stack[0].stack_start + GLOBAL_STACK_CAPACITY + sizeof(vm_activation_record_t);
+
+    vm_activation_record_t *ar = (vm_activation_record_t*) call_stack->stack_start;
+    ar->caller_ar = 0;
+    ar->caller_stack_top = 0;
+
     current_frame = call_stack + 0;
     root_context = call_stack + 0;
 
@@ -523,6 +595,7 @@ int vm_static_init() {
     opcode_execute_funcs[OPCODE_ISAVE] = &vm_execute_opcode_isave;
     opcode_execute_funcs[OPCODE_ILOAD] = &vm_execute_opcode_iload;
     opcode_execute_funcs[OPCODE_ICONST] = &vm_execute_opcode_iconst;
+    opcode_execute_funcs[OPCODE_IRETURN] = &vm_execute_opcode_ireturn;
     opcode_execute_funcs[OPCODE_IADD] = &vm_execute_opcode_iadd;
     opcode_execute_funcs[OPCODE_ISUB] = &vm_execute_opcode_isub;
     opcode_execute_funcs[OPCODE_IMUL] = &vm_execute_opcode_imul;
@@ -538,6 +611,7 @@ int vm_static_init() {
     opcode_execute_funcs[OPCODE_FSAVE] = &vm_execute_opcode_fsave;
     opcode_execute_funcs[OPCODE_FLOAD] = &vm_execute_opcode_fload;
     opcode_execute_funcs[OPCODE_FCONST] = &vm_execute_opcode_fconst;
+    opcode_execute_funcs[OPCODE_FRETURN] = &vm_execute_opcode_freturn;
     opcode_execute_funcs[OPCODE_FADD] = &vm_execute_opcode_fadd;
     opcode_execute_funcs[OPCODE_FSUB] = &vm_execute_opcode_fsub;
     opcode_execute_funcs[OPCODE_FMUL] = &vm_execute_opcode_fmul;
@@ -555,17 +629,23 @@ int vm_static_init() {
 int vm_do_panic(vm_frame_context_t *frame, void *data, const char *format, ...) {
     setvbuf(stdout, 0, _IOLBF, 0);
     const char *format_text = "\033[91m"\
-    "\033[1m  *** VM panic ***  \n\033[21m\033[24m"\
+    "\n\033[1m  *** VM panic ***  \n\033[21m\033[24m"\
     "  Opcode      : %#x, mnemonic=%s\n"\
-    "  Frame       : at %p, pc=%p\n"\
+    "  Frame       : at %p, pc=%p, depth=%d\n"\
     "  Frame stack : %p in [%p;%p]\n"
                               "\033[0m";
     opcode_t opcode = *((uint8_t *) data - 1);
     const char *opcode_name = get_opcode_mnemonic(opcode);
-    printf(format_text,
-           opcode, opcode_name,
-           frame, frame->frame_pc,
-           frame->stack_ptr, frame->stack_start, frame->stack_end);
+    unsigned long stack_depth = (frame - call_stack) / sizeof(vm_frame_context_t);
+    if (stack_depth > CALL_STACK_MAX_SIZE) {
+        // standalone
+        //stack_depth = 0;
+    }
+    fflush(stdout);
+    fprintf(stderr, format_text,
+            opcode, opcode_name,
+            frame, frame->frame_pc, stack_depth,
+            frame->stack_ptr, frame->stack_start, frame->stack_end);
     if (format) {
         va_list list;
         va_start(list, format);
@@ -573,5 +653,7 @@ int vm_do_panic(vm_frame_context_t *frame, void *data, const char *format, ...) 
         va_end(list);
         printf("\n");
     }
+    dump_heap_info();
+    dump_stack_info();
     exit(EXIT_CODE_VM_PANIC);
 }

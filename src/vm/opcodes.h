@@ -38,6 +38,8 @@ typedef unsigned char opcode_t;
 */
 #define OPCODE_ICONST   0x36 // 54 // ( -> value ) : puts integer on the stack
 #define OPCODE_FCONST   0x37 // 55 // ( -> value ) : puts float on the stack
+#define OPCODE_IRETURN  0x38 // 56 // ( value -> ) : puts integer to the caller stack and exits from current function
+#define OPCODE_FRETURN  0x39 // 57 // ( value -> ) : puts float to the caller stack and exits from current function
 
 #define OPCODE_IADD     0x42 // 66 // ( value_1,value_2 -> value_3) : value_1 + value_2 = value_3, integers
 #define OPCODE_ISUB     0x43 // 67 // ( value_1,value_2 -> value_3) : value_1 - value_2 = value_3, integers
