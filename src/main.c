@@ -33,7 +33,8 @@ int read_long_option(const char **word_ptr, int words_left) {
 int main(int argc, const char **argv) {
     pid_t interpreter_pid = getpid();
     printf("Phantom Shell interpreter. PID %d\n", interpreter_pid);
-    setvbuf(stdout, 0, _IOLBF, 0);
+    setvbuf(stdout, 0, _IOFBF, 0);
+    setvbuf(stderr, 0, _IOFBF, 0);
     vm_static_init();
     compiler_init();
     const char **curr_arg = argv + 1;

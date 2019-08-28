@@ -18,9 +18,6 @@ map_t compiler_get_global_function_map() {
 }
 
 const struct func_desc_t *compiler_define_func(ast_node_decl_func_t *func_node) {
-    if (!global_func_map) {
-        global_func_map = hashmap_new();
-    }
     struct func_desc_t *func;
     int ret = hashmap_get(global_func_map, func_node->name, (any_t) &func);
     if (ret != -3) {
@@ -79,9 +76,6 @@ const struct func_desc_t *compiler_define_func(ast_node_decl_func_t *func_node) 
 }
 
 const struct func_desc_t *compiler_lookup_func_by_name(const char *name) {
-    if (!global_func_map) {
-        global_func_map = hashmap_new();
-    }
     struct func_desc_t *func = 0;
     int ret = hashmap_get(global_func_map, name, (any_t) &func);
     if (ret != 0) {
@@ -136,5 +130,26 @@ int compile_func(struct scope_handler_t *scope, ast_node_decl_func_t *node) {
         return 0;
     } else {
         compiler_panic("unable to compile global func node: non root scope");
+    }
+}
+
+const struct func_desc_t builtin_funcs[1] = {
+        {
+                .name = "psh_panic",
+                .signature = "psh_panic(I)",
+                .args_size = 4,
+                .args_count = 1,
+                .args = 0,
+                .ret_type = "V",
+        }
+};
+
+void compiler_init_builtins() {
+    global_func_map = hashmap_new();
+    size_t builtins_len = sizeof(builtin_funcs) / sizeof(struct func_desc_t);
+    for (size_t i = 0; i < builtins_len; i++) {
+        uint16_t out_index;
+        const_pool_register_value(builtin_funcs[i].signature, &out_index);
+        hashmap_put(global_func_map, builtin_funcs[i].name, (any_t) &(builtin_funcs[i]));
     }
 }

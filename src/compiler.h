@@ -137,6 +137,8 @@ struct scope_handler_t *compiler_get_root_frame();
 
 map_t compiler_get_global_function_map();
 
+void compiler_init_builtins();
+
 const struct scope_var_t *frame_lookup_var_by_name(struct scope_handler_t *scope,
                                                    const char *name, bool_t use_parents);
 

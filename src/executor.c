@@ -49,6 +49,7 @@ const char *get_opcode_mnemonic(opcode_t opcode) {
         case OPCODE_JNEZ: return "jnez";
 
         case OPCODE_CALL: return "call";
+        case OPCODE_PANIC: return "panic";
         default: {
             fprintf(stderr, "opcode mnemonic str: invalid opcode %hhu\n", opcode);
             return "!invalid opcode!";

@@ -48,6 +48,7 @@ int compiler_init() {
     current_file = malloc(sizeof(struct program_file_t));
     current_file->package = "";
     current_file->functions_map = hashmap_new();
+    compiler_init_builtins();
     return 0;
 }
 

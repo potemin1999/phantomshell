@@ -490,6 +490,7 @@ int vm_register_constant(size_t const_size, const char *constant, vm_pool_const_
         *out_index = global_const_pool.index_size;
     }
     ++global_const_pool.index_size;
+    global_const_pool.size += const_size_16 + 2;
     vm_execution_trace("\033[32mREGISTERED\033[34m: root pool const %s at index %u",
                        constant, global_const_pool.index_size - 1);
     return 0;
@@ -530,10 +531,11 @@ int vm_register_function(vm_pool_const_t signature_index, size_t data_len, void 
         *signature_str_ptr == 'F') {
         ret_size += 4;
         ++signature_str_ptr;
-    } else {
         //TODO: process return size of other data types
-        vm_do_panic(root_context, data, "Unknown function signature element : in %s at position %zu",
-                    signature_str, (size_t) (signature_str_ptr - signature_str));
+    } else if (*signature_str_ptr == 'O') {
+        // returning object reference
+        const size_t objectref_size = 8;
+        ret_size += objectref_size;
     }
     // allocate new handle
     vm_func_handle_t *handle = (vm_func_handle_t *) malloc(sizeof(vm_func_handle_t));
@@ -582,7 +584,7 @@ int vm_static_init() {
     call_stack[0].stack_ptr = call_stack[0].stack_start + sizeof(vm_activation_record_t);
     call_stack[0].stack_end = call_stack[0].stack_start + GLOBAL_STACK_CAPACITY + sizeof(vm_activation_record_t);
 
-    vm_activation_record_t *ar = (vm_activation_record_t*) call_stack->stack_start;
+    vm_activation_record_t *ar = (vm_activation_record_t *) call_stack->stack_start;
     ar->caller_ar = 0;
     ar->caller_stack_top = 0;
 
@@ -623,16 +625,17 @@ int vm_static_init() {
     opcode_execute_funcs[OPCODE_RJMP] = &vm_execute_opcode_rjmp;
 
     opcode_execute_funcs[OPCODE_CALL] = &vm_execute_opcode_call;
+    vm_load_builtin_functions();
     return 0;
 }
 
 int vm_do_panic(vm_frame_context_t *frame, void *data, const char *format, ...) {
-    setvbuf(stdout, 0, _IOLBF, 0);
     const char *format_text = "\033[91m"\
     "\n\033[1m  *** VM panic ***  \n\033[21m\033[24m"\
     "  Opcode      : %#x, mnemonic=%s\n"\
     "  Frame       : at %p, pc=%p, depth=%d\n"\
-    "  Frame stack : %p in [%p;%p]\n"
+    "  Frame stack : %p in [%p;%p]\n"\
+    "  AR          : ret to %p\n"\
                               "\033[0m";
     opcode_t opcode = *((uint8_t *) data - 1);
     const char *opcode_name = get_opcode_mnemonic(opcode);
@@ -641,11 +644,13 @@ int vm_do_panic(vm_frame_context_t *frame, void *data, const char *format, ...) 
         // standalone
         //stack_depth = 0;
     }
+    vm_activation_record_t *record = (vm_activation_record_t *) frame->stack_start;
     fflush(stdout);
     fprintf(stderr, format_text,
             opcode, opcode_name,
             frame, frame->frame_pc, stack_depth,
-            frame->stack_ptr, frame->stack_start, frame->stack_end);
+            frame->stack_ptr, frame->stack_start, frame->stack_end,
+            record->caller_stack_top);
     if (format) {
         va_list list;
         va_start(list, format);

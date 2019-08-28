@@ -71,4 +71,6 @@ int vm_register_function(vm_pool_const_t signature_index, size_t data_len, void 
 
 int vm_register_class(vm_pool_const_t name_index, size_t data_len, void *data);
 
+int vm_load_builtin_functions();
+
 #endif //SHELL_VM_H
